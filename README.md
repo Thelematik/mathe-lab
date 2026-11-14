@@ -1,2 +1,2 @@
-# mathel-lab
+# mathe-lab
 World of Math
