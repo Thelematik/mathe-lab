@@ -1,6 +1,14 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Termwerkstatt</title>
 <link rel="stylesheet" href="../assets/fonts/fonts.css">
+<style id="typo-basis">
+/* Einheitliche Schriften: Text Source Sans 3, Überschriften Source Serif 4, Zahlen Source Code Pro */
+html{font-size:16px}
+body{font-family:"Source Sans 3", system-ui, sans-serif}
+h1,h2,h3{font-family:"Source Serif 4", Georgia, serif}
+button,input,select,textarea{font-family:inherit}
+code,kbd,samp,pre{font-family:"Source Code Pro", ui-monospace, monospace}
+</style>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
 /* Layout: Karopapier als Grund, kompakte Kopfzeile mit Reitern, darunter je Reiter Merke, Beispiel, Anschauung, Übung */
@@ -9,7 +17,7 @@
   --x:#1c5fd1; --x-soft:#dde8fb; --y:#11804a; --y-soft:#d9f1e4; --v:#7a3ec0; --v-soft:#ede3f8;
   --red:#c2302a; --red-soft:#fbe4e1; --n:#5f6a78; --n-soft:#eceff3;
   --hl:#ffe680; --hl-ink:#18212c; --merke:#fff9de; --merke-line:#d9b84a; --btn:#18212c; --btn-ink:#ffffff;
-  --f-ui:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --f-ui:"Source Sans 3","Segoe UI",system-ui,sans-serif;
   --f-math:"STIX Two Text","Cambria Math","Times New Roman",serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
@@ -601,8 +609,8 @@ function init(){
     else if(e.key==='ArrowLeft'&&!e.target.closest('.tabs')){st&&st.prev();e.preventDefault()}
     else if(/^[1-9]$/.test(e.key))show(+e.key)});
   const scales=[.8,.9,1,1.12,1.25,1.4,1.6];let si=2;
-  try{const v=+localStorage.getItem('tw-scale');if(v>=0&&v<scales.length)si=v}catch(_){}
-  const applyScale=()=>{document.documentElement.style.fontSize=(18*scales[si])+'px';try{localStorage.setItem('tw-scale',si)}catch(_){}};applyScale();
+  try{const raw=localStorage.getItem('tw-scale');const v=+raw;if(raw!==null&&v>=0&&v<scales.length)si=v}catch(_){}
+  const applyScale=()=>{document.documentElement.style.fontSize=(19*scales[si])+'px';try{localStorage.setItem('tw-scale',si)}catch(_){}};applyScale();
   document.getElementById('fsm').onclick=()=>{if(si>0){si--;applyScale()}};
   document.getElementById('fsp').onclick=()=>{if(si<scales.length-1){si++;applyScale()}};
   const root=document.documentElement,tb=document.getElementById('theme');

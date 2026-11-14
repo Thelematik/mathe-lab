@@ -1,15 +1,23 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:17px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Hypothesentest-Labor</title>
 <link rel="stylesheet" href="../assets/fonts/fonts.css">
+<style id="typo-basis">
+/* Einheitliche Schriften: Text Source Sans 3, Überschriften Source Serif 4, Zahlen Source Code Pro */
+html{font-size:19px}
+body{font-family:"Source Sans 3", system-ui, sans-serif}
+h1,h2,h3{font-family:"Source Serif 4", Georgia, serif}
+button,input,select,textarea{font-family:inherit}
+code,kbd,samp,pre{font-family:"Source Code Pro", ui-monospace, monospace}
+</style>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
 /* Layout: Kopfzeile, Testaufbau als durchgehende Leiste, Reiter, darunter Zeichenfläche links und Auswertung rechts; schmal einspaltig */
 :root{
   --paper:#edf1f4; --sheet:#ffffff; --ink:#13212c; --muted:#556776; --line:#d2dce4; --grid:#e3e9ee; --axis:#7a8b99;
   --curve:#0e6584; --reject:#b03f74; --keep:#7a8b99; --beta:#dc8f1e; --good:#2c7a4b; --warn:#a4570f; --on-curve:#ffffff;
-  --font-display:"Newsreader","Iowan Old Style",Georgia,serif;
+  --font-display:"Source Serif 4","Iowan Old Style",Georgia,serif;
   --font-body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
-  --font-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+  --font-mono:"Source Code Pro",ui-monospace,"SFMono-Regular",Consolas,monospace;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
@@ -22,7 +30,7 @@
   --curve:#5ec4e2; --reject:#ec8fbb; --keep:#6d8292; --beta:#f1b155; --good:#6cc596; --warn:#f0a35a; --on-curve:#0b1a22; color-scheme:dark;
 }
 [hidden]{display:none!important}
-body{background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.5}
+body{background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:20.5px;line-height:1.5}
 .wrap{max-width:1380px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:22px 48px}
 h1,h2,h3{font-family:var(--font-display);font-weight:500;text-wrap:balance;margin:0}
 .top{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;margin-bottom:16px}
@@ -262,7 +270,7 @@ function plot(cv,xr,yr,o={}){
   const pad={l:o.padL||58,r:16,t:14,b:30};
   const X=x=>pad.l+(x-xr[0])/(xr[1]-xr[0])*(w-pad.l-pad.r);
   const Y=y=>h-pad.b-(y-yr[0])/(yr[1]-yr[0])*(h-pad.t-pad.b);
-  const fs=w<500?11:13;ctx.font=`${fs}px "JetBrains Mono",ui-monospace,monospace`;
+  const fs=w<500?11:13;ctx.font=`${fs}px "Source Code Pro",ui-monospace,monospace`;
   const xs=o.xStep||Math.max(o.minX||0,nice(xr[1]-xr[0],w<500?5:9)),ys=nice(yr[1]-yr[0],o.yTicks||5);
   ctx.lineWidth=1;ctx.strokeStyle=C('--grid');ctx.fillStyle=C('--muted');ctx.textAlign='center';ctx.textBaseline='top';
   for(let i=Math.ceil(xr[0]/xs-1e-9);i*xs<=xr[1]+1e-9;i++){const x=i*xs+0,px=X(x);ctx.beginPath();ctx.moveTo(px,pad.t);ctx.lineTo(px,h-pad.b);ctx.stroke();ctx.fillText(fmtT(x,dec(xs)),px,h-pad.b+7);}
@@ -272,7 +280,7 @@ function plot(cv,xr,yr,o={}){
   return {ctx,X,Y,w,h,pad,xr,yr};
 }
 function clip(P){const c=P.ctx;c.save();c.beginPath();c.rect(P.pad.l,P.pad.t-2,P.w-P.pad.l-P.pad.r,P.h-P.pad.t-P.pad.b+2);c.clip();}
-function label(P,text,px,py,color,o={}){const c=P.ctx;c.save();c.font=`600 ${P.w<500?11:13}px "JetBrains Mono",ui-monospace,monospace`;const w=c.measureText(text).width;let x=Math.max(P.pad.l+2,Math.min(P.w-P.pad.r-w-4,px-w/2));let y=Math.max(P.pad.t,Math.min(P.h-P.pad.b-20,py));c.globalAlpha=.9;c.fillStyle=C('--sheet');c.fillRect(x-4,y-1,w+8,19);c.globalAlpha=1;c.fillStyle=color||C('--ink');c.textBaseline='top';c.textAlign='left';c.fillText(text,x,y+1);c.restore();}
+function label(P,text,px,py,color,o={}){const c=P.ctx;c.save();c.font=`600 ${P.w<500?11:13}px "Source Code Pro",ui-monospace,monospace`;const w=c.measureText(text).width;let x=Math.max(P.pad.l+2,Math.min(P.w-P.pad.r-w-4,px-w/2));let y=Math.max(P.pad.t,Math.min(P.h-P.pad.b-20,py));c.globalAlpha=.9;c.fillStyle=C('--sheet');c.fillRect(x-4,y-1,w+8,19);c.globalAlpha=1;c.fillStyle=color||C('--ink');c.textBaseline='top';c.textAlign='left';c.fillText(text,x,y+1);c.restore();}
 function vline(P,x,color,dash=[5,4],lw=1.6){if(x<P.xr[0]||x>P.xr[1])return;const c=P.ctx;c.save();c.strokeStyle=color;c.lineWidth=lw;c.setLineDash(dash);c.beginPath();c.moveTo(P.X(x),P.Y(P.yr[0]));c.lineTo(P.X(x),P.pad.t);c.stroke();c.restore();}
 function dot(P,x,y,color){const c=P.ctx;c.save();c.fillStyle=color;c.strokeStyle=C('--sheet');c.lineWidth=2;c.beginPath();c.arc(P.X(x),P.Y(y),5.5,0,7);c.fill();c.stroke();c.restore();}
 function bars(P,D,colorOf){const c=P.ctx;clip(P);const k0=Math.max(0,Math.floor(P.xr[0])),k1=Math.min(D.n,Math.ceil(P.xr[1]));for(let k=k0;k<=k1;k++){const L=P.X(k-.5),R=P.X(k+.5),T=P.Y(D.f[k]),b=P.Y(0);const [col,a]=colorOf(k);c.globalAlpha=a;c.fillStyle=col;c.fillRect(L,T,R-L,b-T);if(R-L>5){c.globalAlpha=1;c.strokeStyle=col;c.lineWidth=1;c.strokeRect(L+.5,T+.5,R-L-1,b-T);}}c.globalAlpha=1;c.restore();}

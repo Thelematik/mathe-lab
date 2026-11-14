@@ -1,6 +1,14 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:18px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Würfel und Raumdiagonalen</title>
 <link rel="stylesheet" href="../assets/fonts/fonts.css">
+<style id="typo-basis">
+/* Einheitliche Schriften: Text Source Sans 3, Überschriften Source Serif 4, Zahlen Source Code Pro */
+html{font-size:21px}
+body{font-family:"Source Sans 3", system-ui, sans-serif}
+h1,h2,h3{font-family:"Source Serif 4", Georgia, serif}
+button,input,select,textarea{font-family:inherit}
+code,kbd,samp,pre{font-family:"Source Code Pro", ui-monospace, monospace}
+</style>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
 /* Layout: links die 3D Ansicht auf Millimeterpapier, rechts das Rechenblatt; darunter die Herleitung als Folge von Schritten */
@@ -8,9 +16,9 @@
   --bg:#eef2f4; --panel:#ffffff; --ink:#16212b; --muted:#566573; --line:#d3dce3; --grid:#dfe6eb;
   --edge:#22303c; --face:#5d7a92; --fdiag:#13798a; --rdiag:#c4451b; --tri:#d99a0b; --arc:#7340b5; --accent:#13798a;
   --chip:#e4ebef;
-  --display:"Zilla Slab", Rockwell, Georgia, serif;
+  --display:"Source Serif 4", Rockwell, Georgia, serif;
   --body:"Source Sans 3", "Segoe UI", system-ui, sans-serif;
-  --mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+  --mono:"Source Code Pro", ui-monospace, Consolas, monospace;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0e151c; --panel:#151f29; --ink:#e4ecf2; --muted:#93a4b3; --line:#2a3845; --grid:#18232d;
@@ -23,7 +31,7 @@
 :root[data-theme="light"]{color-scheme:light}
 
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:21px;line-height:1.5;
   padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:20px 40px}
 .wrap{max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
 header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
@@ -627,7 +635,7 @@ const W=640,H=480,PAD=60;
 function draw(){
   const r=FIG[ps.fig].solve(ps.given[ps.fig],vals());const svg=$('psvg');
   $('pwarn').hidden=r.ok;
-  if(!r.ok){$('pwarn').textContent=r.msg;svg.innerHTML=`<text x="${W/2}" y="${H/2}" text-anchor="middle" style="fill:var(--muted);font:600 18px var(--body)">Mit diesen Werten gibt es keine Figur.</text>`;
+  if(!r.ok){$('pwarn').textContent=r.msg;svg.innerHTML=`<text x="${W/2}" y="${H/2}" text-anchor="middle" style="fill:var(--muted);font:600 23.5px var(--body)">Mit diesen Werten gibt es keine Figur.</text>`;
     $('presults').innerHTML='';$('pcalc').innerHTML='';return;}
   const xs=Object.values(r.pts).map(p=>p[0]),ys=Object.values(r.pts).map(p=>p[1]);
   const minx=Math.min(...xs),maxx=Math.max(...xs),miny=Math.min(...ys),maxy=Math.max(...ys);
@@ -649,7 +657,7 @@ function draw(){
     const cr=u[0]*w[1]-u[1]*w[0];
     out+=`<path d="M${v[0]},${v[1]} L${s1[0]},${s1[1]} A${rad},${rad} 0 0 ${cr>0?1:0} ${s2[0]},${s2[1]} Z" style="fill:var(--arc);fill-opacity:.28;stroke:var(--arc);stroke-width:1.5"/>`;
     let bx=u[0]/lu+w[0]/lw,by=u[1]/lu+w[1]/lw;const bl=Math.hypot(bx,by)||1;bx/=bl;by/=bl;
-    out+=`<text x="${v[0]+bx*(rad+14)}" y="${v[1]+by*(rad+14)}" text-anchor="middle" dominant-baseline="central" style="fill:var(--arc);font:700 19px var(--display)">${sym}</text>`;
+    out+=`<text x="${v[0]+bx*(rad+14)}" y="${v[1]+by*(rad+14)}" text-anchor="middle" dominant-baseline="central" style="fill:var(--arc);font:700 24.5px var(--display)">${sym}</text>`;
   });
   // rechter Winkel
   {const [R,P,Q]=r.right.map(k=>T[k]);const d1=[P[0]-R[0],P[1]-R[1]],d2=[Q[0]-R[0],Q[1]-R[1]];const l1=Math.hypot(...d1),l2=Math.hypot(...d2);const q=Math.min(13,l1*.3,l2*.3);
@@ -658,7 +666,7 @@ function draw(){
   // Seitenbeschriftungen
   const lab=(p,q,text,outward,color)=>{const m=[(T[p][0]+T[q][0])/2,(T[p][1]+T[q][1])/2];let nx=-(T[q][1]-T[p][1]),ny=T[q][0]-T[p][0];const l=Math.hypot(nx,ny)||1;nx/=l;ny/=l;
     if(outward&&((m[0]-cen[0])*nx+(m[1]-cen[1])*ny)<0){nx=-nx;ny=-ny;}
-    out+=`<text x="${m[0]+nx*15}" y="${m[1]+ny*15}" text-anchor="middle" dominant-baseline="central" style="fill:${color};font:italic 600 16px var(--body)">${text.replace('_c','<tspan baseline-shift="sub" style="font-size:11px">c</tspan>')}</text>`;};
+    out+=`<text x="${m[0]+nx*15}" y="${m[1]+ny*15}" text-anchor="middle" dominant-baseline="central" style="fill:${color};font:italic 600 21px var(--body)">${text.replace('_c','<tspan baseline-shift="sub" style="font-size:14.5px">c</tspan>')}</text>`;};
   r.sides.forEach(([p,q,t])=>lab(p,q,t,true,'var(--ink)'));
   r.aux.forEach(([p,q,t])=>{if(t)lab(p,q,t,false,'var(--fdiag)');});
   // Punkte
@@ -667,7 +675,7 @@ function draw(){
     let dx=p[0]-cen[0],dy=p[1]-cen[1];const l=Math.hypot(dx,dy);
     if(l<1||isAux){dx=0.7;dy=-0.7;}else{dx/=l;dy/=l;}
     const off=isAux?16:22;
-    out+=`<text x="${p[0]+dx*off}" y="${p[1]+dy*off}" text-anchor="middle" dominant-baseline="central" style="fill:var(--ink);font:600 16px var(--mono)">${k}</text>`;});
+    out+=`<text x="${p[0]+dx*off}" y="${p[1]+dy*off}" text-anchor="middle" dominant-baseline="central" style="fill:var(--ink);font:600 21px var(--mono)">${k}</text>`;});
   svg.innerHTML=out;
   $('presults').innerHTML=r.results.map(([k,v])=>`<tr><td>${k}</td><td>${v}</td></tr>`).join('');
   $('pcalc').innerHTML=r.steps.map(st=>(st.h?'<h4>'+st.h+'</h4>':'')+(st.p?'<p>'+st.p+'</p>':'')+(st.x||[]).map(l=>'<div class="mrow">'+tex(l)+'</div>').join('')).join('');
