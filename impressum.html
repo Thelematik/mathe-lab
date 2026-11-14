@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Impressum · Mathematik zum Ausprobieren</title>
+<style>
+  :root {
+    --ink: #1f3a5f;
+    --ink-soft: #4a6489;
+    --paper: #fbfaf6;
+    --grid: #e3e8ef;
+    --margin: #d9534f;
+    --card: #ffffff;
+    --line: #d6dde6;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink);
+    background-color: var(--paper);
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 22px 22px;
+    line-height: 1.55;
+  }
+  header {
+    background: var(--paper);
+    border-bottom: 2px solid var(--margin);
+    padding: 2.2rem 1.25rem 1.6rem;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(1.7rem, 4vw, 2.3rem);
+    margin: 0 0 .3rem;
+  }
+  .back { color: var(--ink-soft); font-size: .95rem; }
+  .back a { color: var(--ink); }
+  main { padding: 1.5rem 1.25rem 3rem; }
+  .box {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 1.2rem 1.4rem;
+    margin-bottom: 1.2rem;
+    box-shadow: 0 1px 3px rgba(31,58,95,.06);
+  }
+  h2 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.25rem;
+    margin: 0 0 .5rem;
+  }
+  p { margin: 0 0 .6rem; }
+  p:last-child { margin-bottom: 0; }
+  address { font-style: normal; }
+  a { color: var(--ink); }
+  footer {
+    border-top: 1px solid var(--line);
+    background: var(--paper);
+    padding: 1.2rem 1.25rem;
+    font-size: .85rem;
+    color: var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>Impressum</h1>
+    <p class="back"><a href="./">Zurück zur Startseite</a></p>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="box">
+    <h2>Angaben gemäß § 18 Abs. 1 MStV</h2>
+    <address>
+      Steffen Thel<br>
+      c/o Hohe Landesschule Hanau<br>
+      Alter Rückinger Weg 53<br>
+      63452 Hanau
+    </address>
+  </div>
+
+  <div class="box">
+    <h2>Über dieses Angebot</h2>
+    <p>Diese Seite ist eine Materialsammlung für den Mathematikunterricht. Sie enthält interaktive Tools, Labore, Erklärungen und Übungen, die frei und ohne Anmeldung genutzt werden können.</p>
+    <p>Es handelt sich um ein nichtkommerzielles Angebot. Es gibt keine Werbung und keine Anmeldung.</p>
+  </div>
+
+  <div class="box">
+    <h2>Datenschutz</h2>
+    <p>Diese Seite verwendet keine Cookies, keine Analysewerkzeuge und speichert keine Eingaben. Alle Berechnungen in den Tools laufen ausschließlich im eigenen Browser.</p>
+    <p>Die Seite wird über GitHub Pages bereitgestellt (GitHub Inc., USA). Beim Aufruf verarbeitet GitHub technisch notwendige Daten wie die IP-Adresse, um die Seite ausliefern und absichern zu können. Näheres dazu steht in der <a href="https://docs.github.com/de/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">Datenschutzerklärung von GitHub</a>.</p>
+  </div>
+
+  <div class="box">
+    <h2>Haftung für Links</h2>
+    <p>Für die Inhalte verlinkter externer Seiten sind ausschließlich deren Betreiber verantwortlich. Sollten verlinkte Inhalte rechtswidrig sein, werden die Links nach Kenntnis umgehend entfernt.</p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    Verantwortlich: S. Thel · <a href="./">Startseite</a>
+  </div>
+</footer>
+
+</body>
+</html>
