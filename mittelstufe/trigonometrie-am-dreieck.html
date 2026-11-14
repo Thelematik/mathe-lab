@@ -1,0 +1,495 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Trigonometrie am Dreieck</title>
+<link rel="stylesheet" href="../assets/fonts/fonts.css">
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: Tafelfläche (Karopapier) links, Bedienpult rechts; Stufen als Kopfleiste. Für Beamer: große Schrift, kräftige Linien. */
+:root{
+  --bg:#e9edf2; --paper:#fbfcfd; --ink:#17202b; --muted:#5a6575; --line:#cfd7e1; --grid:#e1e8f0;
+  --accent:#2c4a7a; --accent-ink:#ffffff;
+  --opp:#cc2b26; --adj:#1c5fc2; --hyp:#17834a; --tan:#b0600a;
+  --fill:#2c4a7a10; --angle:#e5a3284f; --angle-dim:#8a94a226;
+  --f-display:"Zilla Slab",Georgia,"Times New Roman",serif;
+  --f-body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e131a; --paper:#151c26; --ink:#e6ebf2; --muted:#97a2b2; --line:#2a3544; --grid:#1d2631;
+  --accent:#8fb1ea; --accent-ink:#0e131a;
+  --opp:#ff6a5c; --adj:#5ea6ff; --hyp:#4cc585; --tan:#f2a447;
+  --fill:#8fb1ea12; --angle:#f0b44a40; --angle-dim:#97a2b222; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e131a; --paper:#151c26; --ink:#e6ebf2; --muted:#97a2b2; --line:#2a3544; --grid:#1d2631;
+  --accent:#8fb1ea; --accent-ink:#0e131a;
+  --opp:#ff6a5c; --adj:#5ea6ff; --hyp:#4cc585; --tan:#f2a447;
+  --fill:#8fb1ea12; --angle:#f0b44a40; --angle-dim:#97a2b222; color-scheme:dark}
+
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.4}
+.app{display:grid;grid-template-rows:auto 1fr;gap:12px;box-sizing:border-box;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 16px}
+@media (min-width:960px){html,body{height:100%}.app{height:100%}}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px}
+.brand{flex:1 1 260px;min-width:0}
+.eyebrow{font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h1{font-family:var(--f-display);font-weight:600;font-size:clamp(1.45rem,2.5vw,2.2rem);margin:2px 0 0;text-wrap:balance;line-height:1.1}
+.steps{display:flex;flex-wrap:wrap;gap:6px}
+button{font:inherit;color:inherit;cursor:pointer}
+.steps button{border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:7px 12px;font-size:.95rem;display:flex;gap:7px;align-items:baseline}
+.steps button b{font-family:var(--f-mono);font-size:.85rem;color:var(--muted)}
+.steps button[aria-current="step"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.steps button[aria-current="step"] b{color:inherit}
+.ghostbtn{border:1px solid var(--line);background:transparent;border-radius:8px;padding:7px 12px}
+button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:14px;min-height:0}
+@media (max-width:959px){.stage{grid-template-columns:1fr}}
+.board{background:var(--paper);border:1px solid var(--line);border-radius:10px;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.question{margin:0;padding:12px 18px;font-size:clamp(1.05rem,1.5vw,1.35rem);border-bottom:1px solid var(--line);text-wrap:balance}
+#board{display:block;width:100%;flex:1;min-height:300px;touch-action:none;font-family:var(--f-body)}
+#board .lbl{paint-order:stroke;stroke:var(--paper);stroke-width:7px;stroke-linejoin:round}
+#board .mono{font-family:var(--f-mono)}
+.panel{display:flex;flex-direction:column;gap:12px;min-width:0;min-height:0;overflow:auto}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.card h2{margin:0;font-family:var(--f-display);font-weight:600;font-size:1.05rem}
+.ctl{display:flex;flex-direction:column;gap:4px}
+.ctl .row{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.ctl output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-weight:600}
+input[type=range]{width:100%;accent-color:var(--accent);height:26px;margin:0}
+.sw{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+.sw input{width:20px;height:20px;accent-color:var(--accent);margin:0}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg label{flex:1;text-align:center;padding:6px 0;cursor:pointer;font-weight:600}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label:has(input:checked){background:var(--accent);color:var(--accent-ink)}
+.seg label:has(input:focus-visible){outline:3px solid var(--accent);outline-offset:-3px}
+.playbtn{border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:8px;padding:8px 12px;font-weight:600}
+.readout{font-size:1.02rem}
+.readout table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+.readout th,.readout td{padding:4px 6px;text-align:right;border-bottom:1px solid var(--line)}
+.readout th:first-child,.readout td:first-child{text-align:left}
+.readout th{font-weight:600;color:var(--muted);font-size:.9rem}
+.readout td{font-family:var(--f-mono)}
+.readout .cap{font-size:.85rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:0}
+.ratio{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:1.1rem}
+.ratio:last-child{border-bottom:0}
+.ratio .fn{font-weight:700;font-family:var(--f-display);font-size:1.2rem}
+.ratio .val{font-family:var(--f-mono);font-weight:600;margin-left:auto}
+math{font-size:1.15em}
+.t-opp{color:var(--opp);font-weight:600}.t-adj{color:var(--adj);font-weight:600}.t-hyp{color:var(--hyp);font-weight:600}.t-tan{color:var(--tan);font-weight:600}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;font-family:var(--f-mono);font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+.big{font-family:var(--f-mono);font-size:1.5rem;font-weight:600}
+.note{font-size:.95rem;color:var(--muted);margin:0}
+.nav{display:flex;gap:8px}
+.nav button{flex:1;border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:10px;font-weight:600}
+.nav button:disabled{opacity:.4;cursor:default}
+.keys{font-size:.82rem;color:var(--muted);margin:0}
+kbd{font-family:var(--f-mono);border:1px solid var(--line);border-radius:4px;padding:0 4px}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <div class="eyebrow">Klasse 10 · Einführung Trigonometrie</div>
+      <h1 id="stTitle">Ähnliche Dreiecke</h1>
+    </div>
+    <nav class="steps" id="steps" aria-label="Stufen"></nav>
+    <button class="ghostbtn" id="fs" type="button">Vollbild</button>
+  </header>
+
+  <main class="stage">
+    <section class="board">
+      <p class="question" id="question"></p>
+      <svg id="board" viewBox="0 0 900 560" role="img" aria-label="Zeichenfläche"></svg>
+    </section>
+
+    <aside class="panel">
+      <div class="card">
+        <h2>Einstellungen</h2>
+
+        <div class="ctl" data-st="1 2 3 4">
+          <div class="row"><label for="alpha">Winkel α</label><output id="o-alpha"></output></div>
+          <input type="range" id="alpha" min="5" max="85" step="1">
+        </div>
+
+        <div class="ctl" data-st="1 2 3">
+          <div class="row"><label for="size">Größe (Hypotenuse c)</label><output id="o-size"></output></div>
+          <input type="range" id="size" min="2" max="8" step="0.1">
+        </div>
+
+        <div class="ctl" data-st="2 3">
+          <span>Bezugswinkel</span>
+          <div class="seg" role="radiogroup" aria-label="Bezugswinkel">
+            <label><input type="radio" name="ref" id="ref-a" value="a">α</label>
+            <label><input type="radio" name="ref" id="ref-b" value="b">β</label>
+          </div>
+        </div>
+
+        <div class="ctl" data-st="4">
+          <div class="row"><label for="tt">Skalieren auf Hypotenuse 1</label><output id="o-t"></output></div>
+          <input type="range" id="tt" min="0" max="1" step="0.01">
+          <button class="playbtn" id="play4" type="button">Übergang abspielen</button>
+        </div>
+
+        <div class="ctl" data-st="5 6">
+          <div class="row"><label for="phi">Winkel α</label><output id="o-phi"></output></div>
+          <input type="range" id="phi" min="0" max="360" step="1">
+          <button class="playbtn" id="play5" type="button">P umlaufen lassen</button>
+        </div>
+
+        <label class="sw" data-st="1"><input type="checkbox" id="c-ghost" data-k="ghost">Vergleichsdreieck</label>
+        <label class="sw" data-st="1 2 3 4"><input type="checkbox" id="c-len" data-k="showLen">Seitenlängen</label>
+        <label class="sw" data-st="1"><input type="checkbox" id="c-ratio" data-k="showRatio">Verhältnisse</label>
+        <label class="sw" data-st="2"><input type="checkbox" id="c-roles" data-k="showRoles">Bezeichnungen</label>
+        <label class="sw" data-st="3 4"><input type="checkbox" id="c-names" data-k="showNames">sin, cos, tan benennen</label>
+        <label class="sw" data-st="5"><input type="checkbox" id="c-coords" data-k="showCoords">Koordinaten von P</label>
+        <label class="sw" data-st="5"><input type="checkbox" id="c-tan" data-k="showTan">Tangens am Einheitskreis</label>
+        <label class="sw" data-st="5"><input type="checkbox" id="c-signs" data-k="showSigns">Vorzeichen in den Quadranten</label>
+        <label class="sw" data-st="6"><input type="checkbox" id="c-sin" data-k="showSinG">Sinuskurve</label>
+        <label class="sw" data-st="6"><input type="checkbox" id="c-cos" data-k="showCosG">Kosinuskurve</label>
+        <label class="sw" data-st="6"><input type="checkbox" id="c-full" data-k="showFull">Ganzen Verlauf andeuten</label>
+      </div>
+
+      <div class="card readout" id="readout"></div>
+
+      <div class="nav">
+        <button id="prev" type="button">Zurück</button>
+        <button id="next" type="button">Weiter</button>
+      </div>
+      <p class="keys"><kbd>←</kbd> <kbd>→</kbd> oder Presenter wechselt die Stufe, <kbd>F</kbd> Vollbild. Am Einheitskreis lässt sich P mit der Maus ziehen.</p>
+    </aside>
+  </main>
+</div>
+
+<script>
+const STAGES=[
+ {n:'Ähnlichkeit', t:'Ähnliche Dreiecke', q:'Wir vergrößern das Dreieck, der Winkel α bleibt gleich. Was ändert sich, was bleibt gleich?'},
+ {n:'Seiten', t:'Gegenkathete, Ankathete, Hypotenuse', q:'Welche Seite liegt dem Winkel gegenüber, welche liegt an ihm an?'},
+ {n:'Verhältnisse', t:'Die Seitenverhältnisse', q:'Hängen die Verhältnisse von der Größe des Dreiecks ab oder nur vom Winkel?'},
+ {n:'Skalieren', t:'Hypotenuse auf 1 skalieren', q:'Was wird aus Gegenkathete und Ankathete, wenn die Hypotenuse die Länge 1 hat?'},
+ {n:'Einheitskreis', t:'Der Einheitskreis', q:'Wie lassen sich Sinus und Kosinus am Punkt P ablesen, auch für Winkel über 90°?'},
+ {n:'Graphen', t:'Sinus- und Kosinuskurve', q:'Wie entstehen die Graphen, wenn P den Einheitskreis durchläuft?'}
+];
+const S={stage:1,alpha:35,size:5,ref:'a',ghost:true,showLen:true,showRatio:false,showRoles:true,showNames:false,
+  t:0,phi:35,showCoords:true,showTan:false,showSigns:false,showSinG:true,showCosG:false,showFull:false};
+
+const $=id=>document.getElementById(id);
+const svg=$('board'), R0=$('readout');
+const rad=d=>d*Math.PI/180;
+const f=v=>Math.round(v*10)/10;
+const lerp=(a,b,t)=>a+(b-a)*t;
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+function num(x,d=3){if(Math.abs(x)<0.5*Math.pow(10,-d))x=0;return x.toFixed(d).replace('.',',').replace('-','−');}
+
+/* ---------- SVG-Bausteine ---------- */
+const L=(x1,y1,x2,y2,c,w=4,ex='')=>`<line x1="${f(x1)}" y1="${f(y1)}" x2="${f(x2)}" y2="${f(y2)}" style="stroke:var(${c});stroke-width:${w}" stroke-linecap="round" ${ex}/>`;
+function TX(x,y,s,o={}){return `<text x="${f(x)}" y="${f(y)}" class="lbl${o.mono?' mono':''}" style="fill:var(${o.c||'--ink'});font-size:${o.size||22}px;font-weight:${o.w||600}" text-anchor="${o.a||'middle'}" dominant-baseline="middle">${s}</text>`;}
+function LB(x,y,lines,o={}){const n=lines.length,lh=(o.size||22)*1.15;return lines.map((s,i)=>TX(x,y+(i-(n-1)/2)*lh,s,o)).join('');}
+function sector(P,a0,a1,r){const x1=P.x+r*Math.cos(rad(a0)),y1=P.y-r*Math.sin(rad(a0)),x2=P.x+r*Math.cos(rad(a1)),y2=P.y-r*Math.sin(rad(a1));
+  return `M${f(P.x)} ${f(P.y)}L${f(x1)} ${f(y1)}A${r} ${r} 0 ${(a1-a0)>180?1:0} 0 ${f(x2)} ${f(y2)}Z`;}
+const DEFS=`<defs>
+<pattern id="kar" width="27.5" height="27.5" patternUnits="userSpaceOnUse"><path d="M27.5 0H0V27.5" fill="none" style="stroke:var(--grid);stroke-width:1"/></pattern>
+<marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--muted)"/></marker>
+<clipPath id="clipB"><rect x="0" y="0" width="900" height="560"/></clipPath></defs>
+<rect width="900" height="560" fill="url(#kar)"/>`;
+
+function tri(alpha,s,px=55,Ax=160,Ay=505){const ca=Math.cos(rad(alpha)),sa=Math.sin(rad(alpha));
+  const A={x:Ax,y:Ay},C={x:Ax+s*ca*px,y:Ay},B={x:Ax+s*ca*px,y:Ay-s*sa*px};
+  return {A,B,C,a:s*sa,b:s*ca,c:s,ca,sa,al:alpha};}
+
+function roles(){return S.ref==='a'?{a:'opp',b:'adj',c:'hyp'}:{a:'adj',b:'opp',c:'hyp'};}
+const RC={opp:'--opp',adj:'--adj',hyp:'--hyp'};
+const RN={opp:'Gegenkathete',adj:'Ankathete',hyp:'Hypotenuse'};
+
+/* Dreieck zeichnen. o.col: Farben je Seite, o.lab: Textzeilen je Seite */
+function drawTri(T,o){
+  const {A,B,C}=T; let s='';
+  const g=o.ghost, w=g?3:5, dash=g?'stroke-dasharray="9 8"':'';
+  if(!g) s+=`<polygon points="${f(A.x)},${f(A.y)} ${f(B.x)},${f(B.y)} ${f(C.x)},${f(C.y)}" style="fill:var(--fill)"/>`;
+  const ra=g?36:52;
+  if(o.arcA) s+=`<path d="${sector(A,0,T.al,ra)}" style="fill:var(${o.hiA?'--angle':'--angle-dim'});stroke:var(--muted);stroke-width:1.5"/>`;
+  if(o.arcB) s+=`<path d="${sector(B,180+T.al,270,ra)}" style="fill:var(${o.hiB?'--angle':'--angle-dim'});stroke:var(--muted);stroke-width:1.5"/>`;
+  const q=g?12:20;
+  if(!g||Math.min(T.a,T.b)*55>q*1.6){
+    s+=`<polyline points="${f(C.x-q)},${f(C.y)} ${f(C.x-q)},${f(C.y-q)} ${f(C.x)},${f(C.y-q)}" fill="none" style="stroke:var(--muted);stroke-width:2"/>`;
+    if(!g) s+=`<circle cx="${f(C.x-q/2)}" cy="${f(C.y-q/2)}" r="2.6" style="fill:var(--muted)"/>`;
+  }
+  s+=`<g ${dash}>`+L(A.x,A.y,C.x,C.y,o.col.b,w,dash)+L(B.x,B.y,C.x,C.y,o.col.a,w,dash)+L(A.x,A.y,B.x,B.y,o.col.c,w,dash)+`</g>`;
+  if(o.arcA&&!g) s+=TX(A.x+82*Math.cos(rad(T.al/2)),A.y-82*Math.sin(rad(T.al/2)),'α',{size:26,c:o.hiA?'--ink':'--muted'});
+  if(o.arcB&&!g){const m=225+T.al/2;s+=TX(B.x+80*Math.cos(rad(m)),B.y-80*Math.sin(rad(m)),'β',{size:26,c:o.hiB?'--ink':'--muted'});}
+  if(o.lab){
+    const sz=o.size||21, lc=o.labCol||{};
+    if(!g){
+      s+=LB(C.x+16,(B.y+C.y)/2,o.lab.a,{a:'start',c:lc.a||o.col.a,size:sz});
+      s+=LB((A.x+C.x)/2,A.y+(o.lab.b.length>1?40:28),o.lab.b,{c:lc.b||o.col.b,size:sz});
+      const mx=(A.x+B.x)/2-T.sa*30,my=(A.y+B.y)/2-T.ca*30;
+      s+=LB(mx,my,o.lab.c,{a:T.sa>0.45?'end':'middle',c:lc.c||o.col.c,size:sz});
+    }else{
+      s+=LB(C.x-12,(B.y+C.y)/2,o.lab.a,{a:'end',c:'--muted',size:18});
+      s+=LB((A.x+C.x)/2+20,A.y-18,o.lab.b,{c:'--muted',size:18});
+      s+=LB((A.x+B.x)/2+T.sa*22,(A.y+B.y)/2+T.ca*22,o.lab.c,{a:'start',c:'--muted',size:18});
+    }
+  }
+  if(o.vtx){s+=TX(A.x-20,A.y+12,'A',{c:'--muted'})+TX(B.x+18,B.y-14,'B',{c:'--muted'})+TX(C.x+18,C.y+16,'C',{c:'--muted'});}
+  return s;
+}
+
+/* ---------- Stufe 1: Ähnliche Dreiecke ---------- */
+function st1(){
+  const m=tri(S.alpha,S.size), g=tri(S.alpha,3);
+  const neu={a:'--ink',b:'--ink',c:'--ink'};
+  const lab=(T,p)=>({a:[S.showLen?`${p.a} = ${num(T.a,2)}`:p.a],b:[S.showLen?`${p.b} = ${num(T.b,2)}`:p.b],c:[S.showLen?`${p.c} = ${num(T.c,2)}`:p.c]});
+  let s='';
+  s+=drawTri(m,{col:neu,lab:lab(m,{a:'a',b:'b',c:'c'}),arcA:true,hiA:true,vtx:true});
+  if(S.ghost) s+=drawTri(g,{ghost:true,col:{a:'--muted',b:'--muted',c:'--muted'},lab:lab(g,{a:'a′',b:'b′',c:'c′'}),arcA:false});
+  let r=`<p class="cap">Seitenlängen in cm</p><table><tr><th></th><th>a</th><th>b</th><th>c</th></tr>
+    <tr><td>Dreieck</td><td>${num(m.a,2)}</td><td>${num(m.b,2)}</td><td>${num(m.c,2)}</td></tr>`;
+  if(S.ghost) r+=`<tr><td>Vergleich</td><td>${num(g.a,2)}</td><td>${num(g.b,2)}</td><td>${num(g.c,2)}</td></tr>`;
+  r+=`</table>`;
+  if(S.showRatio){
+    r+=`<p class="cap">Verhältnisse</p><table><tr><th></th><th>a : c</th><th>b : c</th><th>a : b</th></tr>
+    <tr><td>Dreieck</td><td>${num(m.a/m.c)}</td><td>${num(m.b/m.c)}</td><td>${num(m.a/m.b)}</td></tr>`;
+    if(S.ghost) r+=`<tr><td>Vergleich</td><td>${num(g.a/g.c)}</td><td>${num(g.b/g.c)}</td><td>${num(g.a/g.b)}</td></tr>`;
+    r+=`</table>`;
+  }else r+=`<p class="note">Verhältnisse noch ausgeblendet. Erst vermuten lassen, dann einblenden.</p>`;
+  R0.innerHTML=r; return s;
+}
+
+/* ---------- Stufe 2: Seiten benennen ---------- */
+function st2(){
+  const m=tri(S.alpha,S.size), ro=roles(), w=S.ref==='a'?'α':'β';
+  const col={a:RC[ro.a],b:RC[ro.b],c:RC[ro.c]};
+  const lab={};
+  for(const k of ['a','b','c']){const L1=S.showRoles?[RN[ro[k]]]:[];L1.push(S.showLen?`${k} = ${num(m[k],2)}`:k);lab[k]=L1;}
+  const s=drawTri(m,{col,lab,arcA:true,arcB:true,hiA:S.ref==='a',hiB:S.ref==='b',vtx:true});
+  const opp=S.ref==='a'?'a':'b', adj=S.ref==='a'?'b':'a';
+  R0.innerHTML=`<p class="cap">Bezogen auf den Winkel ${w}</p>
+   <dl class="kv"><dt class="t-opp">Gegenkathete</dt><dd>${opp}</dd><dt class="t-adj">Ankathete</dt><dd>${adj}</dd><dt class="t-hyp">Hypotenuse</dt><dd>c</dd></dl>
+   <p class="note">Die Hypotenuse liegt immer dem rechten Winkel gegenüber. Gegenkathete und Ankathete tauschen ihre Rollen, wenn der Bezugswinkel wechselt.</p>`;
+  return s;
+}
+
+/* ---------- Stufe 3: Verhältnisse ---------- */
+const fr=(n,d,cn,cd)=>`<mfrac><mtext class="${cn}">${n}</mtext><mtext class="${cd}">${d}</mtext></mfrac>`;
+const frl=(n,d,cn,cd)=>`<mfrac><mi class="${cn}">${n}</mi><mi class="${cd}">${d}</mi></mfrac>`;
+function st3(){
+  const m=tri(S.alpha,S.size), ro=roles(), w=S.ref==='a'?'α':'β';
+  const col={a:RC[ro.a],b:RC[ro.b],c:RC[ro.c]};
+  const lab={};
+  for(const k of ['a','b','c']) lab[k]=[S.showLen?`${k} = ${num(m[k],2)}`:k];
+  const s=drawTri(m,{col,lab,arcA:true,arcB:true,hiA:S.ref==='a',hiB:S.ref==='b',vtx:true});
+  const o=S.ref==='a'?'a':'b', d=S.ref==='a'?'b':'a', ang=S.ref==='a'?S.alpha:90-S.alpha;
+  const sv=m[o]/m.c, cv=m[d]/m.c, tv=m[o]/m[d];
+  const row=(fn,N,D,cn,cd,n1,d1,v)=>`<div class="ratio"><span class="fn" ${S.showNames?'':'hidden'}>${fn} ${w} =</span>
+    <math>${fr(N,D,cn,cd)}<mo>=</mo>${frl(n1,d1,cn,cd)}</math><span class="val">${num(v)}</span></div>`;
+  R0.innerHTML=`<p class="cap">${w} = ${Math.round(ang)}°, c = ${num(m.c,1)} cm</p>`+
+    row('sin','Gegenkathete','Hypotenuse','t-opp','t-hyp',o,'c',sv)+
+    row('cos','Ankathete','Hypotenuse','t-adj','t-hyp',d,'c',cv)+
+    row('tan','Gegenkathete','Ankathete','t-opp','t-adj',o,d,tv)+
+    (S.showNames?'':`<p class="note">Bezeichnungen sin, cos und tan sind noch ausgeblendet.</p>`);
+  return s;
+}
+
+/* ---------- Achsen für Einheitskreis ---------- */
+function axes(O,R,op=1,sz=20){
+  let s=`<g style="opacity:${op}">`;
+  s+=L(O.x-R-34,O.y,O.x+R+46,O.y,'--muted',2,'marker-end="url(#arr)"');
+  s+=L(O.x,O.y+R+34,O.x,O.y-R-40,'--muted',2,'marker-end="url(#arr)"');
+  s+=TX(O.x+R+46,O.y+22,'x',{c:'--muted',size:sz,w:400})+TX(O.x-18,O.y-R-38,'y',{c:'--muted',size:sz,w:400});
+  for(const sg of [1,-1]){
+    s+=L(O.x+sg*R,O.y-7,O.x+sg*R,O.y+7,'--muted',2)+L(O.x-7,O.y-sg*R,O.x+7,O.y-sg*R,'--muted',2);
+    s+=TX(O.x+sg*R+(sg>0?12:-14),O.y+22,sg>0?'1':'−1',{c:'--muted',size:sz-2,w:400});
+    s+=TX(O.x-14,O.y-sg*R+(sg>0?-14:14),sg>0?'1':'−1',{c:'--muted',size:sz-2,w:400,a:'end'});
+  }
+  s+=TX(O.x-14,O.y+20,'O',{c:'--muted',size:sz-2,w:400,a:'end'});
+  return s+`</g>`;
+}
+
+/* ---------- Stufe 4: Hypotenuse = 1 ---------- */
+function st4(){
+  const e=S.t*S.t*(3-2*S.t), s0=S.size, O={x:450,y:295}, R=215;
+  const Ax=lerp(160,O.x,e), Ay=lerp(505,O.y,e), hp=lerp(s0*55,R,e);
+  const T=tri(S.alpha,hp/55,55,Ax,Ay);
+  const h=lerp(s0,1,e), sa=T.sa, ca=T.ca;
+  let s=axes(O,R,e);
+  s+=`<circle cx="${O.x}" cy="${O.y}" r="${R}" fill="none" style="stroke:var(--muted);stroke-width:2;opacity:${e}" stroke-dasharray="${e<0.999?'6 6':'none'}"/>`;
+  const done=e>0.995, nm=done&&S.showNames;
+  const lab={
+    a:[nm?`sin α = ${num(sa,3)}`:(S.showLen?`a = ${num(h*sa,2)}`:'a')],
+    b:[nm?`cos α = ${num(ca,3)}`:(S.showLen?`b = ${num(h*ca,2)}`:'b')],
+    c:[S.showLen||done?`c = ${num(h,2)}`:'c']
+  };
+  s+=drawTri(T,{col:{a:'--opp',b:'--adj',c:'--hyp'},lab,arcA:true,hiA:true});
+  const k=h/s0;
+  R0.innerHTML=`<p class="cap">Streckfaktor k = ${num(k,3)}</p>
+   <dl class="kv"><dt class="t-hyp">Hypotenuse c</dt><dd>${num(h)}</dd>
+   <dt class="t-opp">Gegenkathete a</dt><dd>${num(h*sa)}</dd>
+   <dt class="t-adj">Ankathete b</dt><dd>${num(h*ca)}</dd></dl>`+
+   (done?`<div class="ratio"><math><mi>c</mi><mo>=</mo><mn>1</mn><mo>⇒</mo><mi class="t-opp">a</mi><mo>=</mo>${S.showNames?'<mi>sin</mi><mo>⁡</mo><mi>α</mi>':'<mfrac><mi>a</mi><mn>1</mn></mfrac>'}<mo>,</mo><mspace width="0.4em"/><mi class="t-adj">b</mi><mo>=</mo>${S.showNames?'<mi>cos</mi><mo>⁡</mo><mi>α</mi>':'<mfrac><mi>b</mi><mn>1</mn></mfrac>'}</math></div>`
+   :`<p class="note">Die Verhältnisse a : c und b : c ändern sich beim Skalieren nicht: ${num(sa)} und ${num(ca)}.</p>`);
+  return s;
+}
+
+/* ---------- Stufe 5: Einheitskreis ---------- */
+function quad(p){p=((p%360)+360)%360;if(p>0&&p<90)return 1;if(p>90&&p<180)return 2;if(p>180&&p<270)return 3;if(p>270&&p<360)return 4;return 0;}
+function circlePart(O,R,phi,o={}){
+  const sz=o.sz||22, p=rad(phi), c=Math.cos(p), sn=Math.sin(p);
+  const P={x:O.x+R*c,y:O.y-R*sn}, F={x:P.x,y:O.y};
+  let s=`<circle cx="${O.x}" cy="${O.y}" r="${R}" fill="none" style="stroke:var(--muted);stroke-width:2"/>`;
+  const ar=o.ar||44, pm=((phi%360)+360)%360;
+  if(phi>=359.5) s+=`<circle cx="${O.x}" cy="${O.y}" r="${ar}" style="fill:var(--angle);stroke:var(--muted);stroke-width:1.5"/>`;
+  else if(pm>0.5) s+=`<path d="${sector(O,0,pm,ar)}" style="fill:var(--angle);stroke:var(--muted);stroke-width:1.5"/>`;
+  if(pm>0.5) s+=TX(O.x+(ar+22)*Math.cos(p/2),O.y-(ar+22)*Math.sin(p/2),'α',{size:sz+2});
+  s+=L(O.x,O.y,F.x,F.y,'--adj',o.w||7)+L(F.x,F.y,P.x,P.y,'--opp',o.w||7)+L(O.x,O.y,P.x,P.y,'--hyp',4);
+  if(Math.abs(c)>0.12) s+=TX((O.x+F.x)/2,O.y+(sn>=0?26:-24),'cos α',{c:'--adj',size:sz});
+  if(Math.abs(sn)>0.12) s+=TX(P.x+(c>=0?14:-14),(O.y+P.y)/2,'sin α',{c:'--opp',size:sz,a:c>=0?'start':'end'});
+  s+=`<circle cx="${f(P.x)}" cy="${f(P.y)}" r="${o.pr||10}" style="fill:var(--accent);stroke:var(--paper);stroke-width:3;cursor:grab"/>`;
+  return {s,P,c,sn};
+}
+function st5(){
+  const O={x:450,y:287}, R=215, phi=S.phi;
+  let s=axes(O,R,1);
+  if(S.showTan){
+    s+=`<g clip-path="url(#clipB)">`+L(O.x+R,20,O.x+R,540,'--line',2);
+    const p=rad(phi),c=Math.cos(p),sn=Math.sin(p);
+    if(Math.abs(c)>0.015){
+      const t=sn/c, Tp={x:O.x+R,y:O.y-R*t}, P={x:O.x+R*c,y:O.y-R*sn};
+      s+=L(P.x,P.y,Tp.x,Tp.y,'--tan',2.5,'stroke-dasharray="7 7"')+L(O.x+R,O.y,Tp.x,Tp.y,'--tan',7);
+      if(Math.abs(t)>0.1&&Tp.y>30&&Tp.y<530) s+=TX(O.x+R+16,(O.y+Tp.y)/2,'tan α',{c:'--tan',a:'start'});
+    }
+    s+=`</g>`;
+  }
+  if(S.showSigns){
+    const q=quad(phi), pos=[[1,1],[-1,1],[-1,-1],[1,-1]], nm=['I','II','III','IV'];
+    pos.forEach(([sx,sy],i)=>{
+      const sS=sy>0?'+':'−', cS=sx>0?'+':'−', tS=sx*sy>0?'+':'−', on=q===i+1;
+      const lines=[`${nm[i]}. Quadrant`,`sin ${sS}   cos ${cS}`]; if(S.showTan) lines.push(`tan ${tS}`);
+      s+=LB(O.x+sx*(R+130)*0.98,O.y-sy*(R-30),lines,{size:19,c:on?'--ink':'--muted',w:on?700:400});
+    });
+  }
+  const cp=circlePart(O,R,phi); s+=cp.s;
+  const {P,c,sn}=cp;
+  if(S.showCoords){
+    const tx=P.x+(c>=0?20:-20), ty=P.y+(sn>=0?-26:28);
+    s+=TX(tx,ty,`P(${num(c,2)} | ${num(sn,2)})`,{a:c>=0?'start':'end',size:21,mono:true});
+  }else s+=TX(P.x+(c>=0?18:-18),P.y+(sn>=0?-22:24),'P',{a:c>=0?'start':'end'});
+  const q=quad(phi), cz=Math.abs(c)<1e-9;
+  R0.innerHTML=`<div class="big">α = ${Math.round(phi)}°</div>
+   <div class="ratio"><math><mi>P</mi><mo>(</mo><mi class="t-adj">cos α</mi><mo>|</mo><mi class="t-opp">sin α</mi><mo>)</mo></math></div>
+   <dl class="kv"><dt class="t-opp">sin α</dt><dd>${num(sn)}</dd><dt class="t-adj">cos α</dt><dd>${num(c)}</dd>
+   <dt class="t-tan">tan α</dt><dd>${Math.abs(c)<0.0005?'nicht definiert':num(sn/c)}</dd>
+   <dt>Lage</dt><dd>${q?q+'. Quadrant':'auf einer Achse'}</dd></dl>
+   <p class="note">Im Einheitskreis gilt: sin α ist die y-Koordinate, cos α die x-Koordinate von P.</p>`;
+  return s;
+}
+
+/* ---------- Stufe 6: Graphen ---------- */
+const G6={O:{x:165,y:280},R:130,gx0:370,gx1:850};
+function st6(){
+  const {O,R,gx0,gx1}=G6, kx=(gx1-gx0)/360, phi=S.phi;
+  let s=axes(O,R,1,18);
+  // Graph-Achsen
+  s+=L(gx0-10,O.y,gx1+28,O.y,'--muted',2,'marker-end="url(#arr)"')+L(gx0,O.y+R+34,gx0,O.y-R-40,'--muted',2,'marker-end="url(#arr)"');
+  s+=TX(gx1+28,O.y+24,'α',{c:'--muted',size:20,w:400});
+  for(const sg of [1,-1]){s+=L(gx0,O.y-sg*R,gx1,O.y-sg*R,'--line',1.5,'stroke-dasharray="4 6"')+TX(gx0-12,O.y-sg*R,sg>0?'1':'−1',{c:'--muted',size:17,w:400,a:'end'});}
+  for(const d of [90,180,270,360]){const x=gx0+d*kx;s+=L(x,O.y-6,x,O.y+6,'--muted',2)+TX(x,O.y+R+22,d+'°',{c:'--muted',size:17,w:400});
+    s+=L(x,O.y-R,x,O.y+R,'--line',1,'stroke-dasharray="2 6"');}
+  const pts=(fn,to)=>{let a=[];for(let d=0;d<=to;d+=1.5)a.push(`${f(gx0+d*kx)},${f(O.y-R*fn(rad(d)))}`);a.push(`${f(gx0+to*kx)},${f(O.y-R*fn(rad(to)))}`);return a.join(' ');};
+  if(S.showFull){
+    if(S.showSinG) s+=`<polyline points="${pts(Math.sin,360)}" fill="none" style="stroke:var(--opp);stroke-width:2;opacity:.3" stroke-dasharray="6 6"/>`;
+    if(S.showCosG) s+=`<polyline points="${pts(Math.cos,360)}" fill="none" style="stroke:var(--adj);stroke-width:2;opacity:.3" stroke-dasharray="6 6"/>`;
+  }
+  if(S.showCosG) s+=`<polyline points="${pts(Math.cos,phi)}" fill="none" style="stroke:var(--adj);stroke-width:4" stroke-linejoin="round"/>`;
+  if(S.showSinG) s+=`<polyline points="${pts(Math.sin,phi)}" fill="none" style="stroke:var(--opp);stroke-width:4" stroke-linejoin="round"/>`;
+  const cp=circlePart(O,R,phi,{sz:18,ar:30,w:6,pr:9}); s+=cp.s;
+  const X=gx0+phi*kx;
+  s+=L(X,O.y-R-14,X,O.y+R+8,'--accent',1.5,'stroke-dasharray="3 5"');
+  if(S.showSinG){const Y=O.y-R*cp.sn; s+=L(cp.P.x,cp.P.y,X,Y,'--opp',1.5,'stroke-dasharray="6 6"')+`<circle cx="${f(X)}" cy="${f(Y)}" r="8" style="fill:var(--opp);stroke:var(--paper);stroke-width:3"/>`;}
+  if(S.showCosG){const Y=O.y-R*cp.c; s+=`<circle cx="${f(X)}" cy="${f(Y)}" r="8" style="fill:var(--adj);stroke:var(--paper);stroke-width:3"/>`;}
+  if(S.showSinG) s+=TX(gx0+30,O.y-R-22,'y = sin α',{c:'--opp',size:20,a:'start'});
+  if(S.showCosG) s+=TX(gx0+190,O.y-R-22,'y = cos α',{c:'--adj',size:20,a:'start'});
+  R0.innerHTML=`<div class="big">α = ${Math.round(phi)}°</div>
+   <dl class="kv"><dt class="t-opp">sin α</dt><dd>${num(cp.sn)}</dd><dt class="t-adj">cos α</dt><dd>${num(cp.c)}</dd></dl>
+   <p class="note">Die Höhe von P über der x-Achse wird nach rechts übertragen. Ziehen am Kreis oder im Graphen verändert α.</p>`;
+  return s;
+}
+
+/* ---------- Steuerung ---------- */
+const RENDER=[st1,st2,st3,st4,st5,st6];
+const stepsEl=$('steps');
+stepsEl.innerHTML=STAGES.map((st,i)=>`<button type="button" data-go="${i+1}"><b>${i+1}</b>${st.n}</button>`).join('');
+stepsEl.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)go(+b.dataset.go);});
+
+function syncInputs(){
+  $('alpha').value=S.alpha; $('size').value=S.size; $('tt').value=S.t; $('phi').value=Math.round(S.phi);
+  $('o-alpha').textContent=S.alpha+'°'; $('o-size').textContent=num(S.size,1)+' cm';
+  $('o-t').textContent=Math.round(S.t*100)+' %'; $('o-phi').textContent=Math.round(S.phi)+'°';
+  $('ref-a').checked=S.ref==='a'; $('ref-b').checked=S.ref==='b';
+  document.querySelectorAll('input[data-k]').forEach(cb=>cb.checked=!!S[cb.dataset.k]);
+}
+function render(){
+  document.querySelectorAll('[data-st]').forEach(el=>{el.hidden=!el.dataset.st.split(' ').includes(String(S.stage));});
+  const st=STAGES[S.stage-1];
+  $('stTitle').textContent=st.t; $('question').textContent=st.q;
+  stepsEl.querySelectorAll('button').forEach((b,i)=>{if(i+1===S.stage)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');});
+  $('prev').disabled=S.stage===1; $('next').disabled=S.stage===6;
+  syncInputs();
+  svg.innerHTML=DEFS+RENDER[S.stage-1]();
+}
+function go(n){stop();S.stage=clamp(n,1,6);render();}
+
+$('alpha').addEventListener('input',e=>{S.alpha=+e.target.value;render();});
+$('size').addEventListener('input',e=>{S.size=+e.target.value;render();});
+$('tt').addEventListener('input',e=>{stop();S.t=+e.target.value;render();});
+$('phi').addEventListener('input',e=>{stop();S.phi=+e.target.value;render();});
+document.querySelectorAll('input[name=ref]').forEach(r=>r.addEventListener('change',()=>{S.ref=r.value;render();}));
+document.querySelectorAll('input[data-k]').forEach(cb=>cb.addEventListener('change',()=>{S[cb.dataset.k]=cb.checked;render();}));
+$('prev').onclick=()=>go(S.stage-1); $('next').onclick=()=>go(S.stage+1);
+
+/* Animation */
+let raf=null,last=0;
+function setPlayLabels(){$('play4').textContent=raf?'Anhalten':'Übergang abspielen';$('play5').textContent=raf?'Anhalten':'P umlaufen lassen';}
+function stop(){if(raf){cancelAnimationFrame(raf);raf=null;}setPlayLabels();}
+function tick(ts){
+  const dt=Math.min(0.05,(ts-last)/1000); last=ts;
+  if(S.stage===4){S.t=Math.min(1,S.t+dt/2.4);render();if(S.t>=1){stop();return;}}
+  else{S.phi+=dt*40; if(S.phi>=360)S.phi-=360; render();}
+  raf=requestAnimationFrame(tick);
+}
+function play(){
+  if(raf){stop();return;}
+  if(S.stage===4&&S.t>=1)S.t=0;
+  last=performance.now(); raf=requestAnimationFrame(tick); setPlayLabels();
+}
+$('play4').onclick=play; $('play5').onclick=play;
+
+/* Ziehen am Einheitskreis / im Graphen */
+let drag=false;
+function svgPt(e){const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse());}
+function dragTo(e){
+  const p=svgPt(e);
+  if(S.stage===6&&p.x>=G6.gx0){S.phi=Math.round(clamp((p.x-G6.gx0)/((G6.gx1-G6.gx0)/360),0,360));}
+  else{const O=S.stage===5?{x:450,y:287}:G6.O;let a=Math.atan2(O.y-p.y,p.x-O.x)*180/Math.PI;if(a<0)a+=360;S.phi=Math.round(a)%360;}
+  render();
+}
+svg.addEventListener('pointerdown',e=>{if(S.stage<5)return;stop();drag=true;try{svg.setPointerCapture(e.pointerId);}catch(_){}dragTo(e);});
+svg.addEventListener('pointermove',e=>{if(drag)dragTo(e);});
+['pointerup','pointercancel'].forEach(t=>svg.addEventListener(t,()=>{drag=false;}));
+
+/* Tastatur und Vollbild */
+function fullscreen(){const d=document;try{if(d.fullscreenElement)d.exitFullscreen();else d.documentElement.requestFullscreen().catch(()=>{});}catch(_){}}
+$('fs').onclick=fullscreen;
+document.addEventListener('keydown',e=>{
+  const tag=(e.target.type||'');
+  if(tag==='range')return;
+  if(['ArrowRight','PageDown'].includes(e.key)){e.preventDefault();go(S.stage+1);}
+  else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(S.stage-1);}
+  else if(e.key==='f'||e.key==='F'){fullscreen();}
+  else if(e.key===' '&&(S.stage>=4)&&tag!=='checkbox'&&tag!=='radio'&&e.target.tagName!=='BUTTON'){e.preventDefault();play();}
+});
+
+render();
+</script>
+
+</body></html>

@@ -1,0 +1,574 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Gauß-Labor Normalverteilung</title>
+<link rel="stylesheet" href="../assets/fonts/fonts.css">
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: Kopfzeile, Reiterleiste als Lernpfad, darunter Zeichenfläche links und Steuerpult rechts; auf schmalen Bildschirmen einspaltig */
+:root{
+  --paper:#edf1f4; --sheet:#ffffff; --ink:#13212c; --muted:#556776; --line:#d2dce4; --grid:#e3e9ee; --axis:#7a8b99;
+  --curve:#0e6584; --curve2:#b03f74; --area:#dc8f1e; --good:#2c7a4b; --warn:#a4570f; --on-curve:#ffffff;
+  --font-display:"Newsreader","Iowan Old Style",Georgia,serif;
+  --font-body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0e151b; --sheet:#152029; --ink:#e4ecf1; --muted:#93a5b3; --line:#283844; --grid:#1f2c36; --axis:#6d8292;
+    --curve:#5ec4e2; --curve2:#ec8fbb; --area:#f1b155; --good:#6cc596; --warn:#f0a35a; --on-curve:#0b1a22; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0e151b; --sheet:#152029; --ink:#e4ecf1; --muted:#93a5b3; --line:#283844; --grid:#1f2c36; --axis:#6d8292;
+  --curve:#5ec4e2; --curve2:#ec8fbb; --area:#f1b155; --good:#6cc596; --warn:#f0a35a; --on-curve:#0b1a22; color-scheme:dark;
+}
+body{background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.5}
+.wrap{max-width:1380px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:22px 48px}
+h1,h2,h3{font-family:var(--font-display);font-weight:500;text-wrap:balance;margin:0}
+.top{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;margin-bottom:18px}
+.eyebrow{margin:0 0 4px;font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h1{font-size:clamp(1.8rem,3.4vw,2.6rem);line-height:1.1}
+h1 em{color:var(--curve)}
+.tools{display:flex;flex-wrap:wrap;gap:8px}
+.btn{font:600 .92rem var(--font-body);border:1px solid var(--line);background:var(--sheet);color:var(--ink);border-radius:8px;padding:8px 14px;cursor:pointer}
+.btn:hover{border-color:var(--axis)}
+.btn[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.btn.primary{background:var(--curve);border-color:var(--curve);color:var(--on-curve)}
+:focus-visible{outline:2px solid var(--curve);outline-offset:2px}
+.tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);margin-bottom:18px;scrollbar-width:thin}
+.tab{flex:0 0 auto;display:flex;gap:8px;align-items:baseline;font:600 .98rem var(--font-body);background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:10px 14px 9px;cursor:pointer}
+.tab .no{font:600 .78rem var(--font-mono);color:var(--axis)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--curve)}
+.tab[aria-selected="true"] .no{color:var(--curve)}
+.panel{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:920px){.panel{grid-template-columns:minmax(0,1fr)}}
+.stage,.card{background:var(--sheet);border:1px solid var(--line);border-radius:10px}
+.stage{padding:14px;min-width:0}
+.stage canvas{display:block;width:100%;height:clamp(280px,52vh,540px)}
+.stage canvas.small{height:clamp(180px,26vh,260px);margin-top:10px;border-top:1px solid var(--grid);padding-top:6px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.88rem;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:22px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.formula{margin-top:12px;padding-top:10px;border-top:1px solid var(--grid);overflow-x:auto;font-size:1.22rem}
+.formula math{font-size:1.15em;margin:.25em 0}
+.side{display:flex;flex-direction:column;gap:14px;min-width:0}
+.card{padding:14px 16px}
+.card h3{font-size:1.15rem;margin-bottom:10px}
+.slider{display:grid;grid-template-columns:2.6rem minmax(0,1fr) 5.6rem;gap:10px;align-items:center;margin:8px 0}
+.slider .sym{font:italic 500 1.35rem var(--font-display)}
+input[type=range]{accent-color:var(--curve);width:100%;min-width:0}
+input[type=number],select{font:500 .95rem var(--font-mono);border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:6px;padding:6px 8px;width:100%;min-width:0}
+select{font-family:var(--font-body)}
+.field{display:grid;gap:4px;font-size:.9rem;color:var(--muted)}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.toggle{display:flex;gap:10px;align-items:center;padding:6px 0;cursor:pointer}
+.toggle input{width:18px;height:18px;accent-color:var(--curve)}
+.toggle .no{font:600 .78rem var(--font-mono);color:var(--axis);width:1.2rem}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:600 .9rem var(--font-mono);border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:5px 12px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--area);border-color:var(--area);color:#1d1406}
+.state{display:inline-flex;align-items:center;gap:6px;font:600 .85rem var(--font-body);padding:3px 10px;border-radius:999px;border:1px solid currentColor}
+.state.ok{color:var(--good)} .state.no{color:var(--warn)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:.95rem;margin:0}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.result{font:600 1.55rem var(--font-mono);font-variant-numeric:tabular-nums;color:var(--ink);margin:4px 0 2px;overflow-wrap:anywhere}
+.result small{display:block;font:400 .9rem var(--font-body);color:var(--muted)}
+.mono{font-family:var(--font-mono);font-size:.9em}
+details > summary{cursor:pointer;font-weight:700;list-style:none;display:flex;align-items:center;gap:8px}
+details > summary::-webkit-details-marker{display:none}
+details > summary::before{content:"";width:8px;height:8px;border-right:2px solid var(--axis);border-bottom:2px solid var(--axis);transform:rotate(-45deg);transition:transform .15s}
+details[open] > summary::before{transform:rotate(45deg)}
+details .body{margin-top:10px;font-size:.98rem}
+details .body p{margin:0 0 .7em;max-width:65ch}
+.task summary .tag{font:600 .72rem var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--curve2)}
+.steps{margin:0;padding-left:1.2em} .steps li{margin:.3em 0}
+.steps li.on{color:var(--ink)} .steps li.off{color:var(--muted)}
+.tablebox{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.92rem;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--grid);white-space:nowrap}
+th{font-weight:600;color:var(--muted);font-size:.82rem}
+td.num{font-family:var(--font-mono)}
+tr.hl td{background:color-mix(in srgb,var(--area) 22%,transparent)}
+tr.hit td:last-child{color:var(--good);font-weight:600}
+.tasktext{font-size:1.02rem;margin:0 0 10px;max-width:65ch}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.present .explain,.present .task{display:none!important}
+.present .stage canvas:not(.small){height:clamp(320px,66vh,720px)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Q3.2 Stochastik · Leistungskurs · erhöhtes Niveau</p>
+      <h1>Gauß-Labor <em>Normalverteilung</em></h1>
+    </div>
+    <div class="tools">
+      <button class="btn" id="btnPresent" aria-pressed="false">Präsentationsmodus</button>
+      <button class="btn" id="btnTheme">Dunkel</button>
+      <button class="btn" id="btnReset">Zurücksetzen</button>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Themen">
+    <button class="tab" role="tab" data-tab="t1" aria-selected="true"><span class="no">1</span>Von Gauß zur Dichte</button>
+    <button class="tab" role="tab" data-tab="t2" aria-selected="false"><span class="no">2</span>μ und σ</button>
+    <button class="tab" role="tab" data-tab="t3" aria-selected="false"><span class="no">3</span>Flächen als Wahrscheinlichkeiten</button>
+    <button class="tab" role="tab" data-tab="t4" aria-selected="false"><span class="no">4</span>Sigma-Regeln</button>
+    <button class="tab" role="tab" data-tab="t5" aria-selected="false"><span class="no">5</span>Inverse Fragestellungen</button>
+  </nav>
+
+  <main>
+  <!-- Reiter 1 -->
+  <section class="panel" id="t1" role="tabpanel">
+    <div class="stage">
+      <canvas id="c1" aria-label="Graph der Gauß-Funktion"></canvas>
+      <div class="legend"><span><i style="background:var(--curve)"></i>aktuelle Funktion f</span><span><i style="background:var(--muted)"></i>Grundform g(x) = e<sup>−x²/2</sup> (gestrichelt)</span></div>
+      <div class="formula" id="f1"></div>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>Schritt für Schritt</h3>
+        <label class="toggle"><input type="checkbox" id="s1shift"><span class="no">1</span>Verschieben um μ</label>
+        <label class="toggle"><input type="checkbox" id="s1stretch"><span class="no">2</span>Strecken mit σ</label>
+        <label class="toggle"><input type="checkbox" id="s1norm"><span class="no">3</span>Normieren mit 1/(σ√(2π))</label>
+        <div class="slider" data-id="t1mu" data-label="μ" data-min="-5" data-max="5" data-step="0.1" data-val="2"></div>
+        <div class="slider" data-id="t1sg" data-label="σ" data-min="0.2" data-max="4" data-step="0.05" data-val="1.5"></div>
+        <dl class="kv" style="margin-top:10px">
+          <dt>Fläche unter f (numerisch)</dt><dd id="i1"></dd>
+          <dt>Dichtefunktion?</dt><dd id="d1"></dd>
+        </dl>
+      </div>
+      <details class="card explain" open><summary>Erklärung</summary><div class="body" id="e1"></div></details>
+      <details class="card task"><summary><span class="tag">Aufgabe für dich</span></summary><div class="body">
+        <p><b>Begründen</b> Sie, warum g(x) = e<sup>−x²/2</sup> keine Wahrscheinlichkeitsdichte ist.</p>
+        <p><b>Bestimmen</b> Sie den Faktor, mit dem g multipliziert werden muss, damit die Fläche 1 beträgt, und überprüfen Sie Ihr Ergebnis mit Schritt 3.</p>
+        <p><b>Erläutern</b> Sie, warum sich die Fläche beim Verschieben nicht ändert, beim Strecken aber schon.</p>
+      </div></details>
+    </aside>
+  </section>
+
+  <!-- Reiter 2 -->
+  <section class="panel" id="t2" role="tabpanel" hidden>
+    <div class="stage">
+      <canvas id="c2" aria-label="Dichtefunktion der Normalverteilung"></canvas>
+      <div class="legend"><span><i style="background:var(--curve)"></i>φ<sub>μ,σ</sub></span><span id="leg2b" hidden><i style="background:var(--curve2)"></i>Vergleichskurve</span></div>
+      <div class="formula" id="f2"></div>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>Parameter</h3>
+        <div class="slider" data-id="t2mu" data-label="μ" data-min="-5" data-max="5" data-step="0.1" data-val="0"></div>
+        <div class="slider" data-id="t2sg" data-label="σ" data-min="0.2" data-max="4" data-step="0.05" data-val="1"></div>
+        <label class="toggle"><input type="checkbox" id="c2hp" checked>Hochpunkt</label>
+        <label class="toggle"><input type="checkbox" id="c2wp" checked>Wendepunkte</label>
+        <label class="toggle"><input type="checkbox" id="c2sym">Symmetrieachse x = μ</label>
+        <label class="toggle"><input type="checkbox" id="c2cmp">Vergleichskurve einblenden</label>
+        <div id="cmpBox" hidden>
+          <div class="slider" data-id="t2mu2" data-label="μ₂" data-min="-5" data-max="5" data-step="0.1" data-val="2"></div>
+          <div class="slider" data-id="t2sg2" data-label="σ₂" data-min="0.2" data-max="4" data-step="0.05" data-val="2"></div>
+        </div>
+      </div>
+      <div class="card"><dl class="kv" id="kv2"></dl></div>
+      <details class="card explain" open><summary>Erklärung</summary><div class="body">
+        <p><b>μ ist der Erwartungswert.</b> Er legt die Lage der Kurve fest: An der Stelle μ liegt der Hochpunkt, und der Graph ist symmetrisch zur Geraden x = μ.</p>
+        <p><b>σ ist die Standardabweichung.</b> Sie ist der Abstand der beiden Wendestellen von μ. Ein größeres σ macht die Kurve breiter und flacher, die Fläche bleibt immer 1. Die Höhe des Hochpunkts ist 1/(σ√(2π)).</p>
+        <p>Herleitung: Aus φ′(x) = −(x−μ)/σ² · φ(x) = 0 folgt x = μ. Aus φ″(x) = ((x−μ)²/σ⁴ − 1/σ²) · φ(x) = 0 folgt x = μ ± σ.</p>
+      </div></details>
+      <details class="card task"><summary><span class="tag">Aufgabe für dich</span></summary><div class="body">
+        <p>Stellen Sie μ = 2 und σ = 0,5 ein. <b>Bestimmen</b> Sie die Koordinaten des Hochpunkts und der Wendepunkte rechnerisch und vergleichen Sie mit der Anzeige.</p>
+        <p><b>Beschreiben</b> Sie, wie sich der Graph verändert, wenn σ verdoppelt wird. <b>Begründen</b> Sie, warum der Hochpunkt dabei auf die Hälfte sinkt.</p>
+      </div></details>
+    </aside>
+  </section>
+
+  <!-- Reiter 3 -->
+  <section class="panel" id="t3" role="tabpanel" hidden>
+    <div class="stage">
+      <canvas id="c3" aria-label="Fläche unter der Dichtefunktion"></canvas>
+      <canvas id="c3b" class="small" aria-label="Verteilungsfunktion"></canvas>
+      <div class="legend"><span><i style="background:var(--curve)"></i>oben: Dichte φ<sub>μ,σ</sub></span><span><i style="background:var(--curve2)"></i>unten: Verteilungsfunktion Φ<sub>μ,σ</sub></span><span><i style="background:var(--area)"></i>gesuchte Wahrscheinlichkeit</span></div>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>Zufallsgröße X</h3>
+        <div class="slider" data-id="t3mu" data-label="μ" data-min="-10" data-max="200" data-step="0.5" data-val="100"></div>
+        <div class="slider" data-id="t3sg" data-label="σ" data-min="0.5" data-max="40" data-step="0.5" data-val="15"></div>
+        <div class="fields" style="margin-top:8px">
+          <label class="field">Fragestellung
+            <select id="t3type"><option value="bw">P(a ≤ X ≤ b)</option><option value="le">P(X ≤ b)</option><option value="ge">P(X ≥ a)</option></select></label>
+          <label class="field" id="t3aBox">untere Grenze a<input type="number" id="t3a" value="85" step="any"></label>
+          <label class="field" id="t3bBox">obere Grenze b<input type="number" id="t3b" value="115" step="any"></label>
+        </div>
+      </div>
+      <div class="card">
+        <div class="result" id="r3"></div>
+        <p class="mono" id="g3" style="margin:6px 0 0;color:var(--muted)"></p>
+      </div>
+      <details class="card explain" open><summary>Erklärung</summary><div class="body">
+        <p>Bei einer stetigen Zufallsgröße ist eine Wahrscheinlichkeit eine <b>Fläche unter der Dichtefunktion</b>: P(a ≤ X ≤ b) ist das Integral von φ zwischen a und b.</p>
+        <p>Die <b>Verteilungsfunktion</b> Φ(x) gibt die Fläche links von x an. Deshalb gilt P(a ≤ X ≤ b) = Φ(b) − Φ(a) und P(X ≥ a) = 1 − Φ(a).</p>
+        <p><b>Abgrenzung zu diskreten Zufallsgrößen:</b> Über einem einzelnen Punkt liegt keine Fläche, also gilt P(X = x) = 0. Ob man ≤ oder &lt; schreibt, ändert die Wahrscheinlichkeit daher nicht. Bei der Binomialverteilung ist das anders.</p>
+      </div></details>
+      <details class="card task"><summary><span class="tag">Aufgabe für dich</span></summary><div class="body">
+        <p>Der Intelligenzquotient ist normalverteilt mit μ = 100 und σ = 15. <b>Berechnen</b> Sie P(X ≥ 130) und <b>deuten</b> Sie das Ergebnis im Sachzusammenhang.</p>
+        <p><b>Begründen</b> Sie, warum P(X = 100) = 0 gilt, obwohl die Dichtefunktion an der Stelle 100 ihren größten Wert annimmt.</p>
+      </div></details>
+    </aside>
+  </section>
+
+  <!-- Reiter 4 -->
+  <section class="panel" id="t4" role="tabpanel" hidden>
+    <div class="stage">
+      <canvas id="c4" aria-label="Sigma-Umgebung"></canvas>
+      <div class="legend"><span><i style="background:var(--curve)"></i>φ<sub>μ,σ</sub></span><span><i style="background:var(--area)"></i>Umgebung [μ − cσ; μ + cσ]</span></div>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>Umgebung wählen</h3>
+        <div class="chips" id="chips4"></div>
+        <div class="slider" data-id="t4mu" data-label="μ" data-min="-10" data-max="200" data-step="0.5" data-val="100"></div>
+        <div class="slider" data-id="t4sg" data-label="σ" data-min="0.5" data-max="40" data-step="0.5" data-val="15"></div>
+      </div>
+      <div class="card"><div class="result" id="r4"></div></div>
+      <details class="card"><summary>Tabelle aller Sigma-Regeln</summary><div class="body tablebox"><table id="tab4"></table></div></details>
+      <details class="card explain" open><summary>Erklärung</summary><div class="body">
+        <p>Für jede Normalverteilung liegt in der Umgebung [μ − cσ; μ + cσ] stets derselbe Anteil der Fläche. Das liegt daran, dass sich jede Normalverteilung durch Verschieben und Strecken aus der Standardnormalverteilung ergibt.</p>
+        <p>Die Werte 1,64σ, 1,96σ und 2,58σ sind so gewählt, dass genau 90 %, 95 % und 99 % entstehen. Bei Hypothesentests (Q3.3) können die Sigma-Regeln als Hilfsmittel verwendet werden.</p>
+      </div></details>
+      <details class="card task"><summary><span class="tag">Aufgabe für dich</span></summary><div class="body">
+        <p><b>Bestimmen</b> Sie mithilfe der 1,96σ-Regel das Intervall, in dem der IQ von 95 % der Bevölkerung liegt (μ = 100, σ = 15).</p>
+        <p><b>Begründen</b> Sie, warum die Wahrscheinlichkeiten der Sigma-Regeln nicht von μ und σ abhängen.</p>
+      </div></details>
+    </aside>
+  </section>
+
+  <!-- Reiter 5 -->
+  <section class="panel" id="t5" role="tabpanel" hidden>
+    <div class="stage">
+      <canvas id="c5" aria-label="Systematisches Probieren"></canvas>
+      <div class="legend"><span><i style="background:var(--curve)"></i>Normalverteilung mit aktuellem Probierwert</span><span><i style="background:var(--area)"></i>betrachtetes Ereignis</span></div>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>Sachkontext</h3>
+        <div class="fields">
+          <label class="field">Kontext<select id="t5ctx"><option value="koerper">Körpergröße</option><option value="fuell">Füllmenge</option><option value="schoko">Gewicht Schokolade</option></select></label>
+          <label class="field">Gesucht<select id="t5type"><option value="x">Grenze x</option><option value="mu">Erwartungswert μ</option><option value="sg">Standardabweichung σ</option></select></label>
+          <label class="field">Wahrscheinlichkeit<input type="number" id="t5p" step="0.01" min="0.001" max="0.999" value="0.9"></label>
+        </div>
+      </div>
+      <div class="card">
+        <p class="tasktext" id="t5text"></p>
+        <div class="row"><button class="btn primary" id="t5go">Lösung anzeigen</button><button class="btn" id="t5again">Neu starten</button></div>
+      </div>
+      <div class="card" id="t5sol" hidden>
+        <div class="result" id="r5"></div>
+        <div class="tablebox" style="max-height:340px;overflow-y:auto;margin-top:8px"><table id="tab5"></table></div>
+      </div>
+      <details class="card explain" open><summary>Erklärung</summary><div class="body">
+        <p>Bei inversen Fragestellungen ist die Wahrscheinlichkeit gegeben und ein Wert gesucht. Man probiert systematisch: zuerst mit großer Schrittweite, bis die Bedingung erfüllt ist, dann einen Schritt zurück und mit feinerer Schrittweite weiter.</p>
+        <p>Die Wahrscheinlichkeiten liefert der WTR. Die Grenze x kann man auch direkt mit der Umkehrfunktion der Normalverteilung am WTR bestimmen, das wird im Abitur ausdrücklich vorausgesetzt. In der Lösung wird mathematisch notiert, Rechnerschreibweisen sind im Abitur nicht zulässig.</p>
+      </div></details>
+      <details class="card task"><summary><span class="tag">Aufgabe für dich</span></summary><div class="body">
+        <p>Lösen Sie die Aufgabe zuerst selbst durch systematisches Probieren mit dem WTR. <b>Vergleichen</b> Sie anschließend Ihre Wertetabelle mit der Lösung.</p>
+      </div></details>
+    </aside>
+  </section>
+
+  </main>
+</div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const root=document.documentElement;
+const SQ2PI=Math.sqrt(2*Math.PI);
+const phi=(x,m,s)=>Math.exp(-0.5*((x-m)/s)**2)/(s*SQ2PI);
+function erf(x){const t=1/(1+0.3275911*Math.abs(x));const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return x>=0?y:-y;}
+const Phi=(x,m,s)=>0.5*(1+erf((x-m)/(s*Math.SQRT2)));
+function simpson(f,a,b,n=2000){const h=(b-a)/n;let s=f(a)+f(b);for(let i=1;i<n;i++)s+=f(a+i*h)*(i%2?4:2);return s*h/3;}
+const fmt=(x,d=2)=>(Math.abs(x)<1e-12?0:x).toLocaleString('de-DE',{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtT=(x,d=2)=>(Math.abs(x)<1e-12?0:x).toLocaleString('de-DE',{minimumFractionDigits:0,maximumFractionDigits:d});
+const pct=(p,d=2)=>fmt(p*100,d)+' %';
+const pctT=(p)=>fmtT(p*100,2)+' %';
+const C=n=>getComputedStyle(root).getPropertyValue(n).trim();
+
+/* MathML */
+const mn=v=>`<mn>${fmtT(v,2)}</mn>`, mi=s=>`<mi>${s}</mi>`, mo=s=>`<mo>${s}</mo>`;
+const frac=(a,b)=>`<mfrac><mrow>${a}</mrow><mrow>${b}</mrow></mfrac>`;
+const sqrt=a=>`<msqrt>${a}</msqrt>`, sup=(a,b)=>`<msup><mrow>${a}</mrow><mrow>${b}</mrow></msup>`;
+const par=a=>`<mo>(</mo>${a}<mo>)</mo>`;
+const M=x=>`<math display="block">${x}</math>`;
+const half=frac('<mn>1</mn>','<mn>2</mn>');
+function xm(m){if(Math.abs(m)<1e-9)return mi('x');return m>0?mi('x')+mo('−')+mn(m):mi('x')+mo('+')+mn(-m);}
+function gaussExpr(m,s,norm){
+  const one=Math.abs(s-1)<1e-9;
+  const base=one?xm(m):frac(xm(m),mn(s));
+  const sq=(one&&Math.abs(m)<1e-9)?sup(mi('x'),'<mn>2</mn>'):sup(par(base),'<mn>2</mn>');
+  const ex=sup(mi('e'),mo('−')+half+sq);
+  const pre=norm?frac('<mn>1</mn>',(one?'':mn(s)+mo('·'))+sqrt('<mn>2</mn>'+mi('π')))+mo('·'):'';
+  return pre+ex;
+}
+const phiSym=`<msub>${mi('φ')}<mrow>${mi('μ')}${mo(',')}${mi('σ')}</mrow></msub>`;
+const phiGeneral=frac('<mn>1</mn>',sqrt('<mn>2</mn>'+mi('π')+sup(mi('σ'),'<mn>2</mn>')))+mo('·')+sup(mi('e'),mo('−')+half+sup(par(frac(mi('x')+mo('−')+mi('μ'),mi('σ'))),'<mn>2</mn>'));
+
+/* Zeichnen */
+function nice(range,n){const raw=range/n;const mag=10**Math.floor(Math.log10(raw));const r=raw/mag;return (r<1.5?1:r<3?2:r<7?5:10)*mag;}
+const dec=s=>Math.max(0,-Math.floor(Math.log10(s)+1e-9));
+function plot(cv,xr,yr,o={}){
+  const dpr=window.devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;if(!w||!h)return null;
+  cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);
+  const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+  const pad={l:o.padL||60,r:16,t:14,b:32};
+  const X=x=>pad.l+(x-xr[0])/(xr[1]-xr[0])*(w-pad.l-pad.r);
+  const Y=y=>h-pad.b-(y-yr[0])/(yr[1]-yr[0])*(h-pad.t-pad.b);
+  const fs=w<500?11:13;
+  ctx.font=`${fs}px "JetBrains Mono",ui-monospace,monospace`;
+  const xs=o.xStep||nice(xr[1]-xr[0],w<500?5:9),ys=nice(yr[1]-yr[0],o.yTicks||5);
+  ctx.lineWidth=1;ctx.strokeStyle=C('--grid');ctx.fillStyle=C('--muted');
+  ctx.textAlign='center';ctx.textBaseline='top';
+  for(let i=Math.ceil(xr[0]/xs-1e-9);i*xs<=xr[1]+1e-9;i++){const x=i*xs+0,px=X(x);ctx.beginPath();ctx.moveTo(px,pad.t);ctx.lineTo(px,h-pad.b);ctx.stroke();ctx.fillText(fmtT(x,dec(xs)),px,h-pad.b+7);}
+  ctx.textAlign='right';ctx.textBaseline='middle';
+  for(let i=Math.ceil(yr[0]/ys-1e-9);i*ys<=yr[1]+1e-9;i++){const y=i*ys+0,py=Y(y);ctx.beginPath();ctx.moveTo(pad.l,py);ctx.lineTo(w-pad.r,py);ctx.stroke();ctx.fillText(fmtT(y,dec(ys)),pad.l-8,py);}
+  ctx.strokeStyle=C('--axis');ctx.lineWidth=1.3;
+  const y0=Y(Math.max(yr[0],0));ctx.beginPath();ctx.moveTo(pad.l,y0);ctx.lineTo(w-pad.r,y0);ctx.stroke();
+  const ax=(xr[0]<=0&&xr[1]>=0)?X(0):pad.l;ctx.beginPath();ctx.moveTo(ax,pad.t);ctx.lineTo(ax,h-pad.b);ctx.stroke();
+  return {ctx,X,Y,w,h,pad,xr,yr};
+}
+function clip(P){const c=P.ctx;c.save();c.beginPath();c.rect(P.pad.l,P.pad.t-2,P.w-P.pad.l-P.pad.r,P.h-P.pad.t-P.pad.b+2);c.clip();}
+function curve(P,f,color,lw=3,dash){const c=P.ctx;clip(P);c.strokeStyle=color;c.lineWidth=lw;c.setLineDash(dash||[]);c.lineJoin='round';c.beginPath();const N=Math.max(300,P.w|0);for(let i=0;i<=N;i++){const x=P.xr[0]+(P.xr[1]-P.xr[0])*i/N,px=P.X(x),py=P.Y(f(x));i?c.lineTo(px,py):c.moveTo(px,py);}c.stroke();c.restore();}
+function area(P,f,a,b,color,alpha=.38){a=Math.max(a,P.xr[0]);b=Math.min(b,P.xr[1]);if(b<=a)return;const c=P.ctx;clip(P);c.globalAlpha=alpha;c.fillStyle=color;c.beginPath();c.moveTo(P.X(a),P.Y(0));const N=300;for(let i=0;i<=N;i++){const x=a+(b-a)*i/N;c.lineTo(P.X(x),P.Y(f(x)));}c.lineTo(P.X(b),P.Y(0));c.closePath();c.fill();c.restore();}
+function vline(P,x,color,y1,dash=[5,4],lw=1.5){if(x<P.xr[0]||x>P.xr[1])return;const c=P.ctx;c.save();c.strokeStyle=color;c.lineWidth=lw;c.setLineDash(dash);c.beginPath();c.moveTo(P.X(x),P.Y(0));c.lineTo(P.X(x),y1==null?P.pad.t:P.Y(y1));c.stroke();c.restore();}
+function hline(P,y,x1,color){const c=P.ctx;c.save();c.strokeStyle=color;c.lineWidth=1.3;c.setLineDash([5,4]);c.beginPath();c.moveTo(P.pad.l,P.Y(y));c.lineTo(P.X(x1),P.Y(y));c.stroke();c.restore();}
+function dot(P,x,y,color){const c=P.ctx;c.save();c.fillStyle=color;c.strokeStyle=C('--sheet');c.lineWidth=2;c.beginPath();c.arc(P.X(x),P.Y(y),5.5,0,7);c.fill();c.stroke();c.restore();}
+function label(P,text,px,py,color,below){const c=P.ctx;c.save();c.font=`600 ${P.w<500?11:13}px "JetBrains Mono",ui-monospace,monospace`;const w=c.measureText(text).width;let x=Math.max(P.pad.l+2,Math.min(P.w-P.pad.r-w-4,px-w/2));let y=below?py+10:py-24;y=Math.max(P.pad.t,Math.min(P.h-P.pad.b-20,y));c.globalAlpha=.88;c.fillStyle=C('--sheet');c.fillRect(x-4,y-1,w+8,19);c.globalAlpha=1;c.fillStyle=color||C('--ink');c.textBaseline='top';c.textAlign='left';c.fillText(text,x,y+1);c.restore();}
+
+/* Regler */
+const S={},SL={};
+document.querySelectorAll('.slider').forEach(el=>{
+  const d=el.dataset,id=d.id;
+  el.innerHTML=`<label for="${id}-r" class="sym">${d.label}</label><input type="range" id="${id}-r" min="${d.min}" max="${d.max}" step="${d.step}" value="${d.val}"><input type="number" id="${id}-n" step="any" min="${d.min}" max="${d.max}" value="${d.val}" aria-label="${d.label} exakt eingeben">`;
+  const r=el.querySelector('[type=range]'),n=el.querySelector('[type=number]'),min=+d.min,max=+d.max;
+  S[id]=+d.val;SL[id]={r,n};
+  const tab=el.closest('.panel').id;
+  r.addEventListener('input',()=>{S[id]=+r.value;n.value=r.value;update(tab);});
+  n.addEventListener('input',()=>{const v=parseFloat(String(n.value).replace(',','.'));if(!isFinite(v)||v<min||v>max)return;S[id]=v;r.value=v;update(tab);});
+});
+function setVal(id,v){S[id]=v;SL[id].r.value=v;SL[id].n.value=v;}
+
+/* Reiter 1 */
+function r1(){
+  const sh=$('#s1shift').checked,st=$('#s1stretch').checked,no=$('#s1norm').checked;
+  const m=sh?S.t1mu:0,s=st?S.t1sg:1,A=no?1/(s*SQ2PI):1;
+  const f=x=>A*Math.exp(-0.5*((x-m)/s)**2);
+  const I=simpson(f,m-12*s,m+12*s);
+  $('#f1').innerHTML=M(mi('f')+par(mi('x'))+mo('=')+gaussExpr(m,s,no));
+  $('#i1').textContent='≈ '+fmt(I,4);
+  $('#d1').innerHTML=Math.abs(I-1)<1e-4?'<span class="state ok">ja, Fläche = 1</span>':'<span class="state no">nein, Fläche ≠ 1</span>';
+  const li=(on,t)=>`<li class="${on?'on':'off'}">${t}</li>`;
+  let txt=`<p>Ausgangspunkt ist <b>g(x) = e<sup>−x²/2</sup></b>: Hochpunkt (0 | 1), symmetrisch zur y-Achse, Fläche unter dem Graphen √(2π) ≈ 2,5066. Das ist noch keine Dichtefunktion.</p><ol class="steps">`;
+  txt+=li(sh,`<b>Verschieben:</b> x wird durch x − μ ersetzt. Der Graph wandert um ${fmtT(S.t1mu,2)} in x-Richtung, Form und Fläche bleiben gleich.`);
+  txt+=li(st,`<b>Strecken:</b> x − μ wird durch (x − μ)/σ ersetzt. Der Graph wird mit dem Faktor ${fmtT(S.t1sg,2)} in x-Richtung gestreckt, die Fläche wird σ·√(2π) ≈ ${fmt(S.t1sg*SQ2PI,4)}.`);
+  txt+=li(no,`<b>Normieren:</b> Der Faktor 1/(σ√(2π)) staucht den Graphen in y-Richtung, bis die Fläche genau 1 ist. Erst jetzt ist f die Dichte φ<sub>μ,σ</sub> der Normalverteilung.`);
+  $('#e1').innerHTML=txt+'</ol>';
+  const P=plot($('#c1'),[-10,10],[0,Math.max(1.15,A*1.15)]);if(!P)return;
+  curve(P,x=>Math.exp(-x*x/2),C('--muted'),1.6,[6,5]);
+  area(P,f,-10,10,C('--area'),.2);
+  curve(P,f,C('--curve'),3.2);
+  dot(P,m,A,C('--curve'));label(P,`(${fmtT(m,2)} | ${fmt(A,3)})`,P.X(m),P.Y(A),C('--curve'));
+}
+
+/* Reiter 2 */
+function r2(){
+  const mu=S.t2mu,s=S.t2sg,cmp=$('#c2cmp').checked,mu2=S.t2mu2,s2=S.t2sg2;
+  $('#cmpBox').hidden=!cmp;$('#leg2b').hidden=!cmp;
+  const peak=1/(s*SQ2PI),yW=peak*Math.exp(-0.5);
+  $('#f2').innerHTML=M(phiSym+par(mi('x'))+mo('=')+phiGeneral)+M(phiSym+par(mi('x'))+mo('=')+gaussExpr(mu,s,true));
+  $('#kv2').innerHTML=`<dt>Erwartungswert μ</dt><dd>${fmtT(mu,2)}</dd><dt>Standardabweichung σ</dt><dd>${fmtT(s,2)}</dd><dt>Hochpunkt</dt><dd>H(${fmtT(mu,2)} | ${fmt(peak,4)})</dd><dt>Wendepunkte</dt><dd>W₁(${fmtT(mu-s,2)} | ${fmt(yW,4)})<br>W₂(${fmtT(mu+s,2)} | ${fmt(yW,4)})</dd><dt>Fläche</dt><dd>1</dd>`;
+  let ymax=Math.max(.5,peak*1.2);if(cmp)ymax=Math.max(ymax,1.2/(s2*SQ2PI));
+  const P=plot($('#c2'),[-10,10],[0,ymax]);if(!P)return;
+  const f=x=>phi(x,mu,s);
+  area(P,f,-10,10,C('--curve'),.12);
+  if(cmp)curve(P,x=>phi(x,mu2,s2),C('--curve2'),2.6);
+  curve(P,f,C('--curve'),3.2);
+  if($('#c2sym').checked)vline(P,mu,C('--axis'),null,[7,5]);
+  if($('#c2wp').checked){
+    vline(P,mu-s,C('--curve2'),yW,[4,4]);vline(P,mu+s,C('--curve2'),yW,[4,4]);
+    const c=P.ctx;c.save();c.strokeStyle=C('--ink');c.lineWidth=1.5;c.beginPath();c.moveTo(P.X(mu),P.Y(yW*.45));c.lineTo(P.X(mu+s),P.Y(yW*.45));c.stroke();c.restore();
+    label(P,'σ',(P.X(mu)+P.X(mu+s))/2,P.Y(yW*.45),C('--ink'));
+    dot(P,mu-s,yW,C('--curve2'));dot(P,mu+s,yW,C('--curve2'));
+    label(P,'W₁',P.X(mu-s)-22,P.Y(yW)+6,C('--curve2'));label(P,'W₂',P.X(mu+s)+22,P.Y(yW)+6,C('--curve2'));
+  }
+  if($('#c2hp').checked){dot(P,mu,peak,C('--curve'));label(P,`H(${fmtT(mu,2)} | ${fmt(peak,3)})`,P.X(mu),P.Y(peak),C('--curve'));}
+}
+
+/* Reiter 3 */
+function r3(){
+  const mu=S.t3mu,s=S.t3sg,t=$('#t3type').value;
+  let a=parseFloat(String($('#t3a').value).replace(',','.')),b=parseFloat(String($('#t3b').value).replace(',','.'));
+  $('#t3aBox').hidden=t==='le';$('#t3bBox').hidden=t==='ge';
+  if(!isFinite(a))a=mu-s;if(!isFinite(b))b=mu+s;
+  let lo,hi,p,txt;
+  const sw=t==='bw'&&a>b;if(sw){const z=a;a=b;b=z;}
+  if(t==='le'){lo=-Infinity;hi=b;p=Phi(b,mu,s);txt=`P(X ≤ ${fmtT(b)}) = Φ<sub>${fmtT(mu)};${fmtT(s)}</sub>(${fmtT(b)})`; }
+  else if(t==='ge'){lo=a;hi=Infinity;p=1-Phi(a,mu,s);txt=`P(X ≥ ${fmtT(a)}) = 1 − Φ<sub>${fmtT(mu)};${fmtT(s)}</sub>(${fmtT(a)})`; }
+  else{lo=a;hi=b;p=Phi(b,mu,s)-Phi(a,mu,s);txt=`P(${fmtT(a)} ≤ X ≤ ${fmtT(b)}) = Φ<sub>${fmtT(mu)};${fmtT(s)}</sub>(${fmtT(b)}) − Φ<sub>${fmtT(mu)};${fmtT(s)}</sub>(${fmtT(a)})`; }
+  $('#r3').innerHTML=`<small>${txt}${sw?' (Grenzen vertauscht)':''}</small>≈ ${fmt(p,4)} = ${pct(p)}`;
+  $('#g3').textContent='Mit dem WTR berechnen und in mathematischer Schreibweise notieren, nicht in Rechnerschreibweise.';
+  const xr=[mu-4*s,mu+4*s],f=x=>phi(x,mu,s);
+  const P=plot($('#c3'),xr,[0,1.18/(s*SQ2PI)]);if(!P)return;
+  area(P,f,Math.max(lo,xr[0]),Math.min(hi,xr[1]),C('--area'),.5);
+  curve(P,f,C('--curve'),3);
+  if(isFinite(lo))vline(P,lo,C('--ink'),f(lo),[4,4]);
+  if(isFinite(hi))vline(P,hi,C('--ink'),f(hi),[4,4]);
+  label(P,'≈ '+pct(p,1),P.X((Math.max(lo,xr[0])+Math.min(hi,xr[1]))/2),P.Y(f(mu)*0.35),C('--ink'));
+  const Q=plot($('#c3b'),xr,[0,1],{yTicks:4});if(!Q)return;
+  const F=x=>Phi(x,mu,s);
+  curve(Q,F,C('--curve2'),2.6);
+  const c=Q.ctx,yr0=F(Math.max(lo,xr[0])),yr1=F(Math.min(hi,xr[1]));
+  const ya=isFinite(lo)?F(lo):0,yb=isFinite(hi)?F(hi):1;
+  c.save();c.strokeStyle=C('--area');c.lineWidth=7;c.lineCap='round';c.beginPath();c.moveTo(Q.pad.l+4,Q.Y(ya));c.lineTo(Q.pad.l+4,Q.Y(yb));c.stroke();c.restore();
+  if(isFinite(lo)){hline(Q,ya,lo,C('--muted'));vline(Q,lo,C('--muted'),ya);dot(Q,lo,ya,C('--curve2'));label(Q,`Φ(${fmtT(lo)}) ≈ ${fmt(ya,4)}`,Q.X(lo),Q.Y(ya),C('--curve2'),true);}
+  if(isFinite(hi)){hline(Q,yb,hi,C('--muted'));vline(Q,hi,C('--muted'),yb);dot(Q,hi,yb,C('--curve2'));label(Q,`Φ(${fmtT(hi)}) ≈ ${fmt(yb,4)}`,Q.X(hi),Q.Y(yb),C('--curve2'));}
+}
+
+/* Reiter 4 */
+const SIG=[[1,'≈ 68,3 %'],[1.64,'≈ 90 %'],[1.96,'≈ 95 %'],[2,'≈ 95,4 %'],[2.58,'≈ 99 %'],[3,'≈ 99,7 %']];
+S.t4c=1;
+$('#chips4').innerHTML=SIG.map(([c])=>`<button class="chip" data-c="${c}" aria-pressed="${c===1}">${fmtT(c)}σ</button>`).join('');
+$('#chips4').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;S.t4c=+b.dataset.c;document.querySelectorAll('#chips4 .chip').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));update('t4');});
+function r4(){
+  const mu=S.t4mu,s=S.t4sg,c=S.t4c,a=mu-c*s,b=mu+c*s,p=Phi(b,mu,s)-Phi(a,mu,s);
+  const std=SIG.find(z=>z[0]===c)[1];
+  $('#r4').innerHTML=`<small>${fmtT(c)}σ-Umgebung: [μ − ${fmtT(c)}σ; μ + ${fmtT(c)}σ] = [${fmt(a,2)}; ${fmt(b,2)}]</small>P ≈ ${fmt(p,4)} <small>Sigma-Regel: ${std}</small>`;
+  $('#tab4').innerHTML='<tr><th>Umgebung</th><th>Intervall</th><th>Sigma-Regel</th><th>genau</th></tr>'+SIG.map(([cc,t])=>{const q=Phi(mu+cc*s,mu,s)-Phi(mu-cc*s,mu,s);return `<tr class="${cc===c?'hl':''}"><td>${fmtT(cc)}σ</td><td class="num">[${fmt(mu-cc*s,2)}; ${fmt(mu+cc*s,2)}]</td><td>${t}</td><td class="num">${fmt(q,4)}</td></tr>`;}).join('');
+  const xr=[mu-4*s,mu+4*s],f=x=>phi(x,mu,s),pk=1/(s*SQ2PI);
+  const P=plot($('#c4'),xr,[0,pk*1.2]);if(!P)return;
+  area(P,f,a,b,C('--area'),.5);curve(P,f,C('--curve'),3);
+  vline(P,mu,C('--axis'),pk,[7,5]);vline(P,a,C('--ink'),f(a),[4,4]);vline(P,b,C('--ink'),f(b),[4,4]);
+  const yb=pk*.12,cx=P.ctx;cx.save();cx.strokeStyle=C('--ink');cx.lineWidth=1.5;cx.beginPath();cx.moveTo(P.X(a),P.Y(yb));cx.lineTo(P.X(b),P.Y(yb));cx.stroke();cx.restore();
+  label(P,`μ ± ${fmtT(c)}σ: ${std.replace('≈ ','≈')}`,P.X(mu),P.Y(pk*.5),C('--ink'));
+  label(P,`μ − ${fmtT(c)}σ`,P.X(a),P.Y(0)-4,C('--muted'));label(P,`μ + ${fmtT(c)}σ`,P.X(b),P.Y(0)-4,C('--muted'));
+}
+
+/* Reiter 5 */
+const pcS=p=>pctT(p);
+const CTX={
+  koerper:{u:'cm',m0:179,s0:7,steps:[5,1,.1,.01],
+    x:{p:.9,text:p=>`Die Körpergröße X erwachsener Männer ist normalverteilt mit μ = 179 cm und σ = 7 cm. Bestimmen Sie die Größe x, die von ${pcS(p)} der Männer nicht überschritten wird, also P(X ≤ x) = ${pcS(p)}.`,ans:(v,p)=>`${pcS(p)} der Männer sind höchstens etwa ${fmt(v)} cm groß.`},
+    mu:{p:.05,g:165,text:p=>`In einem anderen Land gilt ebenfalls σ = 7 cm, aber nur ${pcS(p)} der Männer sind kleiner als 165 cm. Bestimmen Sie den Erwartungswert μ.`,ans:v=>`Die mittlere Körpergröße beträgt dort etwa ${fmt(v)} cm.`},
+    sg:{p:.8,a:170,b:188,text:p=>`In einer Altersgruppe gilt μ = 179 cm, und ${pcS(p)} der Männer sind zwischen 170 cm und 188 cm groß. Bestimmen Sie die Standardabweichung σ.`,ans:v=>`Die Standardabweichung beträgt etwa ${fmt(v)} cm.`}},
+  fuell:{u:'ml',m0:502,s0:3,steps:[1,.1,.01],
+    x:{p:.05,text:p=>`Die Füllmenge X von 0,5-l-Flaschen ist normalverteilt mit μ = 502 ml und σ = 3 ml. Bestimmen Sie die Füllmenge x, die nur von ${pcS(p)} der Flaschen unterschritten wird, also P(X ≤ x) = ${pcS(p)}.`,ans:(v,p)=>`Nur ${pcS(p)} der Flaschen enthalten weniger als etwa ${fmt(v)} ml.`},
+    mu:{p:.02,g:500,text:p=>`Die Abfüllanlage arbeitet mit σ = 3 ml. Höchstens ${pcS(p)} der Flaschen dürfen weniger als 500 ml enthalten. Bestimmen Sie, auf welchen Wert μ die Anlage mindestens eingestellt werden muss.`,ans:v=>`Die Anlage muss auf mindestens etwa ${fmt(v)} ml eingestellt werden.`},
+    sg:{p:.95,a:497,b:507,text:p=>`Die Anlage ist auf μ = 502 ml eingestellt. ${pcS(p)} der Flaschen sollen zwischen 497 ml und 507 ml enthalten. Bestimmen Sie, wie groß die Standardabweichung σ höchstens sein darf.`,ans:v=>`Die Standardabweichung darf höchstens etwa ${fmt(v)} ml betragen.`}},
+  schoko:{u:'g',m0:100,s0:1.5,steps:[1,.1,.01],
+    x:{p:.1,text:p=>`Das Gewicht X einer 100-g-Tafel Schokolade ist normalverteilt mit μ = 100 g und σ = 1,5 g. Bestimmen Sie das Gewicht x, unter dem die leichtesten ${pcS(p)} der Tafeln liegen.`,ans:(v,p)=>`Die leichtesten ${pcS(p)} der Tafeln wiegen weniger als etwa ${fmt(v)} g.`},
+    mu:{p:.01,g:98,text:p=>`Die Maschine arbeitet mit σ = 1,5 g. Höchstens ${pcS(p)} der Tafeln dürfen weniger als 98 g wiegen. Bestimmen Sie, auf welchen Wert μ die Maschine mindestens eingestellt werden muss.`,ans:v=>`Die Maschine muss auf mindestens etwa ${fmt(v)} g eingestellt werden.`},
+    sg:{p:.9,a:98,b:102,text:p=>`Es gilt μ = 100 g. ${pcS(p)} der Tafeln sollen zwischen 98 g und 102 g wiegen. Bestimmen Sie, wie groß die Standardabweichung σ höchstens sein darf.`,ans:v=>`Die Standardabweichung darf höchstens etwa ${fmt(v)} g betragen.`}}
+};
+let T5={rows:[],shown:0,timer:null,revealed:false};
+function task5(){
+  const k=CTX[$('#t5ctx').value],type=$('#t5type').value,t=k[type];
+  let p=parseFloat(String($('#t5p').value).replace(',','.'));if(!isFinite(p)||p<=0||p>=1)p=t.p;
+  let f,v0;
+  if(type==='x'){f=v=>Phi(v,k.m0,k.s0);v0=k.m0;}
+  else if(type==='mu'){f=v=>Phi(t.g,v,k.s0);v0=k.m0;}
+  else{f=v=>Phi(t.b,k.m0,v)-Phi(t.a,k.m0,v);v0=Math.round(k.s0*2);}
+  return {k,type,t,p,f,v0};
+}
+function probe(f,p,v0,steps,positive){
+  const rows=[{s:null,v:v0,P:f(v0),hit:false}];let v=v0;const needUp=f(v0)<p;
+  for(const s of steps){
+    const dir=((f(v+s)>f(v))===needUp)?1:-1;let g=0;
+    while(g++<80){const nv=+(v+dir*s).toFixed(6);if(positive&&nv<=0)break;const P=f(nv);const hit=needUp?P>=p:P<=p;rows.push({s,v:nv,P,hit});if(hit)break;v=nv;}
+  }
+  return rows;
+}
+function draw5(idx){
+  const {k,type,t,f}=task5(),row=T5.rows[Math.min(idx,T5.rows.length-1)];
+  const vs=T5.rows.map(r=>r.v);
+  let mu=k.m0,s=k.s0,xr,lo,hi;
+  if(type==='x'){xr=[k.m0-4.5*k.s0,k.m0+4.5*k.s0];if(idx>0){lo=-Infinity;hi=row.v;}}
+  else if(type==='mu'){mu=row.v;const ext=[...vs,t.g];xr=[Math.min(...ext)-3.8*k.s0,Math.max(...ext)+3.8*k.s0];lo=-Infinity;hi=t.g;}
+  else{s=row.v;const smax=Math.max(...vs);xr=[k.m0-3.8*smax,k.m0+3.8*smax];lo=t.a;hi=t.b;}
+  const smin=type==='sg'?Math.min(...vs):k.s0;
+  const P=plot($('#c5'),xr,[0,1.2/(smin*SQ2PI)]);if(!P)return;
+  const g=x=>phi(x,mu,s);
+  if(hi!=null)area(P,g,Math.max(lo,xr[0]),Math.min(hi,xr[1]),C('--area'),.5);
+  curve(P,g,C('--curve'),3);
+  if(hi!=null&&isFinite(hi))vline(P,hi,C('--ink'),g(hi),[4,4]);
+  if(lo!=null&&isFinite(lo))vline(P,lo,C('--ink'),g(lo),[4,4]);
+  const nm={x:'x',mu:'μ',sg:'σ'}[type];
+  label(P,`${nm} = ${fmtT(row.v)} ${k.u}: P ≈ ${pct(row.P)}`,P.X(type==='x'&&idx>0?row.v:mu),P.Y(1/(s*SQ2PI)),C('--ink'));
+}
+function table5(n){
+  const {type,k}=task5(),nm={x:'x',mu:'μ',sg:'σ'}[type];
+  const rows=T5.rows.slice(0,n);
+  $('#tab5').innerHTML=`<tr><th>Schrittweite</th><th>${nm} in ${k.u}</th><th>Wahrscheinlichkeit</th><th>Bedingung</th></tr>`+rows.map((r,i)=>`<tr class="${i===n-1?'hl':''} ${r.hit?'hit':''}"><td class="num">${r.s==null?'Start':fmtT(r.s)}</td><td class="num">${fmtT(r.v)}</td><td class="num">${fmt(r.P,4)}</td><td>${r.hit?'erfüllt':'noch nicht'}</td></tr>`).join('');
+  const box=$('#tab5').parentElement;box.scrollTop=box.scrollHeight;
+}
+function reset5(){
+  clearInterval(T5.timer);T5.timer=null;T5.revealed=false;T5.shown=0;
+  const {k,type,t,p,f,v0}=task5();
+  T5.rows=probe(f,p,v0,k.steps,type==='sg');
+  $('#t5text').textContent=t.text(p);
+  $('#t5sol').hidden=true;$('#t5go').textContent='Lösung anzeigen';
+  draw5(0);
+}
+function finish5(){
+  clearInterval(T5.timer);T5.timer=null;T5.shown=T5.rows.length;
+  const {k,type,t,p}=task5(),last=[...T5.rows].reverse().find(r=>r.hit)||T5.rows[T5.rows.length-1];
+  const nm={x:'x',mu:'μ',sg:'σ'}[type];
+  $('#r5').innerHTML=`${nm} ≈ ${fmt(last.v)} ${k.u}<small>${t.ans(last.v,p)} (auf zwei Nachkommastellen durch Probieren)</small>`;
+  table5(T5.rows.length);draw5(T5.rows.indexOf(last));$('#t5go').textContent='Lösung anzeigen';
+}
+$('#t5go').addEventListener('click',()=>{
+  if(T5.timer){finish5();return;}
+  if(T5.revealed&&T5.shown>=T5.rows.length){return;}
+  T5.revealed=true;$('#t5sol').hidden=false;$('#r5').innerHTML='<small>Probieren läuft …</small>';
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){finish5();return;}
+  T5.shown=1;table5(1);draw5(0);$('#t5go').textContent='Überspringen';
+  T5.timer=setInterval(()=>{T5.shown++;if(T5.shown>=T5.rows.length){finish5();return;}table5(T5.shown);draw5(T5.shown-1);},280);
+});
+$('#t5again').addEventListener('click',reset5);
+function setP5(){const {t}=task5();$('#t5p').value=t.p;}
+$('#t5ctx').addEventListener('change',()=>{setP5();reset5();});
+$('#t5type').addEventListener('change',()=>{setP5();reset5();});
+$('#t5p').addEventListener('input',reset5);
+function r5(){if(T5.revealed&&T5.shown>=T5.rows.length){const last=[...T5.rows].reverse().find(r=>r.hit)||T5.rows[T5.rows.length-1];draw5(T5.rows.indexOf(last));}else draw5(Math.max(0,T5.shown-1));}
+
+/* Steuerung */
+const R={t1:r1,t2:r2,t3:r3,t4:r4,t5:r5};
+let active='t1',raf=0;
+function update(tab){if(tab&&tab!==active)return;cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>R[active]());}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
+  active=b.dataset.tab;
+  document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',String(x===b)));
+  document.querySelectorAll('.panel').forEach(p=>p.hidden=p.id!==active);
+  update();
+}));
+['s1shift','s1stretch','s1norm'].forEach(id=>$('#'+id).addEventListener('change',()=>update('t1')));
+['c2hp','c2wp','c2sym','c2cmp'].forEach(id=>$('#'+id).addEventListener('change',()=>update('t2')));
+['t3type','t3a','t3b'].forEach(id=>$('#'+id).addEventListener('input',()=>update('t3')));
+$('#t3type').addEventListener('change',()=>update('t3'));
+$('#btnPresent').addEventListener('click',e=>{const on=root.classList.toggle('present');e.currentTarget.setAttribute('aria-pressed',String(on));update();});
+const mq=matchMedia('(prefers-color-scheme: dark)');
+function isDark(){const t=root.getAttribute('data-theme');return t?t==='dark':mq.matches;}
+function themeLabel(){$('#btnTheme').textContent=isDark()?'Hell':'Dunkel';}
+$('#btnTheme').addEventListener('click',()=>{root.setAttribute('data-theme',isDark()?'light':'dark');themeLabel();update();});
+mq.addEventListener('change',()=>{themeLabel();update();});
+$('#btnReset').addEventListener('click',()=>{
+  ['t1mu','t2mu','t3mu','t4mu'].forEach(id=>setVal(id,0));['t1sg','t2sg','t3sg','t4sg'].forEach(id=>setVal(id,1));
+  setVal('t2mu2',2);setVal('t2sg2',2);
+  ['s1shift','s1stretch','s1norm','c2sym','c2cmp'].forEach(id=>$('#'+id).checked=false);$('#c2hp').checked=true;$('#c2wp').checked=true;
+  $('#t3type').value='bw';$('#t3a').value=-1;$('#t3b').value=1;
+  S.t4c=1;document.querySelectorAll('#chips4 .chip').forEach(x=>x.setAttribute('aria-pressed',String(+x.dataset.c===1)));
+  reset5();update();
+});
+const ro=new ResizeObserver(()=>update());document.querySelectorAll('canvas').forEach(c=>ro.observe(c));
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>update());
+themeLabel();setP5();reset5();update();
+})();
+</script>
+
+</body></html>

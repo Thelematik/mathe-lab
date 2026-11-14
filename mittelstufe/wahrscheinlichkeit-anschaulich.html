@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wahrscheinlichkeit anschaulich</title>
+<link rel="stylesheet" href="../assets/fonts/fonts.css">
+<style>
+:root{--font:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',sans-serif;--c-r:#d94343;--c-b:#2f6fdb;--c-y:#e9b200;--c-w:#f4f4f4}
+:root,[data-theme=light]{--bg:#f4f2ec;--panel:#fff;--panel2:#f7f6f2;--ink:#1c2230;--muted:#5d6676;--line:#dcd8cd;--accent:#1d64d8;--accent-ink:#fff;--soft:#e6eefc;--hl:#f3b400;--hl-soft:#fff4d1;--warn-bg:#fff0d9;--warn:#7f4500;--ok:#17784a;--comp:#d4690a;--jar:rgba(29,100,216,.05);--wl:84%;--rest:#7b8494;--shadow:0 1px 2px rgba(0,0,0,.05),0 6px 18px rgba(0,0,0,.05)}
+[data-theme=dark]{--bg:#11141a;--panel:#1a1f28;--panel2:#222834;--ink:#e9edf3;--muted:#9da7b6;--line:#333b48;--accent:#6ea8ff;--accent-ink:#0b1220;--soft:#1f2d46;--hl:#ffcc33;--hl-soft:#3a3214;--warn-bg:#3b2a10;--warn:#ffc46b;--ok:#4ad08b;--comp:#ff9d4d;--jar:rgba(110,168,255,.06);--wl:36%;--rest:#6c7584;--shadow:none;--c-r:#e25252;--c-b:#4a84ee}
+*{box-sizing:border-box}
+html{font-size:18px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.45;-webkit-font-smoothing:antialiased}
+button,select,input{font:inherit;color:inherit}
+header{position:sticky;top:0;z-index:20;background:var(--panel);border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;gap:.55rem 1.1rem;padding:.6rem 1.2rem}
+.brand{font-weight:700;font-size:1.1rem;white-space:nowrap}
+.brand span{color:var(--accent)}
+nav{display:flex;gap:.2rem;flex-wrap:wrap}
+nav button{border:0;background:transparent;padding:.45rem .8rem;border-radius:10px;cursor:pointer;font-weight:700;color:var(--muted)}
+nav button:hover{background:var(--panel2);color:var(--ink)}
+nav button.on{background:var(--accent);color:var(--accent-ink)}
+.tools{margin-left:auto;display:flex;gap:.8rem;align-items:center;flex-wrap:wrap;font-size:.9rem}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--panel2)}
+.seg button{border:0;background:transparent;padding:.38rem .75rem;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button.on{background:var(--soft);color:var(--accent);font-weight:700}
+.chk{display:inline-flex;align-items:center;gap:.4rem;cursor:pointer;user-select:none}
+.chk input{width:1.1rem;height:1.1rem;accent-color:var(--accent)}
+main{max-width:1340px;margin:0 auto;padding:1.2rem 1.2rem 3rem}
+.view{display:none}.view.on{display:block}
+.titlebar{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin:.2rem 0 1rem}
+h1{font-size:1.75rem;margin:0;letter-spacing:-.01em}
+h2{font-size:1.12rem;margin:0 0 .8rem}
+h3{font-size:1rem;margin:.2rem 0 .5rem}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:1.1rem 1.25rem;box-shadow:var(--shadow);margin-bottom:1.1rem;min-width:0}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1.1rem;margin-bottom:1.1rem}
+.grid2>.card{margin-bottom:0}
+@media(max-width:980px){.grid2{grid-template-columns:1fr}}
+.btn{border:1px solid var(--line);background:var(--panel2);padding:.45rem .95rem;border-radius:10px;cursor:pointer;font-size:.95rem}
+.btn:hover:not(:disabled){border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
+.btn.on{background:var(--soft);border-color:var(--accent);color:var(--accent);font-weight:700}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.sm{padding:.2rem .65rem}
+.sel,.inp{border:1px solid var(--line);background:var(--panel2);padding:.45rem .7rem;border-radius:10px;max-width:100%}
+.row{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin-bottom:.75rem}
+.muted{color:var(--muted)}
+.small{font-size:.85rem}
+.note{font-size:.9rem;color:var(--muted);background:var(--panel2);border-radius:10px;padding:.55rem .8rem;margin:.4rem 0 .8rem}
+.merk{background:var(--hl-soft);border-left:6px solid var(--hl);padding:.9rem 1.2rem;border-radius:12px;margin-bottom:1.1rem;font-size:1.06rem}
+.merk p{margin:.35rem 0}
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 .1em;line-height:1.12}
+.frac>span:first-child{border-bottom:2px solid currentColor;padding:0 .22em .05em}
+.frac>span:last-child{padding:.05em .22em 0}
+.frac.txt{font-size:.78em}
+.line{font-size:1.15rem;padding:.5rem 0;border-bottom:1px dashed var(--line);line-height:2.3}
+.line:last-child{border-bottom:0}
+.reveal{animation:fadein .4s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.tag{display:inline-block;line-height:1.4;vertical-align:middle;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;background:var(--soft);color:var(--accent);padding:.15rem .55rem;border-radius:6px;font-weight:700;margin-right:.3rem}
+.tag.tc{background:color-mix(in srgb,var(--comp) 18%,transparent);color:var(--comp)}
+.tag.tw{background:var(--warn-bg);color:var(--warn)}
+.result{font-size:1.3em;font-weight:700}
+.ok{color:var(--ok);font-weight:700}
+.warn{background:var(--warn-bg);color:var(--warn);border-radius:12px;padding:.8rem 1rem;margin:.5rem 0;font-size:1.05rem}
+.ov{text-decoration:overline}
+.stepctl{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.9rem;padding-top:.8rem;border-top:1px solid var(--line)}
+.nw{white-space:nowrap}
+/* Laplace */
+.tiles{display:flex;flex-wrap:wrap;gap:.7rem;margin:.4rem 0 1rem}
+.tile{position:relative;width:86px;height:86px;border-radius:16px;border:3px solid var(--line);background:var(--panel2);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.2rem;padding:0;transition:transform .15s,border-color .15s,background .15s}
+.tile:hover{transform:translateY(-2px)}
+.tile.sel{border-color:var(--hl);background:var(--hl-soft)}
+.tiles.muenze .tile{width:116px;height:116px}
+.tiles.urne .tile{width:72px;height:72px}
+.tiles.small{gap:.4rem;margin:.6rem 0}
+.tile.static{width:52px;height:52px;cursor:default;border-width:2px;font-size:1.4rem;font-weight:700}
+.tile.static:hover{transform:none}
+.face{font-size:2.3rem;font-weight:700;line-height:1}
+.fnum{position:absolute;left:7px;top:4px;font-size:.68rem;color:var(--muted)}
+.coin{width:62px;height:62px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f9e7a0,#c99a1e);color:#563a00;display:grid;place-items:center;font-weight:700;font-size:1.45rem;border:3px solid #a57a10}
+.tl{font-size:.9rem;font-weight:700}
+.lball{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:1.05rem;box-shadow:inset -5px -6px 0 rgba(0,0,0,.16),inset 4px 4px 0 rgba(255,255,255,.22);border:1px solid rgba(0,0,0,.2)}
+.lball sub{font-size:.7em}
+.wheelwrap{display:flex;justify-content:center;margin:.3rem 0 1rem}
+.wheel{display:block}
+.sector{cursor:pointer}
+.sector path{stroke:var(--panel);stroke-width:2}
+.sector text{font-size:21px;font-weight:700;fill:var(--ink);pointer-events:none}
+.sector.on text{fill:#1c2230}
+/* Urne */
+.counters{display:flex;flex-wrap:wrap;gap:.5rem}
+.counter{display:inline-flex;align-items:center;gap:.2rem;background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:.15rem .25rem .15rem .7rem}
+.cname{font-size:.85rem;margin-right:.2rem}
+.cbtn{width:1.9rem;height:1.9rem;border-radius:50%;border:0;background:transparent;cursor:pointer;font-size:1.15rem;font-weight:700}
+.cbtn:hover{background:var(--soft)}
+.cball{min-width:2.1rem;height:2.1rem;border-radius:999px;display:grid;place-items:center;font-weight:700;border:1px solid rgba(0,0,0,.2);padding:0 .3rem}
+.stagewrap{overflow-x:auto;overflow-y:hidden}
+.stage{position:relative;width:520px;height:292px;margin:.3rem 0 .4rem}
+.jar{position:absolute;left:0;top:0}
+.slot{position:absolute;width:56px;height:56px;border:2.5px dashed var(--muted);border-radius:14px}
+.slot-l{position:absolute;top:64px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:.85rem;color:var(--muted);font-weight:700}
+.slot-n{position:absolute;top:-26px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:.75rem;color:var(--muted)}
+.ghost{position:absolute;left:7px;top:7px;width:38px;height:38px;border-radius:50%;opacity:.38;outline:2px dashed var(--ink);outline-offset:2px}
+.ball{position:absolute;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:15px;box-shadow:inset -5px -6px 0 rgba(0,0,0,.16),inset 4px 4px 0 rgba(255,255,255,.22);border:1px solid rgba(0,0,0,.25);transition:left .4s ease,top .4s ease;z-index:2}
+.info{font-size:1.05rem;min-height:5.5rem}
+.info p{margin:.35rem 0;line-height:2.3}
+.ballrow{display:flex;flex-wrap:wrap;gap:.35rem;margin:.7rem 0}
+.mini{width:28px;height:28px;border-radius:50%;box-shadow:inset -3px -4px 0 rgba(0,0,0,.16);border:1px solid rgba(0,0,0,.3);display:grid;place-items:center;font-size:.7rem;font-weight:700}
+.urns{display:flex;flex-wrap:wrap;gap:.8rem;margin:.3rem 0 .9rem}
+.murn{border:2px solid var(--line);border-radius:0 0 18px 18px;border-top:0;padding:.5rem .6rem .6rem;min-width:150px;background:var(--jar)}
+.murn h3{margin:0 0 .3rem}
+.murn .ballrow{margin:.3rem 0}
+/* Baum */
+.tree{width:100%;height:auto;display:block;margin:0 auto}
+.tree *{pointer-events:none}
+.tree .prow[data-leaf]{pointer-events:all;cursor:pointer}
+.edge{stroke:var(--muted);stroke-width:2.5;stroke-linecap:round}
+.edge.on{stroke:var(--accent);stroke-width:6}
+.edge.cm{stroke:var(--comp);stroke-width:4.5;stroke-dasharray:10 7}
+.sf rect{fill:var(--panel)}
+.sf text{fill:var(--ink);font-size:18px;text-anchor:middle;font-weight:700;font-family:var(--font)}
+.sf line{stroke:var(--ink);stroke-width:1.8}
+.nd{stroke:rgba(0,0,0,.3);stroke-width:1.5}
+.nl{font-weight:700;text-anchor:middle;font-family:var(--font)}
+.pl{fill:var(--ink);font-weight:700;font-family:var(--font)}
+.pl2{fill:var(--muted);font-size:17px;font-family:var(--font)}
+.root{fill:var(--ink)}
+.prow{fill:transparent}
+.prow[data-leaf]:hover{fill:var(--panel2)}
+.prow.on{fill:var(--soft)}
+.prow.cm{fill:color-mix(in srgb,var(--comp) 14%,transparent)}
+.task{font-size:1.3rem;line-height:1.6;margin:.4rem 0 1rem;max-width:64rem}
+.term{font-size:1.4rem;white-space:nowrap}
+.noanim *,.noanim *::before,.noanim *::after{transition:none!important;animation:none!important}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">Wahrscheinlichkeit <span>anschaulich</span></div>
+  <nav id="tabs"></nav>
+  <div class="tools">
+    <div class="seg" title="Darstellung der Ergebnisse">
+      <button data-fmt="frac" class="on">Bruch</button><button data-fmt="dec">Dezimal</button><button data-fmt="pct">Prozent</button>
+    </div>
+    <label class="chk"><input type="checkbox" id="stepT"> Schritt für Schritt</label>
+    <label class="chk"><input type="checkbox" id="animT" checked> Animationen</label>
+    <button class="btn" data-themetoggle id="themeBtn">Dunkel</button>
+  </div>
+</header>
+
+<main>
+<!-- LAPLACE -->
+<section class="view" id="v-laplace">
+  <div class="titlebar"><h1>Laplace-Wahrscheinlichkeit</h1><button class="btn" data-merk="m-laplace">Merksatz</button></div>
+  <div class="merk" id="m-laplace" hidden>
+    <p><b>Laplace-Experiment:</b> Ein Zufallsexperiment, bei dem alle Ergebnisse gleich wahrscheinlich sind.</p>
+    <p>Für jedes Ereignis E gilt dann: &nbsp;P(E) = <span class="frac txt"><span>Anzahl der für E günstigen Ergebnisse</span><span>Anzahl aller möglichen Ergebnisse</span></span></p>
+    <p>Bei einem besonders beschrifteten Würfel zählt man die <b>Seiten</b>, nicht die verschiedenen Beschriftungen: Steht E auf zwei Seiten, ist P(E) = <span class="frac txt"><span>2</span><span>6</span></span>.</p>
+    <p><b>Gegenereignis:</b> <span class="ov">E</span> tritt genau dann ein, wenn E nicht eintritt. Es gilt P(<span class="ov">E</span>) = 1 − P(E).</p>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <h2>Zufallsgerät und Ereignis</h2>
+      <div class="row" id="lp-devs"></div>
+      <div id="lp-extra"></div>
+      <div id="lp-vis"></div>
+      <div class="row" id="lp-pre"></div>
+      <p class="muted small" style="margin:0">Tippe auf einzelne Ergebnisse, um ein eigenes Ereignis E zusammenzustellen.</p>
+    </div>
+    <div class="card">
+      <h2>Rechnung</h2>
+      <div id="lp-calc"></div>
+    </div>
+  </div>
+</section>
+
+<!-- MIT ZURÜCKLEGEN -->
+<section class="view" id="v-mit">
+  <div class="titlebar"><h1>Zweistufig: Ziehen mit Zurücklegen</h1><button class="btn" data-merk="m-mit">Merksatz</button></div>
+  <div class="merk" id="m-mit" hidden>
+    <p><b>Mit Zurücklegen:</b> Das gezogene Objekt wird nach dem Notieren wieder zurückgelegt.</p>
+    <p>Der Inhalt ist bei jedem Zug gleich. Die Wahrscheinlichkeiten auf der 2. Stufe sind dieselben wie auf der 1. Stufe.</p>
+    <p>Zweimal Würfeln oder zweimal ein Glücksrad drehen funktioniert genauso wie Ziehen mit Zurücklegen.</p>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <h2>Inhalt einstellen und ziehen</h2>
+      <div class="urnctl"></div>
+      <div class="stagewrap"><div class="stage" id="st-mit"></div></div>
+      <div class="row drawbtns"></div>
+      <div class="info"></div>
+    </div>
+    <div class="card">
+      <h2>Baumdiagramm</h2>
+      <div class="row"><label class="chk small"><input type="checkbox" data-redge> Brüche an den Ästen kürzen</label></div>
+      <div class="tree-box"></div>
+    </div>
+  </div>
+</section>
+
+<!-- OHNE ZURÜCKLEGEN -->
+<section class="view" id="v-ohne">
+  <div class="titlebar"><h1>Zweistufig: Ziehen ohne Zurücklegen</h1><button class="btn" data-merk="m-ohne">Merksatz</button></div>
+  <div class="merk" id="m-ohne" hidden>
+    <p><b>Ohne Zurücklegen:</b> Das gezogene Objekt bleibt draußen. Auch „nacheinander zwei Lollis ziehen“ oder „zwei Karten ziehen“ ist ohne Zurücklegen gemeint.</p>
+    <p>Beim 2. Zug ist ein Objekt weniger da: Der Nenner wird um 1 kleiner, und von der zuerst gezogenen Sorte ist eines weniger da. Die Wahrscheinlichkeiten auf der 2. Stufe hängen also vom 1. Zug ab.</p>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <h2>Inhalt einstellen und ziehen</h2>
+      <div class="urnctl"></div>
+      <div class="stagewrap"><div class="stage" id="st-ohne"></div></div>
+      <div class="row drawbtns"></div>
+      <div class="info"></div>
+    </div>
+    <div class="card">
+      <h2>Baumdiagramm</h2>
+      <div class="row"><label class="chk small"><input type="checkbox" data-redge> Brüche an den Ästen kürzen</label><label class="chk small"><input type="checkbox" id="cmpT"> Vergleich mit Zurücklegen einblenden</label></div>
+      <div class="tree-box"></div>
+    </div>
+  </div>
+  <div id="cmp-ohne"></div>
+</section>
+
+<!-- PFADREGELN -->
+<section class="view" id="v-pfad">
+  <div class="titlebar"><h1>Pfadregeln</h1><button class="btn" data-merk="m-pfad">Merksatz</button></div>
+  <div class="merk" id="m-pfad" hidden>
+    <p><b>1. Pfadregel (Produktregel):</b> Die Wahrscheinlichkeit eines Pfades ist das Produkt der Wahrscheinlichkeiten entlang dieses Pfades.</p>
+    <p><b>2. Pfadregel (Summenregel):</b> Die Wahrscheinlichkeit eines Ereignisses ist die Summe der Wahrscheinlichkeiten aller Pfade, die zu diesem Ereignis gehören.</p>
+    <p><b>Reihenfolge egal?</b> „Ein Kirsch-Lolli und ein Apfel-Lolli“ bedeutet KA oder AK, also zwei Pfade. Haben beide Pfade dieselbe Wahrscheinlichkeit, rechnet man kurz 2 · (Pfadwahrscheinlichkeit).</p>
+    <p><b>Gegenereignis:</b> Bei „mindestens einer“ oder „zwei verschiedene“ ist 1 − P(Gegenereignis) oft schneller.</p>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <h2>Experiment und Ereignis</h2>
+      <div class="urnctl"></div>
+      <div class="row"><label class="chk small"><input type="checkbox" data-redge> Brüche an den Ästen kürzen</label></div>
+      <div class="tree-box"></div>
+    </div>
+    <div class="card">
+      <h2>Rechnung mit den Pfadregeln</h2>
+      <div class="calc"></div>
+    </div>
+  </div>
+</section>
+
+<!-- MEHRSTUFIG -->
+<section class="view" id="v-multi">
+  <div class="titlebar"><h1>Mehrstufige Experimente</h1><button class="btn" data-merk="m-multi">Merksatz</button></div>
+  <div class="merk" id="m-multi" hidden>
+    <p>Die Pfadregeln gelten für beliebig viele Stufen: Entlang eines Pfades wird multipliziert, Pfade eines Ereignisses werden addiert.</p>
+    <p>Die Wahrscheinlichkeiten einer Stufe dürfen vom bisherigen Verlauf abhängen, zum Beispiel davon, welche Urne der Würfel ausgewählt hat oder welche Farbe zuletzt geleuchtet hat.</p>
+    <p>Ein Spiel heißt <b>fair</b>, wenn die Gewinnwahrscheinlichkeit 50 % beträgt.</p>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <h2>Experiment und Ereignis</h2>
+      <div class="msctl"></div>
+      <div class="tree-box"></div>
+    </div>
+    <div class="card">
+      <h2>Rechnung mit den Pfadregeln</h2>
+      <div class="calc"></div>
+    </div>
+  </div>
+</section>
+
+<!-- AUFGABEN -->
+<section class="view" id="v-aufgaben">
+  <div class="titlebar"><h1>Aufgabe für die Klasse</h1></div>
+  <div class="card">
+    <div class="row">
+      <span>Thema:</span>
+      <select id="tkTopic" class="sel">
+        <option value="mix">gemischt</option>
+        <option value="lap">Laplace und besondere Würfel</option>
+        <option value="mit">Zweimal werfen, drehen, ziehen mit Zurücklegen</option>
+        <option value="ohne">Ziehen ohne Zurücklegen</option>
+        <option value="pfad">Pfadregeln und Gegenereignis</option>
+        <option value="multi">Mehrstufige Experimente</option>
+        <option value="term">Terme deuten</option>
+        <option value="rueck">Rückwärts denken</option>
+      </select>
+      <span style="margin-left:.6rem">Niveau:</span>
+      <div class="seg" id="tkLvl"><button data-tklvl="1" class="on">Grundlagen</button><button data-tklvl="2">Wettbewerbsniveau</button></div>
+    </div>
+    <div id="tk-text" class="task"></div>
+    <div class="row"><button class="btn primary" data-tknew>Neue Aufgabe</button><button class="btn" data-tkshow id="tkShowBtn">Lösung zeigen</button></div>
+    <p class="muted small" style="margin:0">Wie im Wettbewerb dürfen Ergebnisse als Produkt oder Summe stehen bleiben.</p>
+  </div>
+  <div class="card" id="tk-solcard" hidden><h2>Lösung</h2><div id="tk-sol"></div></div>
+</section>
+</main>
+
+<script>
+/* ---------- Hilfsfunktionen ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const gcd=(a,b)=>{a=Math.abs(a);b=Math.abs(b);while(b){const t=a%b;a=b;b=t}return a||1};
+const lcm=(a,b)=>a/gcd(a,b)*b;
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const range=n=>Array.from({length:n},(_,i)=>i+1);
+const sum=a=>a.reduce((s,x)=>s+x,0);
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const isPrime=n=>{if(n<2)return false;for(let k=2;k*k<=n;k++)if(n%k===0)return false;return true};
+const de=(x,d)=>x.toLocaleString('de-DE',{maximumFractionDigits:d});
+const listDE=a=>a.length>1?a.slice(0,-1).join(', ')+' und '+a[a.length-1]:(a[0]||'');
+
+class Fr{
+  constructor(n,d=1){this.n=n;this.d=d}
+  red(){const g=gcd(this.n,this.d);return new Fr(this.n/g,this.d/g)}
+  mul(o){return new Fr(this.n*o.n,this.d*o.d)}
+  val(){return this.n/this.d}
+  isRed(){return gcd(this.n,this.d)===1}
+}
+const ONE=new Fr(1,1);
+const fsum=fs=>{const L=fs.reduce((a,f)=>lcm(a,f.d),1);return new Fr(fs.reduce((a,f)=>a+f.n*L/f.d,0),L).red()};
+
+/* ---------- Zustand ---------- */
+const S={fmt:'frac',step:false,anim:true,tab:'laplace',steps:{},redEdge:false,cmp:false,ctx:'lollis',
+  counts:{kugeln:[3,2,0,0],lollis:[5,3,2,0],schoko:[6,6,4,4],skat:[8,8,8,8]}};
+const dur=ms=>S.anim?ms:0;
+
+/* ---------- Kontexte ---------- */
+const KUG=[{k:'r',sg:'rote Kugel',pl:'rote Kugeln',css:'var(--c-r)',name:'rot'},{k:'b',sg:'blaue Kugel',pl:'blaue Kugeln',css:'var(--c-b)',name:'blau'},{k:'g',sg:'gelbe Kugel',pl:'gelbe Kugeln',css:'var(--c-y)',ink:'#1c2230',name:'gelb'},{k:'w',sg:'weiße Kugel',pl:'weiße Kugeln',css:'var(--c-w)',ink:'#1c2230',name:'weiß'}];
+const CTX={
+  kugeln:{title:'Kugeln in einer Urne',box:'In einer Urne',inBox:'In der Urne',obj:'Kugel',objPl:'Kugeln',g:'f',attr:'Farbe',kinds:KUG},
+  lollis:{title:'Lollis in einem Beutel',box:'In einem Beutel',inBox:'Im Beutel',obj:'Lolli',objPl:'Lollis',g:'m',attr:'Sorte',kinds:[
+    {k:'C',sg:'Cola-Lolli',pl:'Cola-Lollis',css:'#7a4a2a',name:'Cola'},{k:'K',sg:'Kirsch-Lolli',pl:'Kirsch-Lollis',css:'#c8233c',name:'Kirsch'},
+    {k:'A',sg:'Apfel-Lolli',pl:'Apfel-Lollis',css:'#3f9b35',name:'Apfel'},{k:'Z',sg:'Zitronen-Lolli',pl:'Zitronen-Lollis',css:'#e3c000',ink:'#1c2230',name:'Zitrone'}]},
+  schoko:{title:'Schokokugeln in einer Packung',box:'In einer Packung',inBox:'In der Packung',obj:'Schokokugel',objPl:'Schokokugeln',g:'f',attr:'Sorte',kinds:[
+    {k:'N',sg:'Nuss-Kugel',pl:'Nuss-Kugeln',css:'#8b5a2b',name:'Nuss'},{k:'K',sg:'Krokant-Kugel',pl:'Krokant-Kugeln',css:'#d0921f',ink:'#1c2230',name:'Krokant'},
+    {k:'M',sg:'Marzipan-Kugel',pl:'Marzipan-Kugeln',css:'#e08aa6',ink:'#1c2230',name:'Marzipan'},{k:'Z',sg:'Zartbitter-Kugel',pl:'Zartbitter-Kugeln',css:'#3b2a22',name:'Zartbitter'}]},
+  skat:{title:'Skatkarten',box:'In einem Stapel',inBox:'Im Stapel',obj:'Karte',objPl:'Karten',g:'f',attr:'Farbe',kinds:[
+    {k:'♣',sg:'Kreuz-Karte',pl:'Kreuz-Karten',css:'#2b2f38',name:'Kreuz'},{k:'♠',sg:'Pik-Karte',pl:'Pik-Karten',css:'#56606f',name:'Pik'},
+    {k:'♥',sg:'Herz-Karte',pl:'Herz-Karten',css:'#d12b3a',name:'Herz'},{k:'♦',sg:'Karo-Karte',pl:'Karo-Karten',css:'#e0652a',name:'Karo'}]},
+  sieben:{title:'Würfel S I E B E N, zweimal werfen',die:true,v1:'fällt',v2:'fallen',twoV:'fällt',fixed:[1,2,3],
+    note:'Die Buchstaben S, B und N spielen keine Rolle und werden zu x („anderer Buchstabe“) zusammengefasst. So bleibt der Baum klein.',
+    kinds:[{k:'I',one:'ein I',none:'kein I',two:'zweimal I',css:'#7c5cd6',name:'I'},{k:'E',one:'ein E',none:'kein E',two:'zweimal E',css:'#d9622b',name:'E'},
+      {k:'x',rest:true,one:'ein anderer Buchstabe',none:'kein anderer Buchstabe',two:'zweimal ein anderer Buchstabe',css:'var(--rest)',name:'S, B, N'}]},
+  w35:{title:'Würfel mit vier 3en und zwei 5en, zweimal werfen',die:true,v1:'fällt',v2:'fallen',twoV:'fällt',fixed:[4,2],
+    note:'Das Würfelnetz zeigt viermal die 3 und zweimal die 5.',
+    same:{label:'zweimal dieselbe Augenzahl',dass:'zweimal dieselbe Augenzahl fällt'},diff:{label:'zwei verschiedene Augenzahlen',dass:'zwei verschiedene Augenzahlen fallen'},
+    kinds:[{k:'3',one:'eine 3',none:'keine 3',two:'zweimal die 3',css:'#2f8f9d',name:'3'},{k:'5',one:'eine 5',none:'keine 5',two:'zweimal die 5',css:'#b0479a',name:'5'}],
+    extra:[6,8,10].map(s=>({id:'sum'+s,kind:'sum',label:`Augensumme ${s}`,dass:`die Augensumme ${s} beträgt`,t:l=>+l[0]+ +l[1]===s}))}
+};
+function prep(C){
+  const f=C.g==='f';
+  C.kinds.forEach(a=>{if(!a.one){a.one=(f?'eine ':'ein ')+a.sg;a.none=(f?'keine ':'kein ')+a.sg;a.two='zwei '+a.pl}});
+  if(!C.v1){C.v1='gezogen wird';C.v2='gezogen werden';C.twoV=C.v2}
+  if(!C.same&&C.attr){C.same={label:`beide ${C.objPl} haben die gleiche ${C.attr}`,dass:`beide ${C.objPl} die gleiche ${C.attr} haben`};
+    C.diff={label:`die beiden ${C.objPl} haben verschiedene ${C.attr}n`,dass:`die beiden ${C.objPl} verschiedene ${C.attr}n haben`}}
+}
+Object.values(CTX).forEach(prep);
+const URN_CTX=['lollis','schoko','skat','kugeln'];
+const cntOf=id=>CTX[id].fixed||S.counts[id];
+function urnDesc(C,counts){return listDE(C.kinds.map((a,i)=>counts[i]?`${counts[i]} ${counts[i]===1?a.sg:a.pl}`:null).filter(Boolean))}
+
+/* ---------- Brüche ---------- */
+function F(f){return f.d===1?`<span>${f.n}</span>`:`<span class="frac"><span>${f.n}</span><span>${f.d}</span></span>`}
+function T(a,b){return `<span class="frac txt"><span>${a}</span><span>${b}</span></span>`}
+function conv(f){
+  if(f.d===1)return '';
+  const v=f.val();
+  if(S.fmt==='dec'){const r=Math.round(v*1e4)/1e4;return ` ${Math.abs(r-v)<1e-12?'=':'≈'} ${de(r,4)}`}
+  if(S.fmt==='pct'){const r=Math.round(v*1e4)/100;return ` ${Math.abs(r-v*100)<1e-9?'=':'≈'} ${de(r,2)}&nbsp;%`}
+  return '';
+}
+function R(f){f=f.red();return F(f)+conv(f)}
+function chain(f){return (f.isRed()?'':F(f)+' = ')+R(f)}
+const ef=f=>S.redEdge?f.red():f;
+
+/* ---------- Schritt für Schritt ---------- */
+function stepVal(key,n){return S.step?Math.min(S.steps[key]??0,n):n}
+function stepCtl(key,n){
+  if(!S.step)return '';
+  const k=stepVal(key,n);
+  return `<div class="stepctl"><button class="btn primary" data-step="${key}" data-n="${n}" data-act="next" ${k>=n?'disabled':''}>Nächster Schritt (${k}/${n})</button><button class="btn" data-step="${key}" data-n="${n}" data-act="all">Alles zeigen</button><button class="btn" data-step="${key}" data-n="${n}" data-act="reset">Von vorn</button></div>`;
+}
+function stepped(key,lines){const k=stepVal(key,lines.length),sh=lines.slice(0,k);if(S.step&&k>0)sh[k-1]=`<div class="reveal">${sh[k-1]}</div>`;return sh.join('')+stepCtl(key,lines.length)}
+
+function counters(scope,kinds,counts){
+  return `<div class="counters">`+kinds.map((c,i)=>`<div class="counter"><span class="cname">${c.name}</span><button class="cbtn" data-cnt="${scope}" data-i="${i}" data-d="-1" aria-label="${c.name} weniger">−</button><span class="cball" style="background:${c.css};color:${c.ink||'#fff'}">${counts[i]}</span><button class="cbtn" data-cnt="${scope}" data-i="${i}" data-d="1" aria-label="${c.name} mehr">+</button></div>`).join('')+`</div>`;
+}
+function ctxSelect(id,list,cur){return `<select class="sel" id="${id}">${list.map(k=>`<option value="${k}" ${k===cur?'selected':''}>${CTX[k].title}</option>`).join('')}</select>`}
+function ballRow(kinds,counts){let h='';kinds.forEach((a,i)=>{for(let j=0;j<counts[i];j++)h+=`<span class="mini" style="background:${a.css};color:${a.ink||'#fff'}">${a.k}</span>`});return `<div class="ballrow">${h}</div>`}
+function subLabels(labs){const tot={},seen={};labs.forEach(l=>tot[l]=(tot[l]||0)+1);return labs.map(l=>{if(tot[l]===1)return l;seen[l]=(seen[l]||0)+1;return `${l}<sub>${seen[l]}</sub>`})}
+
+/* =========================================================
+   1. LAPLACE
+   ========================================================= */
+const LP={dev:'sonder',sel:new Set(),ev:null,rad:5,urn:[3,2,1,0],faces:['S','I','E','B','E','N']};
+const DEVS=[['wuerfel','Würfel'],['sonder','Besonderer Würfel'],['muenze','Münze'],['rad','Glücksrad'],['urne','Urne'],['radu','Glücksrad (ungleich)']];
+const FACE_PRESETS=['S I E B E N','3 3 3 3 5 5','1 1 2 2 2 3','A N A N A S'];
+const PIPS={1:[[50,50]],2:[[28,28],[72,72]],3:[[28,28],[50,50],[72,72]],4:[[28,28],[72,28],[28,72],[72,72]],5:[[28,28],[72,28],[50,50],[28,72],[72,72]],6:[[28,25],[72,25],[28,50],[72,50],[28,75],[72,75]]};
+const dieSVG=(n,s=62)=>`<svg viewBox="0 0 100 100" width="${s}" height="${s}" aria-label="Augenzahl ${n}"><rect x="5" y="5" width="90" height="90" rx="18" fill="#fff" stroke="#1c2230" stroke-width="4"/>${PIPS[n].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="9" fill="#1c2230"/>`).join('')}</svg>`;
+
+const isPip=f=>/^[1-6]$/.test(f);
+function lpOut(){
+  const D=LP.dev;
+  if(D==='wuerfel')return range(6).map(i=>({id:''+i,lab:''+i,num:i,w:1}));
+  if(D==='sonder'){const sub=subLabels(LP.faces);return LP.faces.map((f,i)=>({id:'f'+i,lab:sub[i],face:f,w:1,num:+f}))}
+  if(D==='muenze')return[{id:'K',lab:'Kopf',w:1},{id:'Z',lab:'Zahl',w:1}];
+  if(D==='rad')return range(LP.rad).map(i=>({id:''+i,lab:''+i,num:i,w:1}));
+  if(D==='radu')return[{id:'1',lab:'1',num:1,w:2},{id:'2',lab:'2',num:2,w:1},{id:'3',lab:'3',num:3,w:1}];
+  const a=[];KUG.forEach((c,ci)=>{for(let i=1;i<=LP.urn[ci];i++)a.push({id:c.k+i,lab:`${c.k}<sub>${i}</sub>`,c:ci,w:1})});return a;
+}
+function lpPresets(){
+  const o=lpOut(),D=LP.dev;const P=(name,f)=>({name,ids:o.filter(f).map(x=>x.id)});
+  if(D==='wuerfel')return[P('gerade Augenzahl',x=>x.num%2===0),P('Primzahl',x=>isPrime(x.num)),P('größer als 4',x=>x.num>4),P('höchstens 2',x=>x.num<=2),P('Sechs',x=>x.num===6)];
+  if(D==='sonder'){
+    const ds=[...new Set(LP.faces)],num=LP.faces.every(f=>!isNaN(+f));
+    const L=ds.map(l=>P(num?`Augenzahl ${l}`:`Buchstabe ${l}`,x=>x.face===l));
+    if(!num&&LP.faces.some(f=>'AEIOU'.includes(f))&&!LP.faces.every(f=>'AEIOU'.includes(f)))L.push(P('Vokal',x=>'AEIOU'.includes(x.face)));
+    if(num&&LP.faces.some(f=>+f%2===0)&&LP.faces.some(f=>+f%2))L.push(P('gerade Zahl',x=>x.num%2===0));
+    return L;
+  }
+  if(D==='muenze')return[P('Kopf',x=>x.id==='K'),P('Zahl',x=>x.id==='Z')];
+  if(D==='rad')return[P('gerade Zahl',x=>x.num%2===0),P('ungerade Zahl',x=>x.num%2===1),P('Primzahl',x=>isPrime(x.num)),P('höchstens 3',x=>x.num<=3)];
+  if(D==='radu')return[P('Feld 1',x=>x.num===1),P('Feld 2',x=>x.num===2),P('Feld 2 oder 3',x=>x.num>1)];
+  return KUG.map((c,i)=>LP.urn[i]?P(c.sg,x=>x.c===i):null).filter(Boolean);
+}
+function wheelSVG(o,{sel=new Set(),click=false,size=310}={}){
+  const W=o.reduce((s,x)=>s+x.w,0);let a0=0;const cx=150,cy=165,r=140;let g='';
+  const P=a=>[cx+r*Math.sin(a*Math.PI/180),cy-r*Math.cos(a*Math.PI/180)];
+  o.forEach((x,i)=>{
+    const a1=a0+x.w/W*360,[x0,y0]=P(a0),[x1,y1]=P(a1),large=a1-a0>180?1:0,hue=(i*53+205)%360,on=sel.has(x.id);
+    const d=`M${cx} ${cy}L${x0.toFixed(2)} ${y0.toFixed(2)}A${r} ${r} 0 ${large} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}Z`;
+    const mid=(a0+a1)/2,tx=cx+r*.7*Math.sin(mid*Math.PI/180),ty=cy-r*.7*Math.cos(mid*Math.PI/180);
+    g+=`<g class="sector${on?' on':''}" ${click?`data-out="${x.id}"`:''}><path d="${d}" style="fill:${on?'var(--hl)':`hsl(${hue} 55% var(--wl))`}"/><text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="middle" dominant-baseline="central">${x.lab}</text></g>`;
+    a0=a1;
+  });
+  return `<svg class="wheel" viewBox="0 0 300 312" width="${size}" style="max-width:100%">${g}<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--ink)" stroke-width="3"/><circle cx="${cx}" cy="${cy}" r="9" fill="var(--ink)"/><path d="M150 40 L137 6 L163 6Z" fill="var(--ink)" stroke="var(--panel)" stroke-width="2"/></svg>`;
+}
+function renderLaplace(){
+  $('#lp-devs').innerHTML=DEVS.map(([k,n])=>`<button class="btn ${LP.dev===k?'on':''}" data-dev="${k}">${n}</button>`).join('');
+  let ex='';
+  if(LP.dev==='rad')ex=`<div class="row"><span>Anzahl gleich großer Felder:</span><button class="btn sm" data-rad="-1">−</button><b>${LP.rad}</b><button class="btn sm" data-rad="1">+</button></div>`;
+  if(LP.dev==='urne')ex=`<div class="row">${counters('lp',KUG,LP.urn)}</div>`;
+  if(LP.dev==='sonder')ex=`<div class="row"><span>Beschriftung:</span>${FACE_PRESETS.map(p=>`<button class="btn sm ${LP.faces.join(' ')===p?'on':''}" data-faces="${p}">${p}</button>`).join('')}</div>
+    <div class="row"><input class="inp" id="lp-faces" value="${LP.faces.join(' ')}" size="16" aria-label="Eigene Beschriftung"><button class="btn sm" data-facesapply>übernehmen</button><span class="muted small" id="lp-faceerr">6 Zeichen, durch Leerzeichen getrennt</span></div>`;
+  $('#lp-extra').innerHTML=ex;
+  lpVisual();
+  $('#lp-pre').innerHTML=`<span class="muted">Ereignis E:</span>`+lpPresets().map(p=>`<button class="btn ${LP.ev===p.name?'on':''}" data-pre="${p.name}">${p.name}</button>`).join('')+`<button class="btn" data-pre="">leeren</button>`;
+  lpCalc();
+}
+function lpVisual(){
+  const o=lpOut(),v=$('#lp-vis'),D=LP.dev;
+  if(D==='rad'||D==='radu'){v.innerHTML=`<div class="wheelwrap">${wheelSVG(o,{sel:LP.sel,click:true})}</div>`;return}
+  v.innerHTML=`<div class="tiles ${D}">`+o.map((x,i)=>{
+    const on=LP.sel.has(x.id);
+    const inner=D==='wuerfel'?dieSVG(x.num):D==='sonder'?`<span class="fnum">Seite ${i+1}</span>${isPip(x.face)?`<span style="margin-top:14px;display:block">${dieSVG(+x.face,50)}</span>`:`<span class="face">${x.face}</span>`}`:D==='muenze'?`<div class="coin">${x.id}</div><div class="tl">${x.lab}</div>`:`<div class="lball" style="background:${KUG[x.c].css};color:${KUG[x.c].ink||'#fff'}">${x.lab}</div>`;
+    return `<button class="tile ${on?'sel':''}" data-out="${x.id}" aria-pressed="${on}">${inner}</button>`;
+  }).join('')+`</div>`;
+}
+function lpCalc(){
+  const o=lpOut(),E=o.filter(x=>LP.sel.has(x.id)),NE=o.filter(x=>!LP.sel.has(x.id)),W=sum(o.map(x=>x.w)),We=sum(E.map(x=>x.w));
+  const set=a=>a.length?`{${a.map(x=>x.lab).join(', ')}}`:'{ }';
+  const evn=LP.ev?` „${LP.ev}“`:'';
+  const L=[];
+  L.push(`<div class="line"><span class="tag">Ergebnisse</span> Ω = ${set(o)} <span class="muted">→ ${o.length} mögliche Ergebnisse</span></div>`);
+  L.push(`<div class="line"><span class="tag">Ereignis</span> E${evn} = ${set(E)} <span class="muted">→ ${E.length} günstige Ergebnisse</span></div>`);
+  let pE;
+  if(LP.dev==='radu'){
+    pE=new Fr(We,W).red();
+    L.push(`<div class="warn"><b>Achtung, kein Laplace-Experiment!</b> Die Felder sind unterschiedlich groß, die Ergebnisse sind also nicht gleich wahrscheinlich. Bloßes Abzählen ergäbe ${F(new Fr(E.length,o.length).red())}, das ist hier falsch.</div>`);
+    L.push(`<div class="line"><span class="tag">Richtig</span> Feld 1 ist ein halber Kreis, Feld 2 und Feld 3 sind je ein Viertelkreis. P(E) = ${E.length>1?E.map(x=>F(new Fr(x.w,W).red())).join(' + ')+' = ':''}<span class="result">${R(pE)}</span></div>`);
+  }else{
+    const why={wuerfel:'Fairer Würfel: Jede Augenzahl ist gleich wahrscheinlich.',sonder:'Jede der 6 Seiten ist gleich wahrscheinlich. Gleiche Beschriftungen auf verschiedenen Seiten werden einzeln gezählt.',muenze:'Faire Münze: Kopf und Zahl sind gleich wahrscheinlich.',rad:'Alle Felder sind gleich groß, also gleich wahrscheinlich.',urne:'Jede einzelne Kugel wird mit gleicher Wahrscheinlichkeit gezogen. Deshalb werden die Kugeln nummeriert.'}[LP.dev];
+    L.push(`<div class="line"><span class="ok">✓ Laplace-Experiment.</span> ${why}</div>`);
+    pE=new Fr(E.length,o.length);
+    let note='';if(!E.length)note=`<span class="muted">(unmögliches Ereignis)</span>`;else if(!NE.length)note=`<span class="muted">(sicheres Ereignis)</span>`;
+    L.push(`<div class="line"><span class="tag">Laplace</span> P(E) = ${T('Anzahl der günstigen Ergebnisse','Anzahl aller möglichen Ergebnisse')} = <span class="result">${chain(pE)}</span> ${note}</div>`);
+    pE=pE.red();
+  }
+  const pc=new Fr(pE.d-pE.n,pE.d);
+  L.push(`<div class="line"><span class="tag tc">Gegenereignis</span> <span class="ov">E</span> = ${set(NE)} &nbsp; P(<span class="ov">E</span>) = 1 − P(E) = 1 − ${F(pE)} = <span class="result">${R(pc)}</span></div>`);
+  $('#lp-calc').innerHTML=stepped('lp',L);
+}
+
+/* =========================================================
+   Bäume (allgemein, beliebig viele Stufen)
+   ========================================================= */
+function urnTree(kinds,counts,rep){
+  const N=sum(counts),kids=[];
+  kinds.forEach((a,i)=>{
+    if(!counts[i])return;
+    const c2=counts.slice();let N2=N;if(!rep){c2[i]--;N2--}
+    const n={lab:a.k,css:a.css,ink:a.ink,p:new Fr(counts[i],N),kids:[]};
+    kinds.forEach((b,j)=>{if(c2[j])n.kids.push({lab:b.k,css:b.css,ink:b.ink,p:new Fr(c2[j],N2),kids:[]})});
+    kids.push(n);
+  });
+  return{depth:2,kids};
+}
+const LED=[{lab:'R',css:'#e04646'},{lab:'G',css:'#2ea85c'},{lab:'B',css:'#3b74e0'}];
+function ledTree(){const mk=(prev,d)=>LED.filter(k=>k.lab!==prev).map(k=>({...k,p:new Fr(1,prev?2:3),kids:d<3?mk(k.lab,d+1):[]}));return{depth:3,kids:mk(null,1)}}
+const GRP=[{lab:'A',css:'#8a63d2',p:new Fr(1,6),faces:'1'},{lab:'B',css:'#1f9aa8',p:new Fr(3,6),faces:'2, 4 oder 6'},{lab:'C',css:'#d9822b',p:new Fr(2,6),faces:'3 oder 5'}];
+function gameTree(U){return{depth:2,kids:GRP.map(g=>{const[w,s]=U[g.lab],t=w+s,kids=[];if(w)kids.push({lab:'w',css:'#f4f4f4',ink:'#1c2230',p:new Fr(w,t),kids:[]});if(s)kids.push({lab:'s',css:'#20242c',p:new Fr(s,t),kids:[]});return{lab:g.lab,css:g.css,p:g.p,kids}})}}
+function leavesOf(T){const out=[];const rec=(n,path)=>{const P=[...path,n];if(!n.kids.length){out.push({labs:P.map(x=>x.lab),key:P.map(x=>x.lab).join(''),ps:P.map(x=>x.p),p:P.reduce((a,x)=>a.mul(x.p),ONE)});return}n.kids.forEach(k=>rec(k,P))};T.kids.forEach(k=>rec(k,[]));return out}
+const keysOf=(T,ev)=>new Set(leavesOf(T).filter(l=>ev.t(l.labs)).map(l=>l.key));
+
+function sf(x,y,f,sc=1){
+  let inner;
+  if(f.d===1)inner=`<rect x="-14" y="-15" width="28" height="30" rx="7"/><text x="0" y="6">${f.n}</text>`;
+  else{const w=Math.max(String(f.n).length,String(f.d).length)*11+16;inner=`<rect x="${-w/2}" y="-23" width="${w}" height="46" rx="8"/><text x="0" y="-6">${f.n}</text><line x1="${-w/2+5}" y1="0" x2="${w/2-5}" y2="0"/><text x="0" y="18">${f.d}</text>`}
+  return `<g class="sf" transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(${sc})">${inner}</g>`;
+}
+const edge=(x1,y1,x2,y2,on,cm)=>`<line class="edge${on?' on':''}${cm?' cm':''}" x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"/>`;
+function treeSVG(T,o={}){
+  const D=T.depth,st=o.stage??99,sel=o.sel||new Set(),comp=o.comp||new Set(),hl=o.hl||'';
+  const nL=leavesOf(T).length,rowH=nL>12?50:nL>8?58:72,sc=rowH<60?.8:1,pad=34,Rn=17*sc;
+  const span=D===2?225:170,X=[30];for(let d=1;d<=D;d++)X[d]=30+d*span;
+  const keyW=Math.max(...leavesOf(T).map(l=>l.key.length))*13*sc;
+  const W=X[D]+Rn+keyW+(o.leafP?150:40);
+  let i=0;const lay=(n,d,pre)=>{n.key=pre+n.lab;n.d=d;if(!n.kids.length){n.y=pad+i*rowH;i++}else{n.kids.forEach(k=>lay(k,d+1,n.key));n.y=(n.kids[0].y+n.kids[n.kids.length-1].y)/2}};
+  T.kids.forEach(k=>lay(k,1,''));
+  const H=pad*2+(i-1)*rowH,y0=(T.kids[0].y+T.kids[T.kids.length-1].y)/2,selA=[...sel],compA=[...comp];
+  let bg='',ed='',lb='',nd='';
+  const draw=(n,px,py,prod)=>{
+    const d=n.d,leaf=!n.kids.length,pr=prod.mul(n.p);
+    const on=(hl&&hl.startsWith(n.key))||selA.some(k=>k.startsWith(n.key)),cm=!on&&compA.some(k=>k.startsWith(n.key));
+    if(leaf&&(o.clickable||sel.has(n.key)||comp.has(n.key)))bg+=`<rect class="prow${sel.has(n.key)?' on':''}${comp.has(n.key)?' cm':''}" ${o.clickable?`data-leaf="${n.key}"`:''} x="${X[D-1]+28}" y="${n.y-rowH/2+3}" width="${W-X[D-1]-32}" height="${rowH-6}" rx="12"/>`;
+    if(st>=2*d-1){
+      ed+=edge(px+(d>1?Rn:0),py,X[d]-Rn,n.y,on,cm);
+      nd+=`<circle class="nd" cx="${X[d]}" cy="${n.y}" r="${Rn}" style="fill:${n.css}"/><text class="nl" x="${X[d]}" y="${n.y+6*sc}" style="fill:${n.ink||'#fff'};font-size:${18*sc}px">${n.lab}</text>`;
+      if(leaf)nd+=`<text class="pl" x="${X[d]+Rn+12}" y="${n.y+7*sc}" style="font-size:${20*sc}px">${n.key}</text>`;
+    }
+    if(st>=2*d){const t=d===1?.56:.7;lb+=sf(px+(X[d]-px)*t,py+(n.y-py)*t,ef(n.p),sc)}
+    if(leaf&&o.leafP&&st>=2*D+1){lb+=`<text class="pl2" x="${X[d]+Rn+22+keyW}" y="${n.y+6}">P =</text>`+sf(X[d]+Rn+keyW+86,n.y,pr.red(),sc)}
+    n.kids.forEach(k=>draw(k,X[d],n.y,pr));
+  };
+  T.kids.forEach(k=>draw(k,X[0],y0,ONE));
+  nd+=`<circle cx="${X[0]}" cy="${y0}" r="7" class="root"/>`;
+  return `<svg class="tree" viewBox="0 0 ${W.toFixed(0)} ${H}" style="max-width:${W.toFixed(0)}px" role="img" aria-label="Baumdiagramm">${bg}${ed}${lb}${nd}</svg>`;
+}
+const treeSteps=T=>2*T.depth+1;
+const STAGE_TXT=['Start: Noch ist nichts passiert.','1. Stufe: Was kann beim 1. Zug herauskommen?','Wahrscheinlichkeiten beim 1. Zug','2. Stufe: Was kann beim 2. Zug herauskommen?','Wahrscheinlichkeiten beim 2. Zug','Pfadwahrscheinlichkeiten nach der 1. Pfadregel'];
+
+/* ---------- Rechnung mit den Pfadregeln ---------- */
+function sumExpr(fs){
+  const L=fs.reduce((a,f)=>lcm(a,f.d),1);
+  let s=fs.map(F).join(' + ');
+  if(!fs.every(f=>f.d===L))s+=' = '+fs.map(f=>F(new Fr(f.n*L/f.d,L))).join(' + ');
+  const t=new Fr(sum(fs.map(f=>f.n*L/f.d)),L);
+  return s+' = '+(t.isRed()?'':F(t)+' = ')+`<span class="result">${R(t)}</span>`;
+}
+function calcLines(T,sel,label){
+  const Ls=leavesOf(T).filter(l=>sel.has(l.key)),out=[];
+  out.push(`<div class="line"><span class="tag">Ereignis</span> E: ${label}. &nbsp; E = {${Ls.map(l=>l.key).join(', ')||' '}}</div>`);
+  if(!Ls.length){out.push(`<div class="line"><span class="tag">Ergebnis</span> Kein Pfad gehört zu E. E ist unmöglich: <span class="result">P(E) = 0</span></div>`);return out}
+  Ls.forEach(l=>{const es=l.ps.map(ef),pr=es.reduce((a,f)=>a.mul(f),ONE);
+    out.push(`<div class="line"><span class="tag">1. Pfadregel</span> P(${l.key}) = ${es.map(F).join(' · ')} = ${Ls.length===1?`<span class="result">${chain(pr)}</span>`:chain(pr)}</div>`)});
+  if(Ls.length>1){
+    out.push(`<div class="line"><span class="tag">2. Pfadregel</span> P(E) = ${Ls.map(l=>`P(${l.key})`).join(' + ')} = ${sumExpr(Ls.map(l=>l.p.red()))}</div>`);
+    const v=Ls[0].p.val();
+    if(Ls.every(l=>Math.abs(l.p.val()-v)<1e-12))out.push(`<div class="line"><span class="tag">Kurzform</span> Alle ${Ls.length} Pfade sind gleich wahrscheinlich: <span class="nw">P(E) = ${Ls.length} · ${Ls[0].ps.map(f=>F(ef(f))).join(' · ')}</span></div>`);
+  }
+  return out;
+}
+function compLine(T,sel){
+  const Lv=leavesOf(T),pE=fsum(Lv.filter(l=>sel.has(l.key)).map(l=>l.p)),C=Lv.filter(l=>!sel.has(l.key)),pc=new Fr(pE.d-pE.n,pE.d);
+  return `<div class="line"><span class="tag tc">Gegenereignis</span> <span class="ov">E</span> = {${C.map(l=>l.key).join(', ')||' '}} &nbsp; P(<span class="ov">E</span>) = 1 − P(E) = 1 − ${F(pE)} = <span class="result">${R(pc)}</span></div>`;
+}
+const ctrlLine=T=>`<div class="line"><span class="tag">Kontrolle</span> Summe aller Pfadwahrscheinlichkeiten: ${sumExpr(leavesOf(T).map(l=>l.p.red()))}</div>`;
+
+/* ---------- Ereignisse für zweistufige Experimente ---------- */
+function events(C,counts){
+  const ks=C.kinds.filter((a,i)=>counts[i]>0&&!a.rest),D=[];
+  if(C.same){D.push({id:'same',kind:'sum',label:C.same.label,dass:C.same.dass,t:l=>l[0]===l[1]});D.push({id:'diff',kind:'sum',label:C.diff.label,dass:C.diff.dass,t:l=>l[0]!==l[1]})}
+  ks.forEach(a=>{const k=a.k;
+    D.push({id:'zw'+k,kind:'single',label:a.two,dass:`${a.two} ${C.twoV}`,t:l=>l[0]===k&&l[1]===k,m:[k]});
+    D.push({id:'gen'+k,kind:'sum',label:`genau ${a.one}`,dass:`genau ${a.one} ${C.v1}`,t:l=>(l[0]===k)!==(l[1]===k),m:[k]});
+    D.push({id:'min'+k,kind:'sum',label:`mindestens ${a.one}`,dass:`mindestens ${a.one} ${C.v1}`,t:l=>l[0]===k||l[1]===k,m:[k]});
+    D.push({id:'kein'+k,kind:'sum',label:a.none,dass:`${a.none} ${C.v1}`,t:l=>l[0]!==k&&l[1]!==k,m:[k]});
+    D.push({id:'erst'+k,kind:'sum',label:`zuerst ${a.one}`,dass:`als Erstes ${a.one} ${C.v1}`,t:l=>l[0]===k,m:[k]});
+  });
+  ks.forEach((a,i)=>ks.forEach((b,j)=>{
+    if(i<j)D.push({id:'und'+a.k+b.k,kind:'sum',label:`${a.one} und ${b.one}`,dass:`${a.one} und ${b.one} ${C.v2}`,t:l=>(l[0]===a.k&&l[1]===b.k)||(l[0]===b.k&&l[1]===a.k),m:[a.k,b.k]});
+    if(i!==j)D.push({id:'seq'+a.k+b.k,kind:'single',label:`zuerst ${a.one}, dann ${b.one}`,dass:`zuerst ${a.one} und danach ${b.one} ${C.v1}`,t:l=>l[0]===a.k&&l[1]===b.k,m:[a.k,b.k]});
+  }));
+  (C.extra||[]).forEach(e=>D.push(e));
+  return D;
+}
+
+/* =========================================================
+   2./3. ZIEHEN MIT ANIMATION
+   ========================================================= */
+const DR={mit:{drawn:[],busy:false,ov:{},tok:0},ohne:{drawn:[],busy:false,ov:{},tok:0}};
+const STAGE_BASE=`<svg class="jar" width="320" height="292" viewBox="0 0 320 292"><path d="M34 64 L34 238 Q34 272 68 272 L252 272 Q286 272 286 238 L286 64" fill="var(--jar)" stroke="var(--ink)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><line x1="20" y1="64" x2="48" y2="64" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/><line x1="272" y1="64" x2="300" y2="64" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/></svg><div class="slot" style="left:336px;top:104px"></div><div class="slot" style="left:436px;top:104px"></div>`;
+const SLOT=[{x:345,y:113},{x:445,y:113}];
+const urnGrid=i=>({x:52+(i%5)*44,y:222-Math.floor(i/5)*44});
+function objList(counts){const a=[];counts.forEach((c,i)=>{for(let j=0;j<c;j++)a.push({id:i+'_'+j,i})});return a}
+const MAXSTAGE=20;
+function renderStage(mode){
+  const el=$('#st-'+mode),C=CTX[S.ctx],cn=S.counts[S.ctx],B=objList(cn),sig=S.ctx+JSON.stringify(cn),D=DR[mode];
+  if(sum(cn)>MAXSTAGE){el.innerHTML=`<div class="note" style="position:absolute;left:0;top:90px;width:470px">Für die Ziehanimation sind höchstens ${MAXSTAGE} Objekte möglich. Das Baumdiagramm rechts ist trotzdem vollständig.</div>`;el.dataset.sig='';return}
+  if(el.dataset.sig!==sig){el.innerHTML=STAGE_BASE+B.map(b=>{const a=C.kinds[b.i];return `<div class="ball" data-id="${b.id}" style="background:${a.css};color:${a.ink||'#fff'}">${a.k}</div>`}).join('');el.dataset.sig=sig}
+  const out={};D.drawn.forEach((d,i)=>{if(!d.back)out[d.id]=i});
+  let k=0;
+  B.forEach(b=>{const div=el.querySelector(`[data-id="${b.id}"]`);let p;
+    if(D.ov[b.id])p=D.ov[b.id];else if(out[b.id]!==undefined)p=SLOT[out[b.id]];else p=urnGrid(k++);
+    div.style.left=p.x+'px';div.style.top=p.y+'px'});
+  $$('.slot',el).forEach((s,i)=>{const d=D.drawn[i],a=d?C.kinds[d.i]:null;s.innerHTML=`<span class="slot-l">${i+1}. Zug</span>`+(d&&d.back?`<span class="ghost" style="background:${a.css}"></span><span class="slot-n">notiert: ${a.name}</span>`:'')});
+}
+function probsTxt(C,cn){const N=sum(cn);return C.kinds.map((a,i)=>cn[i]?`<span class="nw">P(${a.k}) = ${F(new Fr(cn[i],N))}</span>`:null).filter(Boolean).join(',&nbsp; ')}
+function urnInfo(mode){
+  const rep=mode==='mit',D=DR[mode],C=CTX[S.ctx],cn=S.counts[S.ctx],N=sum(cn);
+  if(!D.drawn.length)return `<p>${C.inBox}: <b>${urnDesc(C,cn)}</b>, insgesamt ${N}.</p><p>1. Zug: ${probsTxt(C,cn)}</p>`;
+  const a=D.drawn[0],A=C.kinds[a.i],c2=cn.slice();if(!rep)c2[a.i]--;
+  if(D.drawn.length===1){
+    if(rep)return `<p>Gezogen: <b>${A.sg}</b>. Notieren und <b>zurücklegen</b>.</p><p>${C.inBox} sind wieder ${urnDesc(C,c2)}. 2. Zug: ${probsTxt(C,c2)} <span class="muted">(wie beim 1. Zug)</span></p>`;
+    return `<p>Gezogen: <b>${A.sg}</b>. Sie bleibt draußen, also <b>nicht zurückgelegt</b>.</p><p>${C.inBox} sind nur noch ${urnDesc(C,c2)}, insgesamt ${N-1}. 2. Zug: ${probsTxt(C,c2)}</p><p class="muted">Der Nenner ist um 1 kleiner geworden, und von der Sorte ${A.name} ist eins weniger da.</p>`;
+  }
+  const b=D.drawn[1],B=C.kinds[b.i],key=A.k+B.k,leaf=leavesOf(urnTree(C.kinds,cn,rep)).find(l=>l.key===key);
+  const pr=ef(leaf.ps[0]).mul(ef(leaf.ps[1]));
+  return `<p>Ergebnis: <b>${key}</b> (zuerst ${A.sg}, dann ${B.sg}). Der Pfad ist im Baumdiagramm markiert.</p><p>Wahrscheinlichkeit dieses Pfades: P(${key}) = ${F(ef(leaf.ps[0]))} · ${F(ef(leaf.ps[1]))} = ${chain(pr)}</p>`;
+}
+function renderUrnTab(mode){
+  const v=$('#v-'+mode),rep=mode==='mit',D=DR[mode],n=D.drawn.length,C=CTX[S.ctx],cn=S.counts[S.ctx],big=sum(cn)>MAXSTAGE;
+  $('.urnctl',v).innerHTML=`<div class="row"><span>Beispiel:</span>${ctxSelect('ctxSel-'+mode,URN_CTX,S.ctx)}</div><div class="row">${counters('urn',C.kinds,cn)}</div>`;
+  renderStage(mode);
+  $('.drawbtns',v).innerHTML=`<button class="btn primary" data-draw="${mode}" ${n>=2||D.busy||big?'disabled':''}>${n===0?'1. Zug':'2. Zug'}</button><button class="btn" data-redraw="${mode}" ${D.busy?'disabled':''}>Neu starten</button>`;
+  $('.info',v).innerHTML=urnInfo(mode);
+  const T=urnTree(C.kinds,cn,rep),st=stepVal('tree-'+mode,5);
+  const hl=D.drawn.map(d=>C.kinds[d.i].k).join('');
+  $('.tree-box',v).innerHTML=(S.step?`<p class="muted" style="margin:0 0 .4rem"><b>Schritt ${st}:</b> ${STAGE_TXT[st]}</p>`:'')+treeSVG(T,{stage:st,hl,leafP:true})+stepCtl('tree-'+mode,5);
+  if(mode==='ohne')$('#cmp-ohne').innerHTML=S.cmp?`<div class="card"><h2>Vergleich der beiden Baumdiagramme</h2><p class="muted" style="margin-top:0">Gleicher Inhalt: Auf der 1. Stufe stimmen beide Bäume überein. Auf der 2. Stufe unterscheiden sich die Brüche.</p><div class="grid2" style="margin:0"><div><h2>ohne Zurücklegen</h2>${treeSVG(urnTree(C.kinds,cn,false),{leafP:true})}</div><div><h2>mit Zurücklegen</h2>${treeSVG(urnTree(C.kinds,cn,true),{leafP:true})}</div></div></div>`:'';
+}
+async function urnDraw(mode){
+  const D=DR[mode];if(D.busy||D.drawn.length>=2)return;
+  const rep=mode==='mit',tok=D.tok,cn=S.counts[S.ctx];
+  const out=new Set(D.drawn.filter(d=>!d.back).map(d=>d.id));
+  const b=pick(objList(cn).filter(x=>!out.has(x.id)));
+  D.busy=true;renderUrnTab(mode);
+  if(S.anim){const el=$(`#st-${mode} [data-id="${b.id}"]`);D.ov={[b.id]:{x:parseFloat(el.style.left),y:6}};renderStage(mode);await sleep(430);if(D.tok!==tok)return;D.ov={}}
+  D.drawn.push({id:b.id,i:b.i,back:false});renderUrnTab(mode);
+  if(rep){
+    await sleep(dur(1200));if(D.tok!==tok)return;
+    const d=D.drawn[D.drawn.length-1];
+    if(S.anim){D.ov={[b.id]:{x:140,y:6}};d.back=true;renderStage(mode);await sleep(430);if(D.tok!==tok)return;D.ov={}}else d.back=true;
+  }
+  D.busy=false;renderUrnTab(mode);
+}
+function urnReset(mode){const D=DR[mode];D.drawn=[];D.busy=false;D.ov={};D.tok++}
+function urnChanged(){urnReset('mit');urnReset('ohne');P4.sel=new Set();P4.ev='';S.steps['tree-mit']=0;S.steps['tree-ohne']=0;S.steps.p4=0}
+
+/* =========================================================
+   4. PFADREGELN
+   ========================================================= */
+const P4={ctx:'lollis',rep:false,sel:new Set(),ev:'',comp:false,ctrl:false};
+const P4_CTX=['lollis','schoko','skat','kugeln','sieben','w35'];
+function p4Tree(){const C=CTX[P4.ctx];return urnTree(C.kinds,cntOf(P4.ctx),C.die?true:P4.rep)}
+function p4Events(){const C=CTX[P4.ctx],T=p4Tree();return events(C,cntOf(P4.ctx)).filter(e=>!e.id.startsWith('seq')&&keysOf(T,e).size>0)}
+function renderPfad(){
+  const v=$('#v-pfad'),C=CTX[P4.ctx],defs=p4Events();
+  let h=`<div class="row"><span>Beispiel:</span>${ctxSelect('p4ctx',P4_CTX,P4.ctx)}</div>`;
+  if(C.die)h+=`<div class="note">${C.note} Zweimal würfeln ist wie Ziehen <b>mit</b> Zurücklegen.${P4.ctx==='w35'?dieTiles([3,3,3,3,5,5]):P4.ctx==='sieben'?letterTiles('SIEBEN'):''}</div>`;
+  else h+=`<div class="row">${counters('urn',C.kinds,S.counts[P4.ctx])}</div><div class="row"><span>Ziehen:</span><div class="seg"><button data-p4rep="1" class="${P4.rep?'on':''}">mit Zurücklegen</button><button data-p4rep="0" class="${!P4.rep?'on':''}">ohne Zurücklegen</button></div></div>`;
+  h+=`<div class="row"><span>Ereignis E:</span><select id="p4ev" class="sel"><option value="">eigene Auswahl: Pfade antippen</option>${defs.map(d=>`<option value="${d.id}" ${P4.ev===d.id?'selected':''}>${d.label}</option>`).join('')}</select></div>`;
+  $('.urnctl',v).innerHTML=h;
+  const T=p4Tree(),Lv=leavesOf(T);
+  const comp=new Set(P4.comp&&P4.sel.size?Lv.filter(l=>!P4.sel.has(l.key)).map(l=>l.key):[]);
+  $('.tree-box',v).innerHTML=treeSVG(T,{sel:P4.sel,comp,clickable:true})+`<p class="muted small" style="margin:.4rem 0 0">Tippe rechts im Baum auf einen Pfad, um ihn zum Ereignis hinzuzufügen oder zu entfernen.</p>`;
+  const d=defs.find(x=>x.id===P4.ev),label=d?`„${d.label}“`:'selbst gewählte Pfade';
+  let c=P4.sel.size||d?stepped('p4',calcLines(p4Tree(),P4.sel,label)):`<p class="muted">Wähle links ein Ereignis aus oder tippe im Baumdiagramm auf einen oder mehrere Pfade.</p>`;
+  c+=`<div class="row" style="margin-top:1rem"><button class="btn ${P4.comp?'on':''}" data-p4comp ${P4.sel.size?'':'disabled'}>Gegenereignis</button><button class="btn ${P4.ctrl?'on':''}" data-p4ctrl>Kontrolle: Summe aller Pfade</button></div>`;
+  if(P4.comp&&P4.sel.size)c+=compLine(p4Tree(),P4.sel);
+  if(P4.ctrl)c+=ctrlLine(p4Tree());
+  $('.calc',v).innerHTML=c;
+}
+
+/* =========================================================
+   5. MEHRSTUFIG
+   ========================================================= */
+const MS={ex:'led',sel:new Set(),ev:'',comp:false,ctrl:false,U:{A:[3,3],B:[2,4],C:[4,2]}};
+const cntR=l=>l.filter(x=>x==='R').length;
+const LED_EV=[
+  {id:'rgb',label:'Reihenfolge R, G, B',dass:'die Leuchte in der Reihenfolge R, G, B leuchtet',t:l=>l.join('')==='RGB'},
+  {id:'r2',label:'zweimal rot',dass:'die Leuchte zweimal rot leuchtet',t:l=>cntR(l)===2},
+  {id:'drei',label:'drei verschiedene Farben',dass:'die Leuchte in drei verschiedenen Farben leuchtet',t:l=>new Set(l).size===3},
+  {id:'zwei',label:'nur zwei verschiedene Farben',dass:'insgesamt nur zwei verschiedene Farben leuchten',t:l=>new Set(l).size===2},
+  {id:'r3',label:'nur rot',dass:'die Leuchte nur rot leuchtet',t:l=>cntR(l)===3},
+  {id:'min',label:'mindestens einmal rot',dass:'die Leuchte mindestens einmal rot leuchtet',t:l=>cntR(l)>0},
+  {id:'kein',label:'keinmal rot',dass:'die Leuchte keinmal rot leuchtet',t:l=>cntR(l)===0},
+  {id:'start',label:'beginnt mit rot',dass:'die Leuchte mit Rot beginnt',t:l=>l[0]==='R'}];
+const GAME_EV=[
+  {id:'win',label:'gewinnen (weiße Kugel)',dass:'man gewinnt',t:l=>l[1]==='w'},
+  {id:'lose',label:'verlieren (schwarze Kugel)',dass:'man verliert',t:l=>l[1]==='s'},
+  {id:'C',label:'aus Urne C ziehen',dass:'aus Urne C gezogen wird',t:l=>l[0]==='C'},
+  {id:'Aw',label:'eine 1 würfeln und gewinnen',dass:'man eine 1 würfelt und gewinnt',t:l=>l.join('')==='Aw'},
+  {id:'Bs',label:'eine gerade Zahl würfeln und verlieren',dass:'man eine gerade Augenzahl würfelt und verliert',t:l=>l.join('')==='Bs'},
+  {id:'ugw',label:'eine ungerade Zahl würfeln und gewinnen',dass:'man eine ungerade Augenzahl würfelt und gewinnt',t:l=>l[0]!=='B'&&l[1]==='w'}];
+const msTree=()=>MS.ex==='led'?ledTree():gameTree(MS.U);
+const msEvents=()=>MS.ex==='led'?LED_EV:GAME_EV;
+function gameDesc(U){const k=(n,c)=>`${n} ${c}${n===1?' Kugel':' Kugeln'}`;return GRP.map(g=>`Urne ${g.lab}: ${listDE([U[g.lab][0]?k(U[g.lab][0],'weiße'):null,U[g.lab][1]?k(U[g.lab][1],'schwarze'):null].filter(Boolean))}`).join('; ')}
+function urnsVis(U){return `<div class="urns">${GRP.map(g=>`<div class="murn"><h3>Urne ${g.lab}</h3><div class="small muted">Augenzahl ${g.faces}</div>${ballRow([{k:'',css:'#f4f4f4'},{k:'',css:'#20242c'}],U[g.lab])}</div>`).join('')}</div>`}
+function renderMulti(){
+  const v=$('#v-multi');
+  let h=`<div class="row"><div class="seg"><button data-msex="led" class="${MS.ex==='led'?'on':''}">LED-Leuchte (3 Stufen)</button><button data-msex="spiel" class="${MS.ex==='spiel'?'on':''}">Würfel wählt die Urne</button></div></div>`;
+  if(MS.ex==='led')h+=`<div class="note">Eine LED leuchtet rot (R), grün (G) oder blau (B), jeweils gleich wahrscheinlich. Alle 5 s wechselt sie zufällig zu einer <b>anderen</b> Farbe. Der Baum zeigt die ersten 15 s.</div>`;
+  else{
+    h+=`<div class="note">Zuerst wird gewürfelt. Bei 1 zieht man aus Urne A, bei 2, 4 oder 6 aus Urne B, bei 3 oder 5 aus Urne C. Eine weiße Kugel gewinnt.</div>${urnsVis(MS.U)}`;
+    h+=`<div class="row">${GRP.map(g=>`<div class="counter"><span class="cname">${g.lab} weiß</span><button class="cbtn" data-mscnt="${g.lab}" data-i="0" data-d="-1">−</button><span class="cball" style="background:#f4f4f4;color:#1c2230">${MS.U[g.lab][0]}</span><button class="cbtn" data-mscnt="${g.lab}" data-i="0" data-d="1">+</button><span class="cname" style="margin-left:.4rem">schwarz</span><button class="cbtn" data-mscnt="${g.lab}" data-i="1" data-d="-1">−</button><span class="cball" style="background:#20242c;color:#fff">${MS.U[g.lab][1]}</span><button class="cbtn" data-mscnt="${g.lab}" data-i="1" data-d="1">+</button></div>`).join('')}</div>`;
+  }
+  h+=`<div class="row"><span>Ereignis E:</span><select id="msev" class="sel"><option value="">eigene Auswahl: Pfade antippen</option>${msEvents().map(d=>`<option value="${d.id}" ${MS.ev===d.id?'selected':''}>${d.label}</option>`).join('')}</select></div>`;
+  $('.msctl',v).innerHTML=h;
+  const T=msTree(),Lv=leavesOf(T),comp=new Set(MS.comp&&MS.sel.size?Lv.filter(l=>!MS.sel.has(l.key)).map(l=>l.key):[]);
+  $('.tree-box',v).innerHTML=treeSVG(T,{sel:MS.sel,comp,clickable:true});
+  const d=msEvents().find(x=>x.id===MS.ev),label=d?`„${d.label}“`:'selbst gewählte Pfade';
+  let c=MS.sel.size||d?stepped('ms',calcLines(msTree(),MS.sel,label)):`<p class="muted">Wähle links ein Ereignis aus oder tippe im Baumdiagramm auf Pfade.</p>`;
+  if(MS.ex==='spiel'&&MS.ev==='win'){const p=fsum(leavesOf(msTree()).filter(l=>l.labs[1]==='w').map(l=>l.p));c+=`<div class="${p.n*2===p.d?'note ok':'note'}">${p.n*2===p.d?'Das Spiel ist fair: Die Gewinnwahrscheinlichkeit beträgt genau 50 %.':`Das Spiel ist nicht fair, denn P(gewinnen) ${p.val()<.5?'<':'>'} ${F(new Fr(1,2))}. Verändere die Urnen, bis es fair ist.`}</div>`}
+  c+=`<div class="row" style="margin-top:1rem"><button class="btn ${MS.comp?'on':''}" data-mscomp ${MS.sel.size?'':'disabled'}>Gegenereignis</button><button class="btn ${MS.ctrl?'on':''}" data-msctrl>Kontrolle: Summe aller Pfade</button></div>`;
+  if(MS.comp&&MS.sel.size)c+=compLine(msTree(),MS.sel);
+  if(MS.ctrl)c+=ctrlLine(msTree());
+  $('.calc',v).innerHTML=c;
+}
+
+/* =========================================================
+   6. AUFGABEN
+   ========================================================= */
+const TK={topic:'mix',lvl:1,t:null,show:false};
+const WORDS=['SIEBEN','BANANE','ANANAS','KLASSE','KAKADU','TOMATE','PAPAYA'];
+const LCOL=['#7c5cd6','#d9622b','#2f8f9d','#b0479a'];
+const L=(tag,html,cls='')=>`<div class="line"><span class="tag ${cls}">${tag}</span> ${html}</div>`;
+const pOf=(T,keys)=>fsum(leavesOf(T).filter(l=>keys.has(l.key)).map(l=>l.p));
+const omSet=a=>a.length>12?`{${a.slice(0,3).join(', ')}, …, ${a[a.length-1]}}`:`{${a.join(', ')}}`;
+function lapSol(om,inE,note){
+  const E=om.filter((_,i)=>inE[i]),pE=new Fr(E.length,om.length);
+  const out=[L('Ergebnisse',`Ω = ${omSet(om)} <span class="muted">→ ${om.length} gleich wahrscheinliche Ergebnisse</span>`)];
+  if(note)out.push(L('Hinweis',note));
+  out.push(L('Ereignis',`E = {${E.join(', ')}} <span class="muted">→ ${E.length} günstige Ergebnisse</span>`));
+  out.push(L('Laplace',`P(E) = ${T('Anzahl günstiger Ergebnisse','Anzahl möglicher Ergebnisse')} = <span class="result">${chain(pE)}</span>`));
+  return out;
+}
+const letterTiles=w=>`<div class="tiles small">${[...w].map(c=>`<span class="tile static">${c}</span>`).join('')}</div>`;
+const dieTiles=f=>`<div class="tiles small">${f.map(n=>`<span class="tile static" style="padding:0">${dieSVG(n,40)}</span>`).join('')}</div>`;
+function urnIntro(C,counts,rep,id){
+  if(id==='skat'&&counts.every(c=>c===8))return `Aus einem Skatspiel mit 32 Karten (je 8 Kreuz, Pik, Herz und Karo) werden zufällig nacheinander zwei Karten <b>${rep?'mit':'ohne'}</b> Zurücklegen gezogen.`;
+  return `${C.box} befinden sich ${urnDesc(C,counts)}. Es werden zufällig nacheinander zwei ${C.objPl} <b>${rep?'mit':'ohne'}</b> Zurücklegen gezogen.`;
+}
+/* Sorten, die im Ereignis nicht vorkommen, werden zu x zusammengefasst */
+function grouped(C,counts,ev){
+  const present=C.kinds.filter((a,i)=>counts[i]>0);
+  if(!ev.m||present.length<=ev.m.length+1||C.die)return{kinds:C.kinds,counts,note:null};
+  const kinds=[],cs=[];let rest=0;
+  C.kinds.forEach((a,i)=>{if(ev.m.includes(a.k)){kinds.push(a);cs.push(counts[i])}else rest+=counts[i]});
+  kinds.push({k:'x',css:'var(--rest)',name:'andere',rest:true});cs.push(rest);
+  return{kinds,counts:cs,note:L('Tipp',`Nur ${listDE(ev.m)} sind wichtig. Alle anderen ${C.attr==='Farbe'?'Farben':'Sorten'} werden zu x zusammengefasst (${rest} Stück). So bleibt der Baum klein.`)};
+}
+function twoTask(C,counts,rep,ev,intro){
+  const g=grouped(C,counts,ev),Tf=()=>urnTree(g.kinds,g.counts,rep),keys=keysOf(Tf(),ev);
+  return{text:`${intro} Bestimme die Wahrscheinlichkeit dafür, dass ${ev.dass}.`,tree:()=>treeSVG(Tf(),{sel:keys}),
+    sol:()=>{const out=[];if(g.note)out.push(g.note);out.push(...calcLines(Tf(),keys,`„${ev.label}“`));
+      if(ev.id&&ev.id.startsWith('min')){const k=ev.m[0],T=Tf(),kk=leavesOf(T).filter(l=>!l.labs.includes(k)),pk=fsum(kk.map(l=>l.p));
+        out.push(L('Alternative',`Mit dem Gegenereignis „${C.kinds.find(a=>a.k===k).none}“: P(E) = 1 − P(${kk.map(l=>l.key).join(', ')}) = 1 − ${F(pk)} = <span class="result">${R(new Fr(pk.d-pk.n,pk.d))}</span>`,'tc'))}
+      if(ev.id==='diff'){const T=Tf(),pk=fsum(leavesOf(T).filter(l=>l.labs[0]===l.labs[1]).map(l=>l.p));
+        out.push(L('Alternative',`Mit dem Gegenereignis „${C.same.label}“: P(E) = 1 − ${F(pk)} = <span class="result">${R(new Fr(pk.d-pk.n,pk.d))}</span>`,'tc'))}
+      return out}};
+}
+function validEv(C,counts,rep,ev){const T=urnTree(C.kinds,counts,rep),k=keysOf(T,ev);if(!k.size)return false;const p=pOf(T,k);return p.n<p.d}
+function randCounts(id){return{lollis:[rnd(2,6),rnd(1,5),rnd(1,4),0],schoko:[rnd(2,6),rnd(2,6),rnd(1,5),rnd(1,5)],skat:[8,8,8,8],kugeln:[rnd(1,4),rnd(1,4),rnd(0,3),0]}[id]}
+function urnEventTask(ids,rep,pool){
+  for(let t=0;t<400;t++){
+    const id=pick(ids),C=CTX[id],cn=randCounts(id),r=rep===null?Math.random()<.5:rep;
+    if(sum(cn)<3)continue;
+    const evs=events(C,cn).filter(e=>pool.some(p=>e.id.startsWith(p)));if(!evs.length)continue;
+    const ev=pick(evs);if(!validEv(C,cn,r,ev))continue;
+    return twoTask(C,cn,r,ev,urnIntro(C,cn,r,id));
+  }
+}
+/* Würfel mit Buchstaben, zweimal werfen */
+function letterDieTask(lvl){
+  for(let t=0;t<200;t++){
+    const w=pick(WORDS),ls=[...new Set(w)],X=pick(ls),Y=pick(ls.filter(l=>l!==X)),c=l=>[...w].filter(z=>z===l).length;
+    const kinds=[{k:X,one:`ein ${X}`,none:`kein ${X}`,two:`zweimal ${X}`,css:LCOL[0],name:X},{k:Y,one:`ein ${Y}`,none:`kein ${Y}`,two:`zweimal ${Y}`,css:LCOL[1],name:Y}];
+    const rest=6-c(X)-c(Y);const counts=[c(X),c(Y)];
+    if(rest){kinds.push({k:'x',rest:true,css:'var(--rest)',name:'andere'});counts.push(rest)}
+    const C={kinds,v1:'fällt',v2:'fallen',twoV:'fällt',die:true};
+    const pool=lvl===1?['und','zw','seq']:['und','min','kein','gen'];
+    const ev=pick(events(C,counts).filter(e=>pool.some(p=>e.id.startsWith(p))&&(!e.m||!e.m.includes('x'))));
+    if(!ev||!validEv(C,counts,true,ev))continue;
+    if(ev.m&&ev.m.length===1){/* nur ein Buchstabe wichtig: Rest zusammenfassen */
+      const K=ev.m[0],k2=[kinds.find(k=>k.k===K),{k:'x',rest:true,css:'var(--rest)',name:'andere'}],c2=[c(K),6-c(K)];
+      const ev2=events({...C,kinds:k2},c2).find(e=>e.id===ev.id);
+      return twoTaskDie(w,k2,c2,ev2,[K]);
+    }
+    return twoTaskDie(w,kinds,counts,ev,[X,Y]);
+  }
+}
+function twoTaskDie(w,kinds,counts,ev,used){
+  const Tf=()=>urnTree(kinds,counts,true),keys=keysOf(Tf(),ev);
+  return{text:`Ein Würfel ist mit den Buchstaben ${[...w].join(', ')} beschriftet und wird zweimal geworfen. Bestimme die Wahrscheinlichkeit dafür, dass ${ev.dass}.`,vis:letterTiles(w),tree:()=>treeSVG(Tf(),{sel:keys}),
+    sol:()=>{const out=[L('Tipp',`Nur ${listDE(used)} ${used.length>1?'sind':'ist'} wichtig, alle anderen Buchstaben werden zu x zusammengefasst. ${used.map(u=>`${u} steht auf ${counts[kinds.findIndex(k=>k.k===u)]} von 6 Seiten`).join(', ')}.`)];
+      out.push(...calcLines(Tf(),keys,`„${ev.label}“`));
+      if(ev.id.startsWith('min')){const k=ev.m[0],kk=leavesOf(Tf()).filter(l=>!l.labs.includes(k)),pk=fsum(kk.map(l=>l.p));out.push(L('Alternative',`1 − P(${kinds[0].none}, zweimal) = 1 − ${F(pk)} = <span class="result">${R(new Fr(pk.d-pk.n,pk.d))}</span>`,'tc'))}
+      return out}};
+}
+function netDieTask(lvl,single){
+  for(let t=0;t<200;t++){
+    const a=rnd(1,5),b=rnd(a+1,6),ca=rnd(2,5),cb=6-ca,faces=[...Array(ca).fill(a),...Array(cb).fill(b)];
+    const C={kinds:[{k:''+a,one:`eine ${a}`,none:`keine ${a}`,two:`zweimal die ${a}`,css:'#2f8f9d',name:''+a},{k:''+b,one:`eine ${b}`,none:`keine ${b}`,two:`zweimal die ${b}`,css:'#b0479a',name:''+b}],v1:'fällt',v2:'fallen',twoV:'fällt',die:true,
+      extra:[2*a,a+b,2*b].map(s=>({id:'sum'+s,kind:'sum',label:`die Augensumme ist ${s}`,dass:`die Augensumme ${s} beträgt`,t:l=>+l[0]+ +l[1]===s}))};
+    const counts=[ca,cb],evs=events(C,counts).filter(e=>(lvl===1?['sum','seq','zw']:['sum','min','gen']).some(p=>e.id.startsWith(p)));
+    const ev=pick(evs);if(!validEv(C,counts,true,ev))continue;
+    const Tf=()=>urnTree(C.kinds,counts,true),keys=keysOf(Tf(),ev);
+    if(single){const x=pick([a,b]),cx=x===a?ca:cb;
+      return{text:`Das Netz eines besonderen Würfels zeigt ${ca}-mal die Augenzahl ${a} und ${cb}-mal die Augenzahl ${b}. Mit welcher Wahrscheinlichkeit fällt beim einmaligen Werfen die Augenzahl ${x}?`,vis:dieTiles(faces),
+        sol:()=>lapSol(faces.map((f,i)=>f+`<sub>${i+1}</sub>`),faces.map(f=>f===x),`Die ${x} steht auf ${cx} der 6 gleich wahrscheinlichen Seiten.`)}}
+    return{text:`Das Netz eines besonderen Würfels zeigt ${ca}-mal die Augenzahl ${a} und ${cb}-mal die Augenzahl ${b}. Der Würfel wird zweimal geworfen. Bestimme die Wahrscheinlichkeit dafür, dass ${ev.dass}.`,vis:dieTiles(faces),tree:()=>treeSVG(Tf(),{sel:keys}),sol:()=>calcLines(Tf(),keys,`„${ev.label}“`)};
+  }
+}
+function wheelTask(lvl){
+  const evs1=[()=>{const z=rnd(1,5)*10+rnd(1,5);return{dass:`man die Zahl ${z} erhält`,f:(x,y)=>x*10+y===z}},
+    ()=>({dass:'die Zehnerstelle doppelt so groß wie die Einerstelle ist',f:(x,y)=>x===2*y}),
+    ()=>({dass:'beide Ziffern gleich sind',f:(x,y)=>x===y}),
+    ()=>({dass:'die Zahl gerade ist',f:(x,y)=>y%2===0})];
+  const evs2=[()=>({dass:'die Zahl durch 11 teilbar ist',f:(x,y)=>(10*x+y)%11===0}),
+    ()=>{const k=rnd(2,4);return{dass:`die Zahl größer als ${k}0 ist`,f:(x,y)=>10*x+y>k*10}},
+    ()=>({dass:'die Einerstelle kleiner als die Zehnerstelle ist',f:(x,y)=>y<x}),
+    ()=>{const s=rnd(4,8);return{dass:`die Summe der beiden Ziffern ${s} ergibt`,f:(x,y)=>x+y===s}},
+    ()=>({dass:'die Zahl eine Primzahl ist',f:(x,y)=>isPrime(10*x+y)})];
+  const ev=pick(lvl===1?evs1:evs2)();
+  const all=[];for(let x=1;x<=5;x++)for(let y=1;y<=5;y++)all.push([x,y]);
+  const E=all.filter(([x,y])=>ev.f(x,y)).map(([x,y])=>10*x+y);
+  return{text:`Ein Glücksrad hat fünf gleich große Felder mit den Ziffern 1, 2, 3, 4 und 5. Es wird zweimal gedreht. Die erste Drehung legt die Zehnerstelle, die zweite die Einerstelle einer zweistelligen Zahl fest. Bestimme die Wahrscheinlichkeit dafür, dass ${ev.dass}.`,
+    vis:`<div style="margin:.5rem 0">${wheelSVG(range(5).map(n=>({id:''+n,lab:''+n,w:1})),{size:190})}</div>`,
+    sol:()=>[L('Ergebnisse','Es gibt 5 · 5 = 25 gleich wahrscheinliche Zahlen von 11 bis 55. Jede hat die Wahrscheinlichkeit '+F(new Fr(1,5))+' · '+F(new Fr(1,5))+' = '+F(new Fr(1,25))+'.'),
+      L('Ereignis',`Günstig: ${E.length?E.join(', '):'keine'} <span class="muted">→ ${E.length} Zahlen</span>`),
+      L('Ergebnis',`P(E) = ${E.length} · ${F(new Fr(1,5))} · ${F(new Fr(1,5))} = <span class="result">${chain(new Fr(E.length,25))}</span>`)]};
+}
+function genLap(lvl){
+  if(lvl===1){
+    const v=pick(['word','net','urn','die']);
+    if(v==='word'){const w=pick(WORDS),ls=[...new Set(w)],X=pick(ls),Y=pick(ls.filter(l=>l!==X));
+      const ev=pick([{q:`ein ${X}`,f:c=>c===X},{q:`ein ${X} oder ein ${Y}`,f:c=>c===X||c===Y},{q:`kein ${X}`,f:c=>c!==X}]);
+      return{text:`Ein Würfel ist mit den Buchstaben ${[...w].join(', ')} beschriftet und wird einmal geworfen. Mit welcher Wahrscheinlichkeit fällt ${ev.q}?`,vis:letterTiles(w),sol:()=>lapSol(subLabels([...w]),[...w].map(ev.f),'Gleiche Buchstaben auf verschiedenen Seiten werden einzeln gezählt.')}}
+    if(v==='net')return netDieTask(1,true);
+    if(v==='urn'){const id=pick(['lollis','kugeln','schoko']),C=CTX[id],cn=randCounts(id),i=pick(cn.map((c,j)=>c?j:-1).filter(j=>j>=0)),a=C.kinds[i],N=sum(cn);
+      return{text:`${C.box} befinden sich ${urnDesc(C,cn)}. Es wird zufällig ${C.g==='f'?'eine':'ein'} ${C.obj} gezogen. Mit welcher Wahrscheinlichkeit ist es ${a.one}?`,vis:ballRow(C.kinds,cn),
+        sol:()=>[L('Möglich',`Insgesamt ${N} ${C.objPl}, jede${C.g==='f'?'':'r'} wird mit gleicher Wahrscheinlichkeit gezogen.`),L('Günstig',`${cn[i]} ${cn[i]===1?a.sg:a.pl}`),L('Laplace',`P(E) = <span class="result">${chain(new Fr(cn[i],N))}</span>`)]}}
+    const ev=pick([{q:'eine gerade Augenzahl',f:n=>n%2===0},{q:'eine Primzahl',f:isPrime},{q:'eine Zahl größer als 4',f:n=>n>4},{q:'eine durch 3 teilbare Zahl',f:n=>n%3===0}]);
+    return{text:`Ein fairer Würfel wird einmal geworfen. Mit welcher Wahrscheinlichkeit fällt ${ev.q}?`,sol:()=>lapSol(range(6),range(6).map(ev.f))};
+  }
+  const v=pick(['card','gegen','word2','not']);
+  if(v==='card'){for(;;){const N=pick([12,15,18,20,24,30]),k=pick([3,4,5,6]);
+    const ev=pick([{d:`ein Vielfaches von ${k}`,f:n=>n%k===0},{d:'eine Primzahl',f:isPrime},{d:`ein Teiler von ${N}`,f:n=>N%n===0},{d:'eine Quadratzahl',f:n=>Number.isInteger(Math.sqrt(n))}]);
+    const om=range(N),inE=om.map(ev.f);if(inE.some(Boolean)&&!inE.every(Boolean))return{text:`Auf ${N} Karten stehen die Zahlen 1 bis ${N}. Eine Karte wird zufällig gezogen. Mit welcher Wahrscheinlichkeit ist die Zahl ${ev.d}?`,sol:()=>lapSol(om,inE)}}}
+  if(v==='gegen'){const ps=[new Fr(7,10),new Fr(3,5),new Fr(4,5),new Fr(2,3),new Fr(3,4),new Fr(5,8)],p=pick(ps),an=pick([['Spatzen','Max beobachtet jeden Morgen sein Vogelhäuschen.'],['Regen','Ein Wetterbericht wird ausgewertet.'],['Verspätung','Ein Bus wird jeden Morgen beobachtet.']]);
+    const txt=an[0]==='Spatzen'?['Spatzen zu sehen','keine Spatzen zu sehen']:an[0]==='Regen'?['dass es morgen regnet','dass es morgen nicht regnet']:['dass der Bus Verspätung hat','dass der Bus pünktlich ist'];
+    return{text:`${an[1]} Die Wahrscheinlichkeit, ${txt[0]}, beträgt ${F(p)}. Wie groß ist die Wahrscheinlichkeit, ${txt[1]}?`,sol:()=>[L('Gegenereignis',`Das gesuchte Ereignis ist das Gegenereignis.`,'tc'),L('Ergebnis',`P = 1 − ${F(p)} = <span class="result">${R(new Fr(p.d-p.n,p.d))}</span>`)]}}
+  if(v==='word2'){const w=pick(WORDS);const vow=[...w].map(c=>'AEIOU'.includes(c));if(vow.every(Boolean)||!vow.some(Boolean))return genLap(2);
+    return{text:`Ein Würfel ist mit den Buchstaben ${[...w].join(', ')} beschriftet. Mit welcher Wahrscheinlichkeit fällt beim einmaligen Werfen ein Vokal, mit welcher ein Konsonant?`,vis:letterTiles(w),
+      sol:()=>{const k=vow.filter(Boolean).length;return[...lapSol(subLabels([...w]),vow,'Vokale sind A, E, I, O, U.'),L('Gegenereignis',`Konsonant: P = 1 − ${F(new Fr(k,6).red())} = <span class="result">${R(new Fr(6-k,6))}</span>`,'tc')]}}}
+  const id=pick(['lollis','schoko']),C=CTX[id],cn=randCounts(id),i=pick(cn.map((c,j)=>c?j:-1).filter(j=>j>=0)),a=C.kinds[i],N=sum(cn);
+  return{text:`${C.box} befinden sich ${urnDesc(C,cn)}. Es wird zufällig ${C.g==='f'?'eine':'ein'} ${C.obj} gezogen. Mit welcher Wahrscheinlichkeit ist es ${a.none}?`,vis:ballRow(C.kinds,cn),
+    sol:()=>[L('Günstig',`Alle außer den ${a.pl}: ${N} − ${cn[i]} = ${N-cn[i]}`),L('Laplace',`P = <span class="result">${chain(new Fr(N-cn[i],N))}</span>`),L('Alternative',`P = 1 − ${F(new Fr(cn[i],N))} = ${R(new Fr(N-cn[i],N))}`,'tc')]};
+}
+const genMit=lvl=>{const v=pick(['letter','net','wheel','urn']);return v==='letter'?letterDieTask(lvl):v==='net'?netDieTask(lvl):v==='wheel'?wheelTask(lvl):urnEventTask(['kugeln','lollis'],true,lvl===1?['zw','seq','und']:['same','diff','min','kein','gen'])};
+const genOhne=lvl=>urnEventTask(URN_CTX,false,lvl===1?['zw','und','seq']:['same','diff','gen','min','kein','und']);
+function genPfad(lvl){
+  if(lvl===2&&Math.random()<.25){
+    const ps=[new Fr(7,10),new Fr(3,5),new Fr(4,5),new Fr(2,3)],qs=[new Fr(1,5),new Fr(1,4),new Fr(2,5),new Fr(1,3)],p=pick(ps),q=pick(qs);
+    const nq=new Fr(q.d-q.n,q.d),np=new Fr(p.d-p.n,p.d);
+    const T={depth:2,kids:[{lab:'S',css:'#8b5a2b',p,kids:[{lab:'M',css:'#2f6fdb',p:q,kids:[]},{lab:'m',css:'var(--rest)',p:nq,kids:[]}]},{lab:'s',css:'var(--rest)',p:np,kids:[{lab:'M',css:'#2f6fdb',p:q,kids:[]},{lab:'m',css:'var(--rest)',p:nq,kids:[]}]}]};
+    return{text:`Max beobachtet jeden Morgen sein Vogelhäuschen. Die Wahrscheinlichkeit, Spatzen zu sehen, beträgt ${F(p)}, für Meisen beträgt sie ${F(q)}. Beides soll unabhängig voneinander sein. Wie groß ist die Wahrscheinlichkeit, morgens Spatzen, aber keine Meisen zu sehen?`,
+      tree:()=>treeSVG(T,{sel:new Set(['Sm'])}),
+      sol:()=>[L('Bezeichnungen','S: Spatzen, s: keine Spatzen, M: Meisen, m: keine Meisen'),L('Gegenereignis',`P(keine Meisen) = 1 − ${F(q)} = ${F(nq)}`,'tc'),L('1. Pfadregel',`P(Sm) = ${F(p)} · ${F(nq)} = <span class="result">${chain(p.mul(nq))}</span>`)]};
+  }
+  return urnEventTask(URN_CTX,null,lvl===1?['und','same','erst']:['same','diff','min','kein','gen','und']);
+}
+function genMulti(lvl){
+  if(Math.random()<.45){
+    const evs=lvl===1?LED_EV.filter(e=>['rgb','r2','start','r3'].includes(e.id)):LED_EV.filter(e=>['drei','zwei','min','kein'].includes(e.id));
+    const ev=pick(evs),keys=keysOf(ledTree(),ev);
+    return{text:`Eine LED-Leuchte leuchtet nach dem Einschalten rot (R), grün (G) oder blau (B), jeweils mit gleicher Wahrscheinlichkeit. Alle 5 s wechselt sie zufällig die Farbe, wobei immer eine <b>andere</b> Farbe folgt. Betrachtet werden die ersten 15 s, also drei Farben. Bestimme die Wahrscheinlichkeit dafür, dass ${ev.dass}.`,
+      tree:()=>treeSVG(ledTree(),{sel:keys}),
+      sol:()=>{const out=calcLines(ledTree(),keys,`„${ev.label}“`);if(ev.id==='min'){const pk=pOf(ledTree(),keysOf(ledTree(),LED_EV.find(e=>e.id==='kein')));out.push(L('Alternative',`1 − P(keinmal rot) = 1 − ${F(pk)} = <span class="result">${R(new Fr(pk.d-pk.n,pk.d))}</span>`,'tc'))}return out}};
+  }
+  const U={A:[rnd(1,5),0],B:[rnd(1,5),0],C:[rnd(1,5),0]};GRP.forEach(g=>U[g.lab][1]=6-U[g.lab][0]);
+  const intro=`Ein Glücksspiel: Zuerst wird gewürfelt. Bei einer 1 wird aus Urne A gezogen, bei 2, 4 oder 6 aus Urne B, bei 3 oder 5 aus Urne C. Man gewinnt mit einer weißen Kugel. (${gameDesc(U)}.)`;
+  if(lvl===1&&Math.random()<.35){
+    return{text:`${intro} Paul hat bereits eine 2 gewürfelt. Mit welcher Wahrscheinlichkeit zieht er nun eine schwarze Kugel?`,vis:urnsVis(U),
+      sol:()=>[L('Überlegung','Die 2 ist schon gefallen, Paul zieht also sicher aus Urne B. Nur noch die 2. Stufe zählt.'),L('Laplace',`In Urne B sind ${U.B[1]} von 6 Kugeln schwarz: P = <span class="result">${chain(new Fr(U.B[1],6))}</span>`)]};
+  }
+  const ev=pick(lvl===1?GAME_EV.filter(e=>['C','Aw','Bs'].includes(e.id)):GAME_EV.filter(e=>['win','lose','ugw'].includes(e.id))),Tf=()=>gameTree(U),keys=keysOf(Tf(),ev);
+  return{text:`${intro} Bestimme die Wahrscheinlichkeit dafür, dass ${ev.dass}.`,vis:urnsVis(U),tree:()=>treeSVG(Tf(),{sel:keys}),sol:()=>calcLines(Tf(),keys,`„${ev.label}“`)};
+}
+function genTerm(lvl){
+  for(let t=0;t<300;t++){
+    const id=pick(['lollis','schoko','kugeln','skat']),C=CTX[id],cn=randCounts(id),rep=lvl===2&&Math.random()<.3,N=sum(cn),Nm=rep?N:N-1;
+    const idx=cn.map((c,j)=>c?j:-1).filter(j=>j>=0);if(idx.length<3)continue;
+    const i=pick(idx),j=pick(idx.filter(x=>x!==i)),a=cn[i],b=cn[j],A=C.kinds[i],B=C.kinds[j],r1=rep?0:1;
+    const types=lvl===1?['zwei','seq','und','kein']:['zwei','seq','und','kein','1-zwei','1-kein'];
+    const ty=pick(types);
+    if((ty==='zwei'||ty==='1-zwei')&&a-r1<1)continue;
+    if((ty==='kein'||ty==='1-kein')&&N-a-r1<1)continue;
+    const f=(n,d)=>F(new Fr(n,d));let term,ans,val,why;
+    const pz=new Fr(a*(a-r1),N*Nm),pk=new Fr((N-a)*(N-a-r1),N*Nm),ps=new Fr(a*b,N*Nm);
+    if(ty==='zwei'){term=`${f(a,N)} · ${f(a-r1,Nm)}`;ans=A.two;val=pz;why=`${f(a,N)}: Beim 1. Zug ${A.one}. ${f(a-r1,Nm)}: Beim 2. Zug wieder ${A.one}${rep?'':' (eine weniger, ohne Zurücklegen)'}.`}
+    if(ty==='seq'){term=`${f(a,N)} · ${f(b,Nm)}`;ans=`zuerst ${A.one}, dann ${B.one}`;val=ps;why=`Ein einzelner Pfad: erst ${A.name}, dann ${B.name}.`}
+    if(ty==='und'){term=`2 · ${f(a,N)} · ${f(b,Nm)}`;ans=`${A.one} und ${B.one} (Reihenfolge egal)`;val=new Fr(2*a*b,N*Nm);why=`Der Faktor 2 steht für die zwei Reihenfolgen ${A.k}${B.k} und ${B.k}${A.k}.`}
+    if(ty==='kein'){term=`${f(N-a,N)} · ${f(N-a-r1,Nm)}`;ans=`${A.none} (also zweimal etwas anderes als ${A.name})`;val=pk;why=`${N-a} von ${N} sind nicht ${A.name}, beim 2. Zug ${N-a-r1} von ${Nm}.`}
+    if(ty==='1-zwei'){term=`1 − ${f(a,N)} · ${f(a-r1,Nm)}`;ans=`höchstens ${A.one} (also nicht ${A.two})`;val=new Fr(N*Nm-a*(a-r1),N*Nm);why=`Das Produkt ist P(${A.two}). 1 minus diese Wahrscheinlichkeit ist das Gegenereignis.`}
+    if(ty==='1-kein'){term=`1 − ${f(N-a,N)} · ${f(N-a-r1,Nm)}`;ans=`mindestens ${A.one}`;val=new Fr(N*Nm-(N-a)*(N-a-r1),N*Nm);why=`Das Produkt ist P(${A.none}). Das Gegenereignis davon ist „mindestens ${A.one}“.`}
+    return{text:`${urnIntro(C,cn,rep,id)} Beschreibe ein Ereignis, dessen Wahrscheinlichkeit sich mit dem Term <span class="term">p = ${term}</span> berechnen lässt.`,vis:id==='skat'?'':ballRow(C.kinds,cn),
+      sol:()=>[L('Ereignis',`zum Beispiel: <b>${ans}</b>`),L('Begründung',why),L('Wert',`p = <span class="result">${chain(val)}</span>`)]};
+  }
+}
+function genRueck(lvl){
+  const v=lvl===1?pick(['eaten','howmany']):pick(['eaten','howmany','fair']);
+  if(v==='eaten'){
+    for(;;){const C=CTX.schoko,cn=[rnd(4,8),rnd(3,7),rnd(2,6),rnd(2,6)],N=sum(cn),i=rnd(0,3),A=C.kinds[i],a=cn[i],m=rnd(4,Math.min(12,N-4)),x=rnd(0,Math.min(a-1,m));
+      const p=new Fr(a-x,N-m).red();
+      return{text:`Lena hat eine Packung mit ${N} Schokokugeln: ${urnDesc(C,cn)}. Sie hat bereits ${m} Kugeln gegessen. Die Wahrscheinlichkeit, jetzt zufällig eine ${A.sg} zu ziehen, beträgt ${F(p)}. Wie viele ${A.pl} hat Lena schon gegessen?`,
+        sol:()=>[L('Übrig',`Es sind noch ${N} − ${m} = ${N-m} Kugeln in der Packung.`),L('Rechnung',`Anzahl der ${A.pl} jetzt: ${F(p)} · ${N-m} = ${a-x}`),L('Ergebnis',`Gegessen: ${a} − ${a-x} = <span class="result">${x}</span> ${x===1?A.sg:A.pl}`),L('Probe',`${F(new Fr(a-x,N-m))} = ${F(p)} ✓`)]}}
+  }
+  if(v==='howmany'){
+    const N=lvl===1?rnd(5,10):rnd(8,16),k=rnd(2,N-1),p=new Fr(k*(k-1),N*(N-1)).red();
+    return{text:`In einem Beutel sind ${N} Lollis, einige davon sind Cola-Lollis. Es werden zufällig zwei Lollis ohne Zurücklegen gezogen. Die Wahrscheinlichkeit für zwei Cola-Lollis beträgt ${F(p)}. Wie viele Cola-Lollis sind im Beutel?`,
+      sol:()=>[L('Ansatz',`Bei k Cola-Lollis gilt: ${T('k',N)} · ${T('k − 1',N-1)} = ${F(p)}`),L('Umformen',`k · (k − 1) = ${F(p)} · ${N} · ${N-1} = ${k*(k-1)}`),L('Ergebnis',`${k} · ${k-1} = ${k*(k-1)}, also <span class="result">k = ${k}</span>`),L('Probe',`${F(new Fr(k,N))} · ${F(new Fr(k-1,N-1))} = ${chain(new Fr(k*(k-1),N*(N-1)))} ✓`)]};
+  }
+  for(;;){const wB=rnd(0,6),wC=rnd(0,6),wA=18-3*wB-2*wC;if(wA<0||wA>6)continue;
+    return{text:`Ein Glücksspiel: Zuerst wird gewürfelt. Bei einer 1 wird aus Urne A gezogen, bei 2, 4 oder 6 aus Urne B, bei 3 oder 5 aus Urne C. Man gewinnt mit einer weißen Kugel. Jede Urne enthält 6 Kugeln, in Urne B sind ${wB}, in Urne C ${wC} weiß. Wie viele Kugeln in Urne A müssen weiß sein, damit das Spiel fair ist (Gewinnwahrscheinlichkeit 50 %)?`,
+      sol:()=>[L('Ansatz',`P(gewinnen) = ${F(new Fr(1,6))} · ${T('w',6)} + ${F(new Fr(3,6))} · ${F(new Fr(wB,6))} + ${F(new Fr(2,6))} · ${F(new Fr(wC,6))} = ${F(new Fr(1,2))}`),
+        L('Sechsunddreißigstel',`${T('w',36)} + ${F(new Fr(3*wB,36))} + ${F(new Fr(2*wC,36))} = ${F(new Fr(18,36))}`),
+        L('Ergebnis',`w = 18 − ${3*wB} − ${2*wC} = <span class="result">${wA}</span> weiße Kugeln in Urne A`)]}}
+}
+const GEN={lap:genLap,mit:genMit,ohne:genOhne,pfad:genPfad,multi:genMulti,term:genTerm,rueck:genRueck};
+function genTask(){let t=TK.topic;if(t==='mix')t=pick(Object.keys(GEN));return GEN[t](TK.lvl)}
+function renderTask(){
+  if(!TK.t)TK.t=genTask();
+  $('#tk-text').innerHTML=TK.t.text+(TK.t.vis||'');
+  $('#tkShowBtn').textContent=TK.show?'Lösung verbergen':'Lösung zeigen';
+  $('#tk-solcard').hidden=!TK.show;
+  $('#tk-sol').innerHTML=TK.show?(TK.t.tree?`<div style="margin-bottom:.6rem">${TK.t.tree()}</div>`:'')+stepped('tk',TK.t.sol()):'';
+}
+
+/* =========================================================
+   Navigation, Ereignisse, Start
+   ========================================================= */
+const TABS=[['laplace','Laplace'],['mit','Mit Zurücklegen'],['ohne','Ohne Zurücklegen'],['pfad','Pfadregeln'],['multi','Mehrstufig'],['aufgaben','Aufgaben']];
+$('#tabs').innerHTML=TABS.map(([k,n])=>`<button data-tab="${k}">${n}</button>`).join('');
+function render(){({laplace:renderLaplace,mit:()=>renderUrnTab('mit'),ohne:()=>renderUrnTab('ohne'),pfad:renderPfad,multi:renderMulti,aufgaben:renderTask})[S.tab]()}
+function go(t){
+  if(!TABS.some(x=>x[0]===t))t='laplace';
+  S.tab=t;
+  $$('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+t));
+  $$('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
+  render();
+}
+window.addEventListener('hashchange',()=>go(location.hash.slice(1)));
+function setTheme(t){document.documentElement.dataset.theme=t;$('#themeBtn').textContent=t==='dark'?'☀ Hell':'☾ Dunkel';try{localStorage.setItem('wa-theme',t)}catch(e){}}
+function toggleKey(set,k){set.has(k)?set.delete(k):set.add(k)}
+
+document.addEventListener('click',e=>{
+  const el=e.target.closest('button,[data-out],[data-leaf]');if(!el||el.disabled)return;const ds=el.dataset;
+  if(ds.tab){if(location.hash.slice(1)===ds.tab)go(ds.tab);else location.hash=ds.tab;return}
+  if(ds.themetoggle!==undefined){setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');return}
+  if(ds.fmt){S.fmt=ds.fmt;$$('[data-fmt]').forEach(b=>b.classList.toggle('on',b.dataset.fmt===S.fmt));render();return}
+  if(ds.merk){const m=$('#'+ds.merk);m.hidden=!m.hidden;el.classList.toggle('on',!m.hidden);return}
+  if(ds.step){const k=ds.step,n=+ds.n,cur=S.steps[k]??0;S.steps[k]=ds.act==='next'?Math.min(cur+1,n):ds.act==='all'?n:0;render();return}
+  if(ds.cnt){
+    const lp=ds.cnt==='lp',i=+ds.i,d=+ds.d;
+    const U=lp?LP.urn:S.counts[S.tab==='pfad'?P4.ctx:S.ctx];
+    const lim=lp?{max:6,tmin:1,tmax:12}:{max:8,tmin:2,tmax:32};
+    const nv=U[i]+d,t=sum(U)+d;
+    if(nv<0||nv>lim.max||t<lim.tmin||t>lim.tmax)return;
+    if(!lp&&(DR.mit.busy||DR.ohne.busy))return;
+    U[i]=nv;
+    if(lp){LP.sel=new Set();LP.ev=null;S.steps.lp=0}else urnChanged();
+    render();return;
+  }
+  if(ds.mscnt){const u=MS.U[ds.mscnt],i=+ds.i,nv=u[i]+(+ds.d);if(nv<0||nv>6||u[0]+u[1]-u[i]+nv<1)return;u[i]=nv;MS.sel=new Set(MS.ev?[...keysOf(msTree(),msEvents().find(x=>x.id===MS.ev))]:[]);renderMulti();return}
+  if(ds.dev){LP.dev=ds.dev;LP.sel=new Set();LP.ev=null;S.steps.lp=0;renderLaplace();return}
+  if(ds.rad){const n=LP.rad+(+ds.rad);if(n<2||n>12)return;LP.rad=n;LP.sel=new Set();LP.ev=null;S.steps.lp=0;renderLaplace();return}
+  if(ds.faces){LP.faces=ds.faces.split(' ');LP.sel=new Set();LP.ev=null;S.steps.lp=0;renderLaplace();return}
+  if(ds.facesapply!==undefined){const f=$('#lp-faces').value.trim().split(/[\s,;]+/).filter(Boolean).map(x=>x.slice(0,3).toUpperCase());
+    if(f.length!==6){$('#lp-faceerr').innerHTML='<b style="color:var(--warn)">Bitte genau 6 Beschriftungen eingeben.</b>';return}
+    LP.faces=f;LP.sel=new Set();LP.ev=null;S.steps.lp=0;renderLaplace();return}
+  if(ds.pre!==undefined){const p=lpPresets().find(x=>x.name===ds.pre);LP.sel=new Set(p?p.ids:[]);LP.ev=p?p.name:null;S.steps.lp=0;renderLaplace();return}
+  if(ds.out){toggleKey(LP.sel,ds.out);LP.ev=null;S.steps.lp=0;renderLaplace();return}
+  if(ds.draw){urnDraw(ds.draw);return}
+  if(ds.redraw){urnReset(ds.redraw);renderUrnTab(ds.redraw);return}
+  if(ds.leaf){if(S.tab==='multi'){toggleKey(MS.sel,ds.leaf);MS.ev='';S.steps.ms=0;renderMulti()}else{toggleKey(P4.sel,ds.leaf);P4.ev='';S.steps.p4=0;renderPfad()}return}
+  if(ds.p4rep){P4.rep=ds.p4rep==='1';P4.sel=new Set();P4.ev='';S.steps.p4=0;renderPfad();return}
+  if(ds.p4comp!==undefined){P4.comp=!P4.comp;renderPfad();return}
+  if(ds.p4ctrl!==undefined){P4.ctrl=!P4.ctrl;renderPfad();return}
+  if(ds.msex){MS.ex=ds.msex;MS.sel=new Set();MS.ev='';MS.comp=false;S.steps.ms=0;renderMulti();return}
+  if(ds.mscomp!==undefined){MS.comp=!MS.comp;renderMulti();return}
+  if(ds.msctrl!==undefined){MS.ctrl=!MS.ctrl;renderMulti();return}
+  if(ds.tknew!==undefined){TK.t=genTask();TK.show=false;S.steps.tk=0;renderTask();return}
+  if(ds.tkshow!==undefined){TK.show=!TK.show;S.steps.tk=0;renderTask();return}
+  if(ds.tklvl){TK.lvl=+ds.tklvl;$$('[data-tklvl]').forEach(b=>b.classList.toggle('on',b===el));TK.t=genTask();TK.show=false;S.steps.tk=0;renderTask();return}
+});
+document.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.id==='stepT'){S.step=t.checked;S.steps={};render()}
+  else if(t.id==='animT'){S.anim=t.checked;document.body.classList.toggle('noanim',!S.anim)}
+  else if(t.matches('[data-redge]')){S.redEdge=t.checked;$$('[data-redge]').forEach(x=>x.checked=S.redEdge);render()}
+  else if(t.id==='cmpT'){S.cmp=t.checked;render()}
+  else if(t.id&&t.id.startsWith('ctxSel-')){S.ctx=t.value;urnChanged();render()}
+  else if(t.id==='p4ctx'){P4.ctx=t.value;if(URN_CTX.includes(t.value))S.ctx=t.value;P4.sel=new Set();P4.ev='';P4.comp=false;S.steps.p4=0;urnReset('mit');urnReset('ohne');renderPfad()}
+  else if(t.id==='p4ev'){P4.ev=t.value;const d=p4Events().find(x=>x.id===P4.ev);P4.sel=d?keysOf(p4Tree(),d):new Set();S.steps.p4=0;renderPfad()}
+  else if(t.id==='msev'){MS.ev=t.value;const d=msEvents().find(x=>x.id===MS.ev);MS.sel=d?keysOf(msTree(),d):new Set();S.steps.ms=0;renderMulti()}
+  else if(t.id==='tkTopic'){TK.topic=t.value;TK.t=genTask();TK.show=false;S.steps.tk=0;renderTask()}
+});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='lp-faces'){$('[data-facesapply]').click()}});
+
+(function init(){
+  let t=null;try{t=localStorage.getItem('wa-theme')}catch(e){}
+  if(!t)t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+  setTheme(t);
+  LP.sel=new Set(['f1','f2','f4']);LP.ev=null;
+  P4.ev='undKA';P4.sel=keysOf(p4Tree(),p4Events().find(x=>x.id==='undKA'));
+  go(location.hash.slice(1));
+})();
+</script>
+</body>
+</html>

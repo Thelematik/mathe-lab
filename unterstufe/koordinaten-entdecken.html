@@ -1,0 +1,636 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Koordinaten entdecken</title>
+<link rel="stylesheet" href="../assets/fonts/fonts.css">
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: Kopfzeile mit Reitern und Achsenlegende, darunter Zeichenfläche links und Bedienspalte rechts (auf Telefonbreite untereinander). */
+:root{
+  --bg:#f6f7f5; --surface:#ffffff; --fg:#1d2420; --muted:#5d6862; --line:#d5dad5;
+  --x:#1d5fd0; --y:#d2312d; --on-axis:#ffffff;
+  --grid:#c9d0ca; --grid5:#9aa59d;
+  --sq-light:#e9ece6; --sq-dark:#a5b6aa;
+  --pt:#1d2420; --ok:#18794e; --warn:#b45309;
+  --pw-fill:#ffffff; --pw-stroke:#1d2420; --pb-fill:#1d2420;
+  --font:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121715; --surface:#1b2220; --fg:#e8ede9; --muted:#9aa7a0; --line:#34403b;
+    --x:#6fa3ff; --y:#ff7d74; --on-axis:#0e1311;
+    --grid:#34403b; --grid5:#53625b;
+    --sq-light:#3b4640; --sq-dark:#26302b;
+    --pt:#e8ede9; --ok:#4cc38a; --warn:#f0a35a;
+    --pw-fill:#f2f5f2; --pw-stroke:#0e1311; --pb-fill:#0e1311;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121715; --surface:#1b2220; --fg:#e8ede9; --muted:#9aa7a0; --line:#34403b;
+  --x:#6fa3ff; --y:#ff7d74; --on-axis:#0e1311;
+  --grid:#34403b; --grid5:#53625b;
+  --sq-light:#3b4640; --sq-dark:#26302b;
+  --pt:#e8ede9; --ok:#4cc38a; --warn:#f0a35a;
+  --pw-fill:#f2f5f2; --pw-stroke:#0e1311; --pb-fill:#0e1311;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg); color:var(--fg); font-family:var(--font); font-size:17px; line-height:1.45;
+  padding-block:16px 16px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.wrap{max-width:1240px;margin:0 auto}
+header.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 28px;margin-bottom:18px}
+h1{font-size:1.7rem;line-height:1.15;margin:0;font-weight:700;text-wrap:balance}
+.tabs{display:flex;gap:4px;border-bottom:2px solid var(--line)}
+.tabs button{
+  font:inherit;font-weight:700;background:none;border:0;border-bottom:4px solid transparent;margin-bottom:-2px;
+  padding:8px 16px;color:var(--muted);cursor:pointer;border-radius:6px 6px 0 0
+}
+.tabs button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--fg)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-left:auto;font-size:.95rem}
+.themeBtn{font:inherit;font-weight:700;font-size:.95rem;background:var(--surface);color:var(--fg);border:2px solid var(--fg);border-radius:8px;padding:4px 14px;cursor:pointer}
+.themeBtn:hover{background:var(--fg);color:var(--bg)}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.legend i{display:inline-block;width:26px;height:6px;border-radius:3px}
+.lx i{background:var(--x)} .ly i{background:var(--y)}
+.lx b{color:var(--x)} .ly b{color:var(--y)}
+button:focus-visible,input:focus-visible,select:focus-visible,svg:focus-visible{outline:3px solid var(--fg);outline-offset:2px}
+
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:28px;align-items:start}
+@media (max-width:980px){.stage{grid-template-columns:minmax(0,1fr)}}
+.board{min-width:0}
+.pane{display:flex;flex-direction:column;gap:22px}
+.side>*{flex-shrink:0}
+[hidden]{display:none!important}
+@media (min-width:981px){#p-koord .side{max-height:calc(100vh - 118px);max-height:calc(100dvh - 118px);overflow:auto;padding-right:6px}}
+.board svg{display:block;width:100%;height:auto;max-height:calc(100vh - 128px);max-height:calc(100dvh - 128px);touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.side{min-width:0;display:flex;flex-direction:column;gap:22px}
+.side h2{font-size:.82rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;font-weight:700}
+.side section{padding-top:16px;border-top:1px solid var(--line)}
+.side section:first-child{padding-top:0;border-top:0}
+p{margin:0 0 8px;text-wrap:pretty}
+.muted{color:var(--muted);font-size:.95rem}
+.cx{color:var(--x);font-weight:700} .cy{color:var(--y);font-weight:700}
+.read{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-height:112px}
+.read .big{font-size:2.3rem;font-weight:700;line-height:1.1;margin-bottom:4px;font-variant-numeric:tabular-nums}
+.read .hint{color:var(--muted)}
+.seg{display:inline-flex;border:2px solid var(--fg);border-radius:8px;overflow:hidden}
+.seg button{font:inherit;background:none;color:var(--fg);border:0;padding:7px 14px;cursor:pointer;font-weight:700}
+.seg button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.btn{font:inherit;font-weight:700;background:var(--surface);color:var(--fg);border:2px solid var(--fg);border-radius:8px;padding:7px 14px;cursor:pointer}
+.btn:hover{background:var(--fg);color:var(--bg)}
+.btn.primary{background:var(--fg);color:var(--bg)}
+.btn.small{padding:4px 10px;font-size:.9rem}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+label.f{display:flex;flex-direction:column;gap:3px;font-size:.9rem;color:var(--muted);font-weight:700}
+input[type=text],input[type=number],select{
+  font:inherit;font-size:1rem;color:var(--fg);background:var(--surface);border:2px solid var(--line);border-radius:8px;padding:6px 8px;width:76px;min-width:0
+}
+select{width:auto;max-width:100%}
+input.ix{border-color:var(--x)} input.iy{border-color:var(--y)}
+label.f.lx2{color:var(--x)} label.f.ly2{color:var(--y)}
+.msg{min-height:1.4em;font-size:.95rem;margin-top:6px}
+.msg.err{color:var(--warn)} .msg.ok{color:var(--ok)}
+ul.pts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;max-height:150px;overflow:auto}
+ul.pts li{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 8px;border-radius:6px;background:var(--surface);border:1px solid var(--line);font-variant-numeric:tabular-nums}
+ul.pts button{font:inherit;font-size:.85rem;background:none;border:0;color:var(--muted);cursor:pointer;text-decoration:underline;padding:2px 4px}
+.checks{display:flex;flex-direction:column;gap:6px}
+.checks label{display:flex;align-items:center;gap:8px;cursor:pointer}
+.checks input{width:20px;height:20px;accent-color:var(--fg)}
+.sub{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* SVG */
+.grid{stroke:var(--grid);stroke-width:1}
+.grid5{stroke:var(--grid5);stroke-width:1.2}
+.axl-x{font-weight:700;fill:var(--x)} .axl-y{font-weight:700;fill:var(--y)}
+.halo{paint-order:stroke;stroke:var(--bg);stroke-width:4px;stroke-linejoin:round}
+.sqL{fill:var(--sq-light)} .sqD{fill:var(--sq-dark)}
+.chess-note{display:flex;flex-direction:column;gap:10px}
+.fine{font-size:.95rem;color:var(--muted)}
+.bridge{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>Koordinaten entdecken</h1>
+    <div class="tabs" role="tablist" aria-label="Bereiche">
+      <button role="tab" id="t-schach" aria-selected="true" aria-controls="p-schach">Schachbrett</button>
+      <button role="tab" id="t-koord" aria-selected="false" aria-controls="p-koord">Koordinatensystem</button>
+    </div>
+    <div class="legend" aria-label="Farblegende">
+      <span class="lx"><i></i><b>x</b> blau: nach rechts</span>
+      <span class="ly"><i></i><b>y</b> rot: nach oben</span>
+      <button type="button" id="themeBtn" class="themeBtn" aria-pressed="false" title="Zwischen hell und dunkel wechseln">Dunkel</button>
+    </div>
+  </header>
+
+  <!-- SCHACHBRETT -->
+  <section id="p-schach" role="tabpanel" aria-labelledby="t-schach">
+    <div class="stage">
+      <div class="board">
+        <svg id="chess" role="img" aria-label="Schachbrett mit Spalten A bis H und Zeilen 1 bis 8"></svg>
+      </div>
+      <div class="side">
+        <section>
+          <h2>Feld</h2>
+          <div class="read" id="chessRead" aria-live="polite"></div>
+        </section>
+        <section class="chess-note">
+          <h2>Auf dem Schachbrett</h2>
+          <p>Jedes Feld hat einen Namen aus zwei Teilen: einem Buchstaben für die Spalte und einer Zahl für die Zeile. Erst mit beiden Angaben ist das Feld eindeutig.</p>
+          <div class="checks"><label><input type="checkbox" id="chessPieces"> Figuren in Grundstellung zeigen</label></div>
+          <div class="sub">
+            <button class="btn" id="chessQuiz" type="button">Feld finden</button>
+            <span class="muted" id="chessQuizMsg" aria-live="polite"></span>
+          </div>
+        </section>
+        <section class="bridge">
+          <h2>Der nächste Schritt</h2>
+          <p>Im Koordinatensystem werden statt Feldern Punkte beschrieben, und statt Buchstaben stehen auch auf der waagerechten Achse Zahlen. Die Reihenfolge bleibt: erst die Angabe nach rechts (<span class="cx">x</span>), dann die Angabe nach oben (<span class="cy">y</span>).</p>
+          <button class="btn primary" type="button" id="goKoord">Zum Koordinatensystem</button>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <!-- KOORDINATENSYSTEM -->
+  <section id="p-koord" role="tabpanel" aria-labelledby="t-koord" hidden>
+    <div class="stage">
+      <div class="board">
+        <svg id="cs" role="img" aria-label="Koordinatensystem mit Gitter"></svg>
+      </div>
+      <div class="side">
+        <section>
+          <h2>Ablesen</h2>
+          <div class="read" id="csRead" aria-live="polite"></div>
+        </section>
+
+        <div class="seg" role="group" aria-label="Bereich der Bedienung" style="align-self:flex-start">
+          <button type="button" id="sDraw" aria-pressed="true">Zeichnen</button>
+          <button type="button" id="sPractice" aria-pressed="false">Übung</button>
+        </div>
+
+        <div class="pane" id="paneDraw">
+        <section>
+          <h2>Mit der Maus oder dem Finger</h2>
+          <div class="seg" role="group" aria-label="Was ein Klick bewirkt">
+            <button type="button" id="mSet" aria-pressed="true">Punkt setzen</button>
+            <button type="button" id="mRead" aria-pressed="false">Nur ablesen</button>
+          </div>
+        </section>
+
+        <section>
+          <h2>Punkt eintragen</h2>
+          <form id="addForm" autocomplete="off" novalidate>
+            <div class="row">
+              <label class="f lx2" for="inX">x (rechts)<input class="ix" id="inX" type="text" inputmode="decimal" placeholder="4"></label>
+              <label class="f ly2" for="inY">y (hoch)<input class="iy" id="inY" type="text" inputmode="decimal" placeholder="7"></label>
+              <label class="f" for="inN">Name<input id="inN" type="text" maxlength="3" placeholder="A"></label>
+              <button class="btn primary" type="submit">Setzen</button>
+            </div>
+          </form>
+          <div class="msg" id="addMsg" aria-live="polite"></div>
+        </section>
+
+        <section>
+          <h2>Eingetragene Punkte</h2>
+          <ul class="pts" id="ptList"></ul>
+          <p class="muted" id="ptEmpty">Noch keine Punkte. Klicke ins Gitter oder nutze das Formular.</p>
+          <div class="sub" style="margin-top:8px">
+            <button class="btn small" type="button" id="undo">Letzten entfernen</button>
+            <button class="btn small" type="button" id="clear">Alles löschen</button>
+          </div>
+        </section>
+
+        <section>
+          <h2>Darstellung</h2>
+          <div class="checks">
+            <label><input type="checkbox" id="cGuides" checked> Hilfslinien zu den Achsen</label>
+            <label><input type="checkbox" id="cLabels" checked> Namen an den Punkten</label>
+            <label><input type="checkbox" id="cConnect"> Punkte der Reihe nach verbinden</label>
+            <label><input type="checkbox" id="cClose"> Figur schließen (letzter mit erstem)</label>
+          </div>
+          <div class="row" style="margin-top:12px">
+            <label class="f" for="quad">Bereich
+              <select id="quad"><option value="q1">Nur oben rechts</option><option value="q4">Alle vier Viertel</option></select>
+            </label>
+            <label class="f lx2" for="xBis">x bis<input class="ix" id="xBis" type="number" min="4" max="20" value="14"></label>
+            <label class="f ly2" for="yBis">y bis<input class="iy" id="yBis" type="number" min="4" max="20" value="12"></label>
+          </div>
+        </section>
+
+        </div>
+
+        <div class="pane" id="panePractice" hidden>
+        <section>
+          <h2>Übung</h2>
+          <div class="row">
+            <label class="f" for="pType">Aufgabe
+              <select id="pType"><option value="click">Punkt anklicken</option><option value="read">Koordinaten ablesen</option></select>
+            </label>
+            <button class="btn primary" type="button" id="pStart">Starten</button>
+          </div>
+          <div id="pBody" hidden style="margin-top:12px">
+            <p id="pTask" style="font-size:1.15rem;font-weight:700"></p>
+            <form id="pForm" class="row" hidden autocomplete="off" novalidate>
+              <label class="f lx2" for="rx">x<input class="ix" id="rx" type="text" inputmode="decimal"></label>
+              <label class="f ly2" for="ry">y<input class="iy" id="ry" type="text" inputmode="decimal"></label>
+              <button class="btn" type="submit">Prüfen</button>
+            </form>
+            <div class="msg" id="pMsg" aria-live="polite"></div>
+            <div class="sub" style="margin-top:6px">
+              <button class="btn small" type="button" id="pNext">Nächste Aufgabe</button>
+              <span class="muted" id="pScore"></span>
+            </div>
+          </div>
+        </section>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var NS='http://www.w3.org/2000/svg';
+  var $=function(s){return document.querySelector(s)};
+  function el(tag,attrs,parent){var e=document.createElementNS(NS,tag);for(var k in attrs){e.setAttribute(k,attrs[k])}if(parent)parent.appendChild(e);return e}
+  function toSvg(evt,svg){var p=svg.createSVGPoint();p.x=evt.clientX;p.y=evt.clientY;return p.matrixTransform(svg.getScreenCTM().inverse())}
+  function fmt(n){return String(n).replace('-','−').replace('.',',')}
+  function parseNum(s){var v=String(s).trim().replace(/−/g,'-').replace(',','.');if(v===''||!isFinite(Number(v)))return NaN;return Number(v)}
+  function rnd(a,b){return a+Math.floor(Math.random()*(b-a+1))}
+
+  /* ---------- Reiter ---------- */
+  var tabs={schach:{t:$('#t-schach'),p:$('#p-schach')},koord:{t:$('#t-koord'),p:$('#p-koord')}};
+  function showTab(k){
+    for(var n in tabs){var on=n===k;tabs[n].t.setAttribute('aria-selected',on);tabs[n].p.hidden=!on}
+  }
+  tabs.schach.t.addEventListener('click',function(){showTab('schach')});
+  tabs.koord.t.addEventListener('click',function(){showTab('koord')});
+  $('#goKoord').addEventListener('click',function(){showTab('koord');window.scrollTo(0,0)});
+  showTab(location.hash==='#koordinaten'?'koord':'schach');
+
+  /* Hell/Dunkel: folgt zuerst dem System, die Schaltfläche überschreibt */
+  (function theme(){
+    var root=document.documentElement,btn=$('#themeBtn');
+    function isDark(){
+      var t=root.getAttribute('data-theme');
+      if(t)return t==='dark';
+      return window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    function label(){var d=isDark();btn.textContent=d?'Hell':'Dunkel';btn.setAttribute('aria-pressed',d)}
+    try{var s=localStorage.getItem('koord-theme');if(s==='light'||s==='dark')root.setAttribute('data-theme',s)}catch(e){}
+    btn.addEventListener('click',function(){
+      var n=isDark()?'light':'dark';root.setAttribute('data-theme',n);
+      try{localStorage.setItem('koord-theme',n)}catch(e){}
+      label();
+    });
+    label();
+  })();
+
+  /* ---------- Schachbrett ---------- */
+  (function chess(){
+    var svg=$('#chess'),S=64,ml=44,mt=12,files='ABCDEFGH';
+    var W=ml+8*S+12,H=mt+8*S+44;
+    svg.setAttribute('viewBox','0 0 '+W+' '+H);
+    var gSq=el('g',{},svg),gBand=el('g',{},svg),gLab=el('g',{},svg),gPcs=el('g',{'pointer-events':'none'},svg);
+    for(var c=0;c<8;c++)for(var r=1;r<=8;r++){
+      el('rect',{x:ml+c*S,y:mt+(8-r)*S,width:S,height:S,'class':((c+r)%2===0)?'sqL':'sqD'},gSq);
+    }
+    var bandC=el('rect',{y:mt,width:S,height:8*S,fill:'var(--x)','fill-opacity':'.30'},gBand);
+    var bandR=el('rect',{x:ml,width:8*S,height:S,fill:'var(--y)','fill-opacity':'.30'},gBand);
+    var cell=el('rect',{width:S-4,height:S-4,fill:'none',stroke:'var(--fg)','stroke-width':'4'},gBand);
+    bandC.style.display=bandR.style.display=cell.style.display='none';
+    for(var i=0;i<8;i++){
+      var t=el('text',{x:ml+i*S+S/2,y:mt+8*S+30,'text-anchor':'middle','font-size':'26','class':'axl-x'},gLab);t.textContent=files[i];
+      var n=el('text',{x:ml-16,y:mt+(7-i)*S+S/2+9,'text-anchor':'middle','font-size':'26','class':'axl-y'},gLab);n.textContent=String(i+1);
+    }
+    var back='RNBQKBNR',glyph={K:'♚',Q:'♛',R:'♜',B:'♝',N:'♞',P:'♟'};
+    function piece(c,r,ch,white){
+      var t=el('text',{x:ml+c*S+S/2,y:mt+(8-r)*S+S/2+2,'text-anchor':'middle','dominant-baseline':'central','font-size':'46',
+        fill:white?'var(--pw-fill)':'var(--pb-fill)',stroke:white?'var(--pw-stroke)':'var(--pw-fill)','stroke-width':white?'1.6':'1','paint-order':'stroke'},gPcs);
+      t.textContent=glyph[ch]+'︎';
+    }
+    for(var k=0;k<8;k++){piece(k,1,back[k],true);piece(k,2,'P',true);piece(k,7,'P',false);piece(k,8,back[k],false)}
+    gPcs.style.display='none';
+    $('#chessPieces').addEventListener('change',function(e){gPcs.style.display=e.target.checked?'':'none'});
+
+    var read=$('#chessRead'),target=null,sel=null;
+    function sq(c,r){return files[c]+r}
+    function showRead(c,r){
+      if(c==null){
+        read.innerHTML='<div class="hint">'+(target?'Tippe auf das Feld <b>'+sq(target.c,target.r)+'</b>.':'Fahre mit der Maus über ein Feld oder tippe darauf.')+'</div>';
+        return;
+      }
+      read.innerHTML='<div class="big"><span class="cx">'+files[c]+'</span><span class="cy">'+r+'</span></div>'+
+        '<div>Spalte <span class="cx">'+files[c]+'</span> (blau), Zeile <span class="cy">'+r+'</span> (rot)</div>';
+    }
+    function mark(c,r){
+      if(c==null){bandC.style.display=bandR.style.display=cell.style.display='none';return}
+      bandC.setAttribute('x',ml+c*S);bandR.setAttribute('y',mt+(8-r)*S);
+      cell.setAttribute('x',ml+c*S+2);cell.setAttribute('y',mt+(8-r)*S+2);
+      bandC.style.display=bandR.style.display=cell.style.display='';
+    }
+    function at(evt){
+      var p=toSvg(evt,svg),c=Math.floor((p.x-ml)/S),r=8-Math.floor((p.y-mt)/S);
+      if(c<0||c>7||r<1||r>8)return null;return {c:c,r:r};
+    }
+    function hover(evt){var a=at(evt);if(!a){return}if(target&&!sel){}mark(a.c,a.r);showRead(a.c,a.r)}
+    svg.addEventListener('pointermove',hover);
+    svg.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse'&&!sel){mark(null);showRead(null)}});
+    svg.addEventListener('click',function(e){
+      var a=at(e);if(!a)return;
+      mark(a.c,a.r);showRead(a.c,a.r);
+      if(target){
+        var m=$('#chessQuizMsg');
+        if(a.c===target.c&&a.r===target.r){m.textContent='Richtig, das ist '+sq(a.c,a.r)+'.';m.style.color='var(--ok)';target=null;$('#chessQuiz').textContent='Noch ein Feld'}
+        else{m.textContent='Das war '+sq(a.c,a.r)+'. Gesucht ist '+sq(target.c,target.r)+'.';m.style.color='var(--warn)'}
+      }
+    });
+    $('#chessQuiz').addEventListener('click',function(){
+      target={c:rnd(0,7),r:rnd(1,8)};
+      var m=$('#chessQuizMsg');m.style.color='';m.textContent='Gesucht: '+sq(target.c,target.r);
+      mark(null);showRead(null);
+    });
+    showRead(null);
+  })();
+
+  /* ---------- Koordinatensystem ---------- */
+  (function coord(){
+    var svg=$('#cs'),S=40,ml=50,mb=46,mt=32,mr=38;
+    var st={xmin:0,xmax:14,ymin:0,ymax:12,quad:'q1',pts:[],mode:'set',connect:false,close:false,guides:true,labels:true,hover:null,sel:null,practice:null};
+    var gDyn=null,W=0,H=0;
+    function px(x){return ml+(x-st.xmin)*S}
+    function py(y){return mt+(st.ymax-y)*S}
+    function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+
+    function readRange(){
+      var xb=clamp(Math.round(Number($('#xBis').value))||14,4,20),yb=clamp(Math.round(Number($('#yBis').value))||12,4,20);
+      st.quad=$('#quad').value;
+      if(st.quad==='q1'){st.xmin=0;st.xmax=xb;st.ymin=0;st.ymax=yb}
+      else{st.xmin=-xb;st.xmax=xb;st.ymin=-yb;st.ymax=yb}
+      st.pts=st.pts.filter(function(p){return p.x>=st.xmin&&p.x<=st.xmax&&p.y>=st.ymin&&p.y<=st.ymax});
+    }
+
+    function build(){
+      svg.innerHTML='';
+      W=ml+(st.xmax-st.xmin)*S+mr;H=mt+(st.ymax-st.ymin)*S+mb;
+      svg.setAttribute('viewBox','0 0 '+W+' '+H);
+      var g=el('g',{},svg),i;
+      for(i=st.xmin;i<=st.xmax;i++)el('line',{x1:px(i),x2:px(i),y1:py(st.ymax),y2:py(st.ymin),'class':i%5===0?'grid5':'grid'},g);
+      for(i=st.ymin;i<=st.ymax;i++)el('line',{x1:px(st.xmin),x2:px(st.xmax),y1:py(i),y2:py(i),'class':i%5===0?'grid5':'grid'},g);
+      var ax=px(0),ay=py(0),xEnd=px(st.xmax+0.65),yEnd=py(st.ymax+0.65),xStart=px(st.xmin-0.4),yStart=py(st.ymin-0.4);
+      el('line',{x1:xStart,x2:xEnd-6,y1:ay,y2:ay,stroke:'var(--x)','stroke-width':3.5,'stroke-linecap':'round'},g);
+      el('line',{x1:ax,x2:ax,y1:yStart,y2:yEnd+6,stroke:'var(--y)','stroke-width':3.5,'stroke-linecap':'round'},g);
+      el('polygon',{points:xEnd+','+ay+' '+(xEnd-15)+','+(ay-7)+' '+(xEnd-15)+','+(ay+7),fill:'var(--x)'},g);
+      el('polygon',{points:ax+','+yEnd+' '+(ax-7)+','+(yEnd+15)+' '+(ax+7)+','+(yEnd+15),fill:'var(--y)'},g);
+      for(i=st.xmin;i<=st.xmax;i++){
+        if(i===0)continue;
+        el('line',{x1:px(i),x2:px(i),y1:ay-7,y2:ay+7,stroke:'var(--x)','stroke-width':2.5},g);
+        var t=el('text',{x:px(i),y:ay+27,'text-anchor':'middle','font-size':'16','font-weight':'700',fill:'var(--x)','class':'halo'},g);t.textContent=fmt(i);
+      }
+      for(i=st.ymin;i<=st.ymax;i++){
+        if(i===0)continue;
+        el('line',{x1:ax-7,x2:ax+7,y1:py(i),y2:py(i),stroke:'var(--y)','stroke-width':2.5},g);
+        var u=el('text',{x:ax-14,y:py(i)+5.5,'text-anchor':'end','font-size':'16','font-weight':'700',fill:'var(--y)','class':'halo'},g);u.textContent=fmt(i);
+      }
+      var o=el('text',{x:ax-9,y:ay+22,'text-anchor':'end','font-size':'16',fill:'var(--muted)','class':'halo'},g);o.textContent='0';
+      var lx=el('text',{x:xEnd-4,y:ay-14,'text-anchor':'end','font-size':'22','class':'axl-x halo'},g);lx.textContent='x';
+      var ly=el('text',{x:ax+14,y:yEnd+8,'font-size':'22','class':'axl-y halo'},g);ly.textContent='y';
+      gDyn=el('g',{},svg);
+      draw();
+    }
+
+    function nearest(evt){
+      var p=toSvg(evt,svg),x=Math.round((p.x-ml)/S+st.xmin),y=Math.round(st.ymax-(p.y-mt)/S);
+      if(x<st.xmin||x>st.xmax||y<st.ymin||y>st.ymax)return null;
+      return {x:x,y:y};
+    }
+
+    function partsText(parent,x,y,prefix,size){
+      var t=el('text',{'font-size':size||'18','font-weight':'700'},parent);
+      var a=el('tspan',{fill:'var(--fg)'},t);a.textContent=prefix+'(';
+      var b=el('tspan',{fill:'var(--x)'},t);b.textContent=fmt(x);
+      var c=el('tspan',{fill:'var(--fg)'},t);c.textContent='|';
+      var d=el('tspan',{fill:'var(--y)'},t);d.textContent=fmt(y);
+      var e=el('tspan',{fill:'var(--fg)'},t);e.textContent=')';
+      return t;
+    }
+
+    function guides(g,x,y,opacity,dash){
+      el('line',{x1:px(x),x2:px(x),y1:py(y),y2:py(0),stroke:'var(--x)','stroke-width':2,'stroke-dasharray':dash||'6 5',opacity:opacity},g);
+      el('line',{x1:px(x),x2:px(0),y1:py(y),y2:py(y),stroke:'var(--y)','stroke-width':2,'stroke-dasharray':dash||'6 5',opacity:opacity},g);
+    }
+
+    /* Kreuz statt Punkt: weiße Unterlage, damit es auf dem Gitter lesbar bleibt */
+    function cross(g,cx,cy,a,w){
+      var d='M'+(cx-a)+' '+(cy-a)+'L'+(cx+a)+' '+(cy+a)+'M'+(cx-a)+' '+(cy+a)+'L'+(cx+a)+' '+(cy-a);
+      el('path',{d:d,fill:'none',stroke:'var(--bg)','stroke-width':w+3,'stroke-linecap':'round'},g);
+      el('path',{d:d,fill:'none',stroke:'var(--pt)','stroke-width':w,'stroke-linecap':'round'},g);
+    }
+
+    function bubble(g,cx,cy,txt,color,anchor){
+      var w=Math.max(30,txt.length*11+14),h=24,x=anchor==='end'?cx-w:(anchor==='start'?cx:cx-w/2);
+      el('rect',{x:x,y:cy-h/2,width:w,height:h,rx:7,fill:color},g);
+      var t=el('text',{x:x+w/2,y:cy+6,'text-anchor':'middle','font-size':'16','font-weight':'700',fill:'var(--on-axis)'},g);t.textContent=txt;
+    }
+
+    function drawHover(g,x,y){
+      guides(g,x,y,1);
+      bubble(g,px(x),py(0)+(st.ymin<0&&y<0?-26:27),fmt(x),'var(--x)');
+      bubble(g,px(0)-(st.xmin<0&&x<0?-26:14),py(y),fmt(y),'var(--y)',(st.xmin<0&&x<0)?'start':'end');
+      el('circle',{cx:px(x),cy:py(y),r:9,fill:'none',stroke:'var(--fg)','stroke-width':2.5},g);
+      cross(g,px(x),py(y),3,2);
+      var tg=el('g',{},g),tx=partsText(tg,x,y,hoverName(x,y),'20');
+      var bb=tx.getBBox(),w=bb.width+16,h=bb.height+8;
+      var tx0=px(x)+14,ty0=py(y)-14-h;
+      if(tx0+w>W-4)tx0=px(x)-14-w;
+      if(ty0<2)ty0=py(y)+14;
+      var r=el('rect',{x:tx0,y:ty0,width:w,height:h,rx:8,fill:'var(--surface)',stroke:'var(--fg)','stroke-width':1.5});
+      tg.insertBefore(r,tx);
+      tx.setAttribute('x',tx0+8);tx.setAttribute('y',ty0+h-9);
+    }
+
+    function draw(){
+      if(!gDyn)return;
+      gDyn.innerHTML='';
+      var pr=st.practice,hidden=pr&&pr.type==='click'&&!pr.done;
+      /* Verbindungen */
+      if(st.connect&&st.pts.length>1){
+        var d=st.pts.map(function(p,i){return(i?'L':'M')+px(p.x)+' '+py(p.y)}).join(' ')+(st.close&&st.pts.length>2?' Z':'');
+        el('path',{d:d,fill:'none',stroke:'var(--fg)','stroke-width':3,'stroke-linejoin':'round','stroke-linecap':'round'},gDyn);
+      }
+      st.pts.forEach(function(p){if(st.guides)guides(gDyn,p.x,p.y,.55,'4 5')});
+      st.pts.forEach(function(p){
+        cross(gDyn,px(p.x),py(p.y),4,2.5);
+        if(st.labels){var t=el('text',{x:px(p.x)+10,y:py(p.y)-10,'font-size':'19','font-weight':'700',fill:'var(--fg)','class':'halo'},gDyn);t.textContent=p.name}
+      });
+      /* Übung */
+      if(pr){
+        if(pr.type==='read'){
+          var c=el('g',{},gDyn);
+          el('circle',{cx:px(pr.x),cy:py(pr.y),r:12,fill:'none',stroke:pr.done?'var(--ok)':'var(--fg)','stroke-width':3},c);
+          el('circle',{cx:px(pr.x),cy:py(pr.y),r:5,fill:pr.done?'var(--ok)':'var(--fg)'},c);
+          if(!pr.done){var q=el('text',{x:px(pr.x)+16,y:py(pr.y)-12,'font-size':'22','font-weight':'700',fill:'var(--fg)','class':'halo'},c);q.textContent='?'}
+          else guides(gDyn,pr.x,pr.y,1);
+        }else if(pr.done){
+          el('circle',{cx:px(pr.x),cy:py(pr.y),r:13,fill:'none',stroke:'var(--ok)','stroke-width':4},gDyn);
+          guides(gDyn,pr.x,pr.y,1);
+        }
+        if(pr.miss){el('circle',{cx:px(pr.miss.x),cy:py(pr.miss.y),r:9,fill:'none',stroke:'var(--warn)','stroke-width':3,'stroke-dasharray':'3 3'},gDyn)}
+      }
+      if(st.hover&&!hidden)drawHover(gDyn,st.hover.x,st.hover.y);
+      renderRead();
+    }
+
+    function way(x,y){
+      if(x===0&&y===0)return 'Das ist der Ursprung.';
+      var a=x===0?'nicht nach rechts oder links':fmt(Math.abs(x))+' nach '+(x>0?'rechts':'links');
+      var b=y===0?'nicht nach oben oder unten':fmt(Math.abs(y))+' nach '+(y>0?'oben':'unten');
+      return 'Vom Ursprung aus: <span class="cx">'+a+'</span>, dann <span class="cy">'+b+'</span>.';
+    }
+    function renderRead(){
+      var pr=st.practice,box=$('#csRead'),p=st.hover||st.sel;
+      if(pr&&pr.type==='click'&&!pr.done){box.innerHTML='<div class="hint">Während der Übung zeigt das Gitter nichts an. Klicke den gesuchten Punkt.</div>';return}
+      if(!p){box.innerHTML='<div class="hint">Fahre mit der Maus über das Gitter oder tippe auf einen Kreuzungspunkt. Hier steht dann, wie der Punkt heißt.</div>';return}
+      box.innerHTML='<div class="big">'+hoverName(p.x,p.y)+'(<span class="cx">'+fmt(p.x)+'</span>|<span class="cy">'+fmt(p.y)+'</span>)</div><div>'+way(p.x,p.y)+'</div>';
+    }
+
+    /* Name in der Vorschau: vorhandener Punkt behält seinen Namen, sonst der Name, den ein Klick vergeben würde */
+    function hoverName(x,y){
+      var ex=st.pts.filter(function(p){return p.x===x&&p.y===y})[0];
+      if(ex)return ex.name;
+      if(!st.practice&&st.mode==='set')return nextName();
+      return 'P';
+    }
+    function nextName(){
+      var used={};st.pts.forEach(function(p){used[p.name]=1});
+      for(var i=0;i<26;i++){var n=String.fromCharCode(65+i);if(!used[n])return n}
+      var k=1;while(used['P'+k])k++;return 'P'+k;
+    }
+    function addPoint(x,y,name){
+      if(st.pts.some(function(p){return p.x===x&&p.y===y}))return false;
+      st.pts.push({x:x,y:y,name:name||nextName()});listPts();return true;
+    }
+    function listPts(){
+      var ul=$('#ptList');ul.innerHTML='';
+      st.pts.forEach(function(p,i){
+        var li=document.createElement('li');
+        li.innerHTML='<span><b>'+p.name+'</b>(<span class="cx">'+fmt(p.x)+'</span>|<span class="cy">'+fmt(p.y)+'</span>)</span>';
+        var b=document.createElement('button');b.type='button';b.textContent='entfernen';
+        b.addEventListener('click',function(){st.pts.splice(i,1);listPts();draw()});
+        li.appendChild(b);ul.appendChild(li);
+      });
+      $('#ptEmpty').hidden=st.pts.length>0;
+    }
+
+    /* Zeigersteuerung */
+    svg.addEventListener('pointermove',function(e){
+      var n=nearest(e);if(!n)return;
+      if(!st.hover||st.hover.x!==n.x||st.hover.y!==n.y){st.hover=n;draw()}
+    });
+    svg.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse'){st.hover=null;draw()}});
+    svg.addEventListener('click',function(e){
+      var n=nearest(e);if(!n)return;
+      st.hover=n;st.sel=n;
+      var pr=st.practice;
+      if(pr&&pr.type==='click'){
+        if(!pr.done){
+          pr.tries++;
+          var m=$('#pMsg');
+          if(n.x===pr.x&&n.y===pr.y){pr.done=true;pr.right++;pr.miss=null;m.className='msg ok';m.innerHTML='Richtig! Das ist P('+fmt(pr.x)+'|'+fmt(pr.y)+').'}
+          else{pr.miss=n;m.className='msg err';m.innerHTML='Du hast P('+fmt(n.x)+'|'+fmt(n.y)+') getroffen. Gesucht ist P('+fmt(pr.x)+'|'+fmt(pr.y)+').'}
+          score();
+        }
+        draw();return;
+      }
+      if(st.mode==='set'&&!pr){addPoint(n.x,n.y)}
+      draw();
+    });
+
+    /* Formular */
+    $('#addForm').addEventListener('submit',function(e){
+      e.preventDefault();
+      var x=parseNum($('#inX').value),y=parseNum($('#inY').value),m=$('#addMsg');
+      if(isNaN(x)||isNaN(y)){m.className='msg err';m.textContent='Bitte für x und y je eine Zahl eingeben.';return}
+      if(x<st.xmin||x>st.xmax||y<st.ymin||y>st.ymax){m.className='msg err';m.textContent='Der Punkt liegt außerhalb des Bereichs (x von '+fmt(st.xmin)+' bis '+fmt(st.xmax)+', y von '+fmt(st.ymin)+' bis '+fmt(st.ymax)+').';return}
+      var name=$('#inN').value.trim();
+      var shown=name||nextName();
+      if(!addPoint(x,y,name)){m.className='msg err';m.textContent='Dieser Punkt ist schon eingetragen.';return}
+      m.className='msg ok';m.innerHTML='Gesetzt: '+shown+'('+fmt(x)+'|'+fmt(y)+').';
+      st.sel=st.hover={x:Math.round(x),y:Math.round(y)};
+      if(x!==Math.round(x)||y!==Math.round(y))st.hover=st.sel=null;
+      $('#inN').value='';$('#inX').select();draw();
+    });
+    $('#undo').addEventListener('click',function(){st.pts.pop();listPts();draw()});
+    $('#clear').addEventListener('click',function(){st.pts=[];listPts();draw()});
+
+    /* Einstellungen */
+    function setMode(m){st.mode=m;$('#mSet').setAttribute('aria-pressed',m==='set');$('#mRead').setAttribute('aria-pressed',m==='read');draw()}
+    $('#mSet').addEventListener('click',function(){setMode('set')});
+    $('#mRead').addEventListener('click',function(){setMode('read')});
+    $('#cGuides').addEventListener('change',function(e){st.guides=e.target.checked;draw()});
+    $('#cLabels').addEventListener('change',function(e){st.labels=e.target.checked;draw()});
+    $('#cConnect').addEventListener('change',function(e){st.connect=e.target.checked;draw()});
+    $('#cClose').addEventListener('change',function(e){st.close=e.target.checked;draw()});
+    function rangeChange(){readRange();st.hover=st.sel=null;if(st.practice)endPractice();listPts();build()}
+    $('#quad').addEventListener('change',rangeChange);
+    $('#xBis').addEventListener('change',rangeChange);
+    $('#yBis').addEventListener('change',rangeChange);
+
+    /* Übung */
+    function score(){var pr=st.practice;$('#pScore').textContent='Richtig: '+pr.right+' von '+pr.tries+' Versuchen'}
+    function newTask(){
+      var pr=st.practice,x,y;
+      do{x=rnd(st.xmin,st.xmax);y=rnd(st.ymin,st.ymax)}while(x===0&&y===0);
+      pr.x=x;pr.y=y;pr.done=false;pr.miss=null;
+      var m=$('#pMsg');m.className='msg';m.textContent='';
+      st.hover=null;st.sel=null;
+      $('#pForm').hidden=pr.type!=='read';
+      $('#rx').value='';$('#ry').value='';
+      $('#pTask').innerHTML=pr.type==='click'
+        ?'Klicke auf den Punkt <b>P(<span class="cx">'+fmt(x)+'</span>|<span class="cy">'+fmt(y)+'</span>)</b>.'
+        :'Lies die Koordinaten des markierten Punktes ab.';
+      draw();
+      if(pr.type==='read')$('#rx').focus();
+    }
+    function startPractice(){
+      st.practice={type:$('#pType').value,tries:0,right:0};
+      $('#pBody').hidden=false;$('#pStart').textContent='Beenden';
+      score();newTask();
+    }
+    function endPractice(){st.practice=null;$('#pBody').hidden=true;$('#pStart').textContent='Starten';draw()}
+    $('#pStart').addEventListener('click',function(){if(st.practice)endPractice();else startPractice()});
+    $('#pNext').addEventListener('click',function(){if(st.practice)newTask()});
+    function showPane(k){
+      var pr=k==='practice';
+      $('#paneDraw').hidden=pr;$('#panePractice').hidden=!pr;
+      $('#sDraw').setAttribute('aria-pressed',!pr);$('#sPractice').setAttribute('aria-pressed',pr);
+      if(!pr&&st.practice)endPractice();
+    }
+    $('#sDraw').addEventListener('click',function(){showPane('draw')});
+    $('#sPractice').addEventListener('click',function(){showPane('practice')});
+    $('#pType').addEventListener('change',function(){if(st.practice){startPractice()}});
+    $('#pForm').addEventListener('submit',function(e){
+      e.preventDefault();
+      var pr=st.practice;if(!pr||pr.type!=='read'||pr.done)return;
+      var a=parseNum($('#rx').value),b=parseNum($('#ry').value),m=$('#pMsg');
+      if(isNaN(a)||isNaN(b)){m.className='msg err';m.textContent='Bitte beide Zahlen eingeben.';return}
+      pr.tries++;
+      if(a===pr.x&&b===pr.y){pr.done=true;pr.right++;m.className='msg ok';m.innerHTML='Richtig! P(<span class="cx">'+fmt(pr.x)+'</span>|<span class="cy">'+fmt(pr.y)+'</span>)'}
+      else{
+        m.className='msg err';
+        m.innerHTML=(a===pr.x?'<span class="cx">x stimmt.</span> ':'<span class="cx">x stimmt noch nicht.</span> ')+(b===pr.y?'<span class="cy">y stimmt.</span>':'<span class="cy">y stimmt noch nicht.</span>');
+      }
+      score();draw();
+    });
+
+    readRange();listPts();build();
+  })();
+})();
+</script>
+
+</body></html>

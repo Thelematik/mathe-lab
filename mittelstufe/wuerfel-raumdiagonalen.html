@@ -1,0 +1,690 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Würfel und Raumdiagonalen</title>
+<link rel="stylesheet" href="../assets/fonts/fonts.css">
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: links die 3D Ansicht auf Millimeterpapier, rechts das Rechenblatt; darunter die Herleitung als Folge von Schritten */
+:root{
+  --bg:#eef2f4; --panel:#ffffff; --ink:#16212b; --muted:#566573; --line:#d3dce3; --grid:#dfe6eb;
+  --edge:#22303c; --face:#5d7a92; --fdiag:#13798a; --rdiag:#c4451b; --tri:#d99a0b; --arc:#7340b5; --accent:#13798a;
+  --chip:#e4ebef;
+  --display:"Zilla Slab", Rockwell, Georgia, serif;
+  --body:"Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e151c; --panel:#151f29; --ink:#e4ecf2; --muted:#93a4b3; --line:#2a3845; --grid:#18232d;
+  --edge:#cdd8e1; --face:#7f9db5; --fdiag:#4cc3d6; --rdiag:#ff7d4f; --tri:#f2c14e; --arc:#b991f2; --accent:#4cc3d6;
+  --chip:#1d2934; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0e151c; --panel:#151f29; --ink:#e4ecf2; --muted:#93a4b3; --line:#2a3845; --grid:#18232d;
+  --edge:#cdd8e1; --face:#7f9db5; --fdiag:#4cc3d6; --rdiag:#ff7d4f; --tri:#f2c14e; --arc:#b991f2; --accent:#4cc3d6;
+  --chip:#1d2934; color-scheme:dark }
+:root[data-theme="light"]{color-scheme:light}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:20px 40px}
+.wrap{max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(1.7rem,3.2vw,2.4rem);line-height:1.1;margin:0;text-wrap:balance}
+h1 small{display:block;font-family:var(--body);font-weight:400;font-size:1rem;color:var(--muted);margin-top:6px}
+h2{font-family:var(--display);font-weight:700;font-size:1.3rem;margin:0;text-wrap:balance}
+h3{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0;font-weight:700}
+.btn{font:inherit;font-weight:600;font-size:.92rem;border:1px solid var(--line);background:var(--panel);color:var(--ink);
+  border-radius:8px;padding:7px 14px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn:focus-visible,input:focus-visible,.vlabel:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.btn:disabled{opacity:.45;cursor:default}
+.top-actions{display:flex;gap:8px}
+
+.main{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:960px){.main{grid-template-columns:minmax(0,1fr)}}
+
+.stage{position:sticky;top:12px;border:1px solid var(--line);border-radius:12px;overflow:hidden;
+  background-color:var(--bg);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;height:min(72vh,680px);min-height:360px}
+@media (max-width:960px){.stage{position:relative;top:0;height:420px}}
+.stage canvas{display:block;width:100%;height:100%;touch-action:none}
+.labels{position:absolute;inset:0;pointer-events:none}
+.vlabel{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;cursor:pointer;
+  font-family:var(--mono);font-weight:600;font-size:.9rem;color:var(--ink);background:var(--panel);
+  border:1px solid var(--line);border-radius:6px;padding:0 6px;line-height:1.5;user-select:none}
+.vlabel.sel{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.vlabel.aux{border-style:dashed}
+.alabel{position:absolute;transform:translate(-50%,-50%);font-family:var(--display);font-weight:700;font-size:1.25rem;color:var(--arc)}
+.hint{position:absolute;left:12px;bottom:10px;right:12px;font-size:.82rem;color:var(--muted);pointer-events:none}
+.legend{position:absolute;top:10px;left:12px;display:flex;flex-wrap:wrap;gap:6px 12px;font-size:.8rem;color:var(--muted);pointer-events:none}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:18px;height:4px;border-radius:2px}
+
+.side{display:flex;flex-direction:column;gap:16px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.seg{display:inline-flex;background:var(--chip);border-radius:9px;padding:3px;gap:3px;flex-wrap:wrap}
+.seg button{font:inherit;font-size:.92rem;font-weight:600;border:0;background:transparent;color:var(--muted);padding:6px 14px;border-radius:7px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--panel);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.slider{display:grid;grid-template-columns:2.2em minmax(0,1fr) 5.4em;align-items:center;gap:10px}
+.slider label{font-family:var(--mono);font-weight:600}
+.slider output{font-family:var(--mono);text-align:right;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.checks{display:flex;flex-wrap:wrap;gap:8px 18px}
+.checks label{display:inline-flex;align-items:center;gap:7px;cursor:pointer}
+.checks input{accent-color:var(--accent);width:17px;height:17px}
+
+.modes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media (max-width:420px){.modes{grid-template-columns:minmax(0,1fr)}}
+.mode{font:inherit;text-align:left;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:9px;padding:8px 10px;cursor:pointer;display:flex;gap:10px;align-items:baseline}
+.mode b{font-family:var(--display);font-size:1.2rem;color:var(--arc);min-width:1em}
+.mode span{font-size:.9rem;line-height:1.3}
+.mode[aria-pressed="true"]{border-color:var(--arc);box-shadow:inset 0 0 0 1px var(--arc)}
+
+.calc{display:flex;flex-direction:column;gap:6px}
+.calc p{margin:0;color:var(--muted);font-size:.95rem}
+.mrow{overflow-x:auto;padding:2px 0}
+math{font-size:1.12em}
+math[display="block"]{margin:2px 0;text-align:left}
+.result{display:flex;align-items:baseline;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding-top:10px;flex-wrap:wrap}
+.result .val{font-family:var(--mono);font-size:1.5rem;font-weight:600;color:var(--arc);font-variant-numeric:tabular-nums}
+
+table{width:100%;border-collapse:collapse;font-size:.93rem}
+td{padding:5px 0;border-bottom:1px solid var(--line);vertical-align:middle}
+td:last-child{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:8px}
+.custom{font-size:.93rem;color:var(--muted)}
+
+.derive{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:16px}
+.derive-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px}
+.derive-head p{margin:4px 0 0;color:var(--muted);max-width:62ch}
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr));gap:12px}
+.step{border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;min-width:0;cursor:pointer}
+.step.current{border-color:var(--tri);box-shadow:inset 0 0 0 1px var(--tri)}
+.step .no{font-family:var(--mono);font-size:.78rem;color:var(--muted)}
+.step h4{margin:0;font-family:var(--display);font-size:1.08rem}
+.step p{margin:0;font-size:.94rem;color:var(--muted)}
+.step.locked{opacity:.35;cursor:default}
+.step.locked .body{visibility:hidden}
+.note{border-left:3px solid var(--tri);padding:4px 0 4px 12px;margin:0;color:var(--ink);font-size:.95rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs button{font:inherit;font-weight:700;font-size:1rem;border:0;background:transparent;color:var(--muted);padding:10px 16px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.view{display:flex;flex-direction:column;gap:20px}
+.stage.plane svg{display:block;width:100%;height:100%}
+.legend i.dash{background:repeating-linear-gradient(90deg,var(--fdiag) 0 5px,transparent 5px 9px)}
+.warn{border-left:3px solid var(--rdiag);padding:4px 0 4px 12px;margin:0;font-size:.95rem}
+.calc h4{margin:6px 0 0;font-size:.95rem}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Würfel und Raumdiagonalen<small>Winkel und Längen mit Trigonometrie berechnen, im Raum und in der Ebene</small></h1>
+    <div class="top-actions">
+      <button class="btn" id="themeBtn" type="button">Dunkler Modus</button>
+      <button class="btn" id="resetBtn" type="button">Zurücksetzen</button>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Bereich wählen">
+    <button type="button" role="tab" id="tab3d" aria-selected="true" aria-controls="view3d">Würfel und Quader</button>
+    <button type="button" role="tab" id="tab2d" aria-selected="false" aria-controls="view2d">Dreieck, Raute, Drachen</button>
+  </nav>
+
+  <div id="view3d" class="view" role="tabpanel" aria-labelledby="tab3d">
+  <div class="main">
+    <div class="stage" id="stage">
+      <div class="legend">
+        <span><i style="background:var(--edge)"></i>Kanten</span>
+        <span><i style="background:var(--fdiag)"></i>Flächendiagonalen</span>
+        <span><i style="background:var(--rdiag)"></i>Raumdiagonalen</span>
+        <span><i style="background:var(--tri)"></i>Hilfsdreieck</span>
+      </div>
+      <div class="labels" id="labels"></div>
+      <div class="hint">Ziehen zum Drehen, Mausrad oder zwei Finger zum Zoomen. Zwei Eckpunkte anklicken, um eine eigene Strecke zu messen.</div>
+    </div>
+
+    <div class="side">
+      <section class="card" aria-labelledby="h-koerper">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+          <h3 id="h-koerper">Körper</h3>
+          <div class="seg" role="group" aria-label="Körper wählen">
+            <button type="button" id="cubeBtn" aria-pressed="true">Würfel</button>
+            <button type="button" id="boxBtn" aria-pressed="false">Quader</button>
+          </div>
+        </div>
+        <div class="slider"><label for="sa">a</label><input id="sa" type="range" min="0.5" max="10" step="0.1" value="4"><output id="oa"></output></div>
+        <div class="slider" id="rowb"><label for="sb">b</label><input id="sb" type="range" min="0.5" max="10" step="0.1" value="3"><output id="ob"></output></div>
+        <div class="slider" id="rowc"><label for="sc">c</label><input id="sc" type="range" min="0.5" max="10" step="0.1" value="2.5"><output id="oc"></output></div>
+        <div class="checks">
+          <label><input type="checkbox" id="cf" checked> Flächendiagonalen</label>
+          <label><input type="checkbox" id="cr" checked> Raumdiagonalen</label>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="h-winkel">
+        <h3 id="h-winkel">Winkel wählen</h3>
+        <div class="modes" id="modes">
+          <button type="button" class="mode" data-mode="alpha"><b>α</b><span>Raumdiagonale AG und Grundfläche</span></button>
+          <button type="button" class="mode" data-mode="beta"><b>β</b><span>Raumdiagonale AG und Kante AB</span></button>
+          <button type="button" class="mode" data-mode="gamma"><b>γ</b><span>Schnittwinkel der Raumdiagonalen AG und BH</span></button>
+          <button type="button" class="mode" data-mode="delta"><b>δ</b><span>Flächendiagonale AC und Kante AB</span></button>
+        </div>
+        <div class="calc" id="calc"></div>
+      </section>
+
+      <section class="card" aria-labelledby="h-laengen">
+        <h3 id="h-laengen">Streckenlängen</h3>
+        <table id="lengths"></table>
+        <div class="custom" id="custom">Eigene Strecke: zwei Eckpunkte im Modell anklicken.</div>
+      </section>
+    </div>
+  </div>
+
+  <section class="derive" aria-labelledby="h-herl">
+    <div class="derive-head">
+      <div>
+        <h2 id="h-herl">Herleitung im Würfel</h2>
+        <p>Wie groß ist der Winkel α zwischen Raumdiagonale und Grundfläche, wenn der Würfel die Kantenlänge a hat? Jeder Schritt zeigt das passende Dreieck im Modell.</p>
+      </div>
+      <div class="top-actions">
+        <button class="btn" id="prevBtn" type="button">Zurück</button>
+        <button class="btn primary" id="nextBtn" type="button">Nächster Schritt</button>
+      </div>
+    </div>
+    <ol class="steps" id="steps"></ol>
+  </section>
+  </div>
+
+  <div id="view2d" class="view" role="tabpanel" aria-labelledby="tab2d" hidden>
+    <div class="main">
+      <div class="stage plane" id="pstage">
+        <div class="legend">
+          <span><i style="background:var(--edge)"></i>Figur</span>
+          <span><i class="dash"></i>Hilfslinien</span>
+          <span><i style="background:var(--tri)"></i>Hilfsdreieck</span>
+          <span><i style="background:var(--arc)"></i>Winkel</span>
+        </div>
+        <svg id="psvg" viewBox="0 0 640 480" role="img" aria-label="Zeichnung der gewählten Figur mit Hilfslinien"></svg>
+      </div>
+      <div class="side">
+        <section class="card" aria-labelledby="h-figur">
+          <h3 id="h-figur">Figur</h3>
+          <div class="seg" role="group" aria-label="Figur wählen" id="figSeg"></div>
+          <h3>Gegeben</h3>
+          <div class="seg" role="group" aria-label="Gegebene Größen wählen" id="givenSeg"></div>
+          <div id="psliders" style="display:flex;flex-direction:column;gap:10px"></div>
+          <p class="warn" id="pwarn" hidden></p>
+        </section>
+        <section class="card" aria-labelledby="h-erg">
+          <h3 id="h-erg">Ergebnisse</h3>
+          <table id="presults"></table>
+        </section>
+        <section class="card" aria-labelledby="h-rech">
+          <h3 id="h-rech">Rechnung</h3>
+          <div class="calc" id="pcalc"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/lib/three/three.min.js"></script>
+<script src="../assets/lib/three/OrbitControls.js"></script>
+<script src="../assets/lib/katex/katex.min.js"></script>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const root=document.documentElement;
+const S=0.36; // Szeneneinheiten pro Längeneinheit
+
+const state={shape:'cube',a:4,b:3,c:2.5,showF:true,showR:true,mode:'alpha',override:null,sel:[],custom:null,step:0};
+
+/* ---------- Hilfsfunktionen ---------- */
+function tex(s,display=true){
+  if(window.katex){try{return katex.renderToString(s,{output:'mathml',displayMode:display,throwOnError:false});}catch(e){}}
+  return '<code>'+s+'</code>';
+}
+const n=(x,d=2)=>{const r=Math.round(x*Math.pow(10,d))/Math.pow(10,d);return (Number.isInteger(r)?String(r):r.toFixed(d)).replace('.','{,}');};
+const nt=(x,d=2)=>x.toLocaleString('de-DE',{minimumFractionDigits:d,maximumFractionDigits:d});
+const nv=x=>(Number.isInteger(x)?String(x):String(x).replace('.','{,}'));
+const deg=r=>r*180/Math.PI;
+function dims(){return state.shape==='cube'?[state.a,state.a,state.a]:[state.a,state.b,state.c];}
+function P(name){
+  const [a,b,c]=dims();
+  const m={A:[0,0,0],B:[a,0,0],C:[a,b,0],D:[0,b,0],E:[0,0,c],F:[a,0,c],G:[a,b,c],H:[0,b,c],M:[a/2,b/2,c/2],N:[a/2,0,0]};
+  return m[name];
+}
+function V(name){const [a,b,c]=dims();const p=P(name);return new THREE.Vector3((p[0]-a/2)*S,(p[2]-c/2)*S,-(p[1]-b/2)*S);}
+function tok(t){return getComputedStyle(root).getPropertyValue(t).trim()||'#888';}
+
+/* ---------- Szene ---------- */
+const stage=$('stage');
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+stage.insertBefore(renderer.domElement,stage.firstChild);
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(40,1,0.1,100);
+const controls=new THREE.OrbitControls(camera,renderer.domElement);
+controls.enableDamping=true;controls.dampingFactor=0.1;controls.minDistance=3;controls.maxDistance=30;
+function resetCam(){camera.position.set(5.6,3.9,7.3);controls.target.set(0,0,0);controls.update();}
+resetCam();
+let group=new THREE.Group();scene.add(group);
+
+function seg(p,q,rad,color,opacity=1){
+  const dir=new THREE.Vector3().subVectors(q,p);const len=dir.length();
+  const g=new THREE.CylinderGeometry(rad,rad,len,10,1,true);
+  const m=new THREE.MeshBasicMaterial({color,transparent:opacity<1,opacity,depthWrite:opacity>=1});
+  const mesh=new THREE.Mesh(g,m);
+  mesh.position.copy(p).addScaledVector(dir,0.5);
+  mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.clone().normalize());
+  group.add(mesh);
+}
+function dot(p,r,color){const m=new THREE.Mesh(new THREE.SphereGeometry(r,16,12),new THREE.MeshBasicMaterial({color}));m.position.copy(p);group.add(m);}
+function polyFill(pts,color,opacity){
+  const g=new THREE.BufferGeometry();const arr=[];
+  for(let i=1;i<pts.length-1;i++){[pts[0],pts[i],pts[i+1]].forEach(v=>arr.push(v.x,v.y,v.z));}
+  g.setAttribute('position',new THREE.Float32BufferAttribute(arr,3));
+  const m=new THREE.MeshBasicMaterial({color,transparent:true,opacity,side:THREE.DoubleSide,depthWrite:false});
+  group.add(new THREE.Mesh(g,m));
+}
+function polyline(pts,rad,color){for(let i=0;i<pts.length-1;i++)seg(pts[i],pts[i+1],rad,color);}
+
+const FACE_D=[['A','C'],['B','D'],['E','G'],['F','H'],['A','F'],['B','E'],['D','G'],['C','H'],['B','G'],['C','F'],['A','H'],['D','E']];
+const SPACE_D=[['A','G'],['B','H'],['C','E'],['D','F']];
+const EDGES=[['A','B'],['B','C'],['C','D'],['D','A'],['E','F'],['F','G'],['G','H'],['H','E'],['A','E'],['B','F'],['C','G'],['D','H']];
+
+/* Hervorhebungen: Dreieck, rechter Winkel, Winkelbogen */
+const MODES={
+  alpha:{tri:['A','C','G'],right:['C','A','G'],angle:['A','C','G','α'],segs:[['A','C','fdiag'],['A','G','rdiag'],['C','G','tri']]},
+  beta:{tri:['A','B','G'],right:['B','A','G'],angle:['A','B','G','β'],segs:[['A','B','tri'],['B','G','fdiag'],['A','G','rdiag']]},
+  gamma:{tri:['A','N','M'],right:['N','A','M'],angle:['M','A','B','γ'],segs:[['A','G','rdiag'],['B','H','rdiag'],['M','N','tri'],['A','B','tri']],aux:['M','N'],extraFill:['A','B','M']},
+  delta:{tri:['A','B','C'],right:['B','A','C'],angle:['A','B','C','δ'],segs:[['A','C','fdiag'],['A','B','tri'],['B','C','tri']]}
+};
+let angleLabel=null;
+
+function build(){
+  scene.remove(group);group.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});
+  group=new THREE.Group();scene.add(group);
+  const C={edge:tok('--edge'),face:tok('--face'),fdiag:tok('--fdiag'),rdiag:tok('--rdiag'),tri:tok('--tri'),arc:tok('--arc'),accent:tok('--accent')};
+  const [a,b,c]=dims();
+  const box=new THREE.Mesh(new THREE.BoxGeometry(a*S,c*S,b*S),new THREE.MeshBasicMaterial({color:C.face,transparent:true,opacity:0.1,depthWrite:false,side:THREE.DoubleSide}));
+  group.add(box);
+  EDGES.forEach(([p,q])=>seg(V(p),V(q),0.022,C.edge));
+  const spec=state.override||MODES[state.mode];
+  const emph=new Set((spec&&spec.segs||[]).map(s=>[s[0],s[1]].sort().join('')));
+  if(state.showF)FACE_D.forEach(([p,q])=>{if(!emph.has([p,q].sort().join('')))seg(V(p),V(q),0.012,C.fdiag,0.45);});
+  if(state.showR)SPACE_D.forEach(([p,q])=>{if(!emph.has([p,q].sort().join('')))seg(V(p),V(q),0.014,C.rdiag,0.45);});
+  angleLabel=null;
+  if(spec){
+    if(spec.extraFill)polyFill(spec.extraFill.map(V),C.tri,0.12);
+    polyFill(spec.tri.map(V),C.tri,0.32);
+    spec.segs.forEach(([p,q,k])=>seg(V(p),V(q),0.03,C[k]));
+    if(spec.right){
+      const [R,n1,n2]=spec.right.map(V);
+      const d1=n1.clone().sub(R),d2=n2.clone().sub(R);
+      const s=Math.min(0.22,d1.length()*0.25,d2.length()*0.25);d1.setLength(s);d2.setLength(s);
+      polyline([R.clone().add(d1),R.clone().add(d1).add(d2),R.clone().add(d2)],0.012,C.edge);
+    }
+    if(spec.angle){
+      const [O,p1,p2,sym]=[V(spec.angle[0]),V(spec.angle[1]),V(spec.angle[2]),spec.angle[3]];
+      const u=p1.clone().sub(O),v=p2.clone().sub(O);
+      const r=Math.min(0.75,0.32*Math.min(u.length(),v.length()));
+      u.normalize();v.normalize();
+      const th=Math.acos(Math.max(-1,Math.min(1,u.dot(v))));
+      const w=v.clone().sub(u.clone().multiplyScalar(u.dot(v))).normalize();
+      const pts=[O.clone()];const arc=[];
+      for(let i=0;i<=32;i++){const t=th*i/32;const p=O.clone().add(u.clone().multiplyScalar(Math.cos(t)*r)).add(w.clone().multiplyScalar(Math.sin(t)*r));pts.push(p);arc.push(p);}
+      polyFill(pts,C.arc,0.35);polyline(arc,0.014,C.arc);
+      angleLabel={pos:O.clone().add(u.clone().add(v).normalize().multiplyScalar(r*1.55)),sym};
+    }
+  }
+  if(state.custom){seg(V(state.custom[0]),V(state.custom[1]),0.03,C.accent);}
+  ['A','B','C','D','E','F','G','H'].forEach(k=>dot(V(k),0.05,C.edge));
+  if(spec&&spec.aux)spec.aux.forEach(k=>dot(V(k),0.045,C.tri));
+  buildLabels(spec);
+}
+
+/* ---------- Beschriftungen ---------- */
+const labelsEl=$('labels');let labelEls=[];
+function buildLabels(spec){
+  labelsEl.innerHTML='';labelEls=[];
+  const names=['A','B','C','D','E','F','G','H'].concat(spec&&spec.aux?spec.aux:[]);
+  names.forEach(k=>{
+    const el=document.createElement(k==='M'||k==='N'?'span':'button');
+    el.className='vlabel'+(k==='M'||k==='N'?' aux':'')+(state.sel.includes(k)?' sel':'');
+    el.textContent=k;
+    if(el.tagName==='BUTTON'){el.type='button';el.setAttribute('aria-label','Eckpunkt '+k+' auswählen');el.addEventListener('click',()=>pick(k));}
+    labelsEl.appendChild(el);labelEls.push({el,k,out:true});
+  });
+  if(angleLabel){const el=document.createElement('span');el.className='alabel';el.textContent=angleLabel.sym;labelsEl.appendChild(el);labelEls.push({el,pos:angleLabel.pos});}
+}
+function placeLabels(){
+  const w=stage.clientWidth,h=stage.clientHeight;
+  const c0=new THREE.Vector3(0,0,0).project(camera);
+  labelEls.forEach(L=>{
+    const p=(L.pos||V(L.k)).clone().project(camera);
+    let x=(p.x+1)/2*w,y=(1-p.y)/2*h;
+    if(L.k){const cx=(c0.x+1)/2*w,cy=(1-c0.y)/2*h;let dx=x-cx,dy=y-cy;const l=Math.hypot(dx,dy)||1;
+      const off=L.k==='M'?0:18;if(L.k==='M'){dx=0;dy=-1;}x+=dx/l*off;y+=(L.k==='M'?-18:dy/l*off);}
+    L.el.style.left=x+'px';L.el.style.top=y+'px';
+  });
+}
+
+/* ---------- Eigene Strecke ---------- */
+function pick(k){
+  state.sel=state.sel.includes(k)?state.sel.filter(x=>x!==k):state.sel.concat(k);
+  if(state.sel.length===2){state.custom=state.sel.slice();state.sel=[];}
+  else if(state.sel.length===1){state.custom=null;}
+  build();renderCustom();
+}
+function renderCustom(){
+  const el=$('custom');
+  if(!state.custom){el.innerHTML=state.sel.length?'Erster Punkt: '+state.sel[0]+'. Jetzt den zweiten Punkt anklicken.':'Eigene Strecke: zwei Eckpunkte im Modell anklicken.';return;}
+  const [p,q]=state.custom.map(P);const [a,b,c]=dims();
+  const diff=[Math.abs(p[0]-q[0])>1e-9,Math.abs(p[1]-q[1])>1e-9,Math.abs(p[2]-q[2])>1e-9];
+  const k=diff.filter(Boolean).length;const L=Math.hypot(p[0]-q[0],p[1]-q[1],p[2]-q[2]);
+  const kind=['','Kante','Flächendiagonale','Raumdiagonale'][k];
+  let term;
+  if(state.shape==='cube')term=k===1?'a':'a\\sqrt{'+k+'}';
+  else{const v=['a','b','c'].filter((_,i)=>diff[i]);term=k===1?v[0]:'\\sqrt{'+v.map(s=>s+'^2').join('+')+'}';}
+  el.innerHTML='<span style="color:var(--ink);font-weight:600">'+kind+' '+state.custom.join('')+'</span>'+tex('\\overline{'+state.custom.join('')+'} = '+term+(k===1?' = ':' \\approx ')+n(L),true);
+}
+
+/* ---------- Rechnungen ---------- */
+function calcFor(mode){
+  const [a,b,c]=dims();const cube=state.shape==='cube';
+  const d=Math.hypot(a,b),e=Math.hypot(a,b,c);
+  const A=nv(a),B=nv(b),Cc=nv(c);
+  if(mode==='alpha'){const r=c/d,x=deg(Math.atan(r));return{
+    intro:'Dreieck ACG mit rechtem Winkel bei C. Die Kante CG ist Gegenkathete, die Flächendiagonale AC ist Ankathete.',
+    lines:[cube?`\\overline{AC} = d = a\\sqrt{2} = ${A}\\cdot\\sqrt{2} \\approx ${n(d)}`:`\\overline{AC} = d = \\sqrt{a^2+b^2} = \\sqrt{${A}^2+${B}^2} \\approx ${n(d)}`,
+      `\\overline{CG} = ${cube?'a':'c'} = ${Cc}`,
+      `\\tan(\\alpha) = \\frac{\\overline{CG}}{\\overline{AC}} = \\frac{${Cc}}{${n(d)}} \\approx ${n(r,4)}`,
+      `\\alpha = \\tan^{-1}(${n(r,4)}) \\approx ${n(x)}^\\circ`],val:x,sym:'α'};}
+  if(mode==='beta'){const r=a/e,x=deg(Math.acos(r));return{
+    intro:'Dreieck ABG mit rechtem Winkel bei B, denn AB steht senkrecht auf der Seitenfläche BCGF. Die Kante AB ist Ankathete, die Raumdiagonale AG ist Hypotenuse.',
+    lines:[cube?`\\overline{AG} = e = a\\sqrt{3} = ${A}\\cdot\\sqrt{3} \\approx ${n(e)}`:`\\overline{AG} = e = \\sqrt{a^2+b^2+c^2} = \\sqrt{${A}^2+${B}^2+${Cc}^2} \\approx ${n(e)}`,
+      `\\cos(\\beta) = \\frac{\\overline{AB}}{\\overline{AG}} = \\frac{${A}}{${n(e)}} \\approx ${n(r,4)}`,
+      `\\beta = \\cos^{-1}(${n(r,4)}) \\approx ${n(x)}^\\circ`],val:x,sym:'β'};}
+  if(mode==='gamma'){const r=a/e,h=deg(Math.asin(r)),x=2*h;return{
+    intro:'Die Raumdiagonalen AG und BH schneiden sich im Mittelpunkt M und halbieren sich dort. Das Dreieck ABM ist gleichschenklig. Die Höhe MN teilt es in zwei rechtwinklige Dreiecke, N ist die Mitte von AB.',
+    lines:[`\\overline{AN} = \\frac{a}{2} = ${n(a/2)}, \\quad \\overline{AM} = \\frac{e}{2} \\approx ${n(e/2)}`,
+      `\\sin\\left(\\frac{\\gamma}{2}\\right) = \\frac{\\overline{AN}}{\\overline{AM}} = \\frac{${n(a/2)}}{${n(e/2)}} \\approx ${n(r,4)}`,
+      `\\frac{\\gamma}{2} \\approx ${n(h)}^\\circ \\quad\\Rightarrow\\quad \\gamma \\approx ${n(x)}^\\circ`],
+    outro:`Der Nebenwinkel (zum Beispiel ∢BMG) misst ${nt(180-x)}°.`,val:x,sym:'γ'};}
+  const r=b/a,x=deg(Math.atan(r));return{
+    intro:'Dreieck ABC mit rechtem Winkel bei B in der Grundfläche. Die Kante BC ist Gegenkathete, die Kante AB ist Ankathete.',
+    lines:[`\\tan(\\delta) = \\frac{\\overline{BC}}{\\overline{AB}} = \\frac{${cube?A:B}}{${A}} ${cube?'= 1':'\\approx '+n(r,4)}`,
+      `\\delta = \\tan^{-1}(${cube?'1':n(r,4)}) \\approx ${n(x)}^\\circ`],val:x,sym:'δ'};
+}
+function renderCalc(){
+  const k=calcFor(state.mode);
+  $('calc').innerHTML='<p>'+k.intro+'</p>'+k.lines.map(l=>'<div class="mrow">'+tex(l)+'</div>').join('')+(k.outro?'<p>'+k.outro+'</p>':'')+
+    '<div class="result"><span>Ergebnis '+(state.shape==='cube'?'im Würfel':'im Quader')+'</span><span class="val">'+k.sym+' ≈ '+nt(k.val)+'°</span></div>';
+  document.querySelectorAll('.mode').forEach(b=>b.setAttribute('aria-pressed',String(!state.override&&b.dataset.mode===state.mode)));
+}
+function renderLengths(){
+  const [a,b,c]=dims();const cube=state.shape==='cube';
+  const rows=cube?[
+    ['edge','Kante','a',a],['fdiag','Flächendiagonale','a\\sqrt{2}',a*Math.SQRT2],['rdiag','Raumdiagonale','a\\sqrt{3}',a*Math.sqrt(3)]
+  ]:[
+    ['edge','Kanten a, b, c','',null],
+    ['fdiag','Diagonale Grundfläche','\\sqrt{a^2+b^2}',Math.hypot(a,b)],
+    ['fdiag','Diagonale Vorderfläche','\\sqrt{a^2+c^2}',Math.hypot(a,c)],
+    ['fdiag','Diagonale Seitenfläche','\\sqrt{b^2+c^2}',Math.hypot(b,c)],
+    ['rdiag','Raumdiagonale','\\sqrt{a^2+b^2+c^2}',Math.hypot(a,b,c)]
+  ];
+  $('lengths').innerHTML=rows.map(([t,name,term,v])=>'<tr><td><span class="sw" style="background:var(--'+t+')"></span>'+name+'</td><td>'+(term?tex(term,false):'')+'</td><td>'+(v===null?nt(a,1)+' · '+nt(b,1)+' · '+nt(c,1):nt(v))+'</td></tr>').join('');
+}
+
+/* ---------- Herleitung ---------- */
+const STEPS=[
+  {t:'Flächendiagonale',p:'Im rechtwinkligen Dreieck ABC der Grundfläche gilt der Satz des Pythagoras.',
+   x:['d^2 = a^2 + a^2 = 2a^2','d = a\\sqrt{2}'],spec:{tri:['A','B','C'],right:['B','A','C'],segs:[['A','C','fdiag'],['A','B','tri'],['B','C','tri']]}},
+  {t:'Raumdiagonale',p:'Das Dreieck ACG ist bei C rechtwinklig, weil die Kante CG senkrecht auf der Grundfläche steht.',
+   x:['e^2 = d^2 + a^2 = 2a^2 + a^2 = 3a^2','e = a\\sqrt{3}'],spec:{tri:['A','C','G'],right:['C','A','G'],segs:[['A','C','fdiag'],['A','G','rdiag'],['C','G','tri']]}},
+  {t:'Ansatz mit dem Tangens',p:'Gesucht ist α bei A. Gegenkathete ist CG, Ankathete ist AC.',
+   x:['\\tan(\\alpha) = \\frac{\\overline{CG}}{\\overline{AC}} = \\frac{a}{a\\sqrt{2}}'],spec:MODES.alpha},
+  {t:'Kürzen',p:'Die Kantenlänge a kürzt sich heraus. Der Winkel ist deshalb in jedem Würfel gleich groß.',
+   x:['\\tan(\\alpha) = \\frac{1}{\\sqrt{2}} = \\frac{\\sqrt{2}}{2}','\\alpha = \\tan^{-1}\\left(\\frac{1}{\\sqrt{2}}\\right) \\approx 35{,}26^\\circ'],spec:MODES.alpha},
+  {t:'Kontrolle mit Sinus und Kosinus',p:'Mit der Hypotenuse e = a√3 ergibt sich dasselbe Ergebnis.',
+   x:['\\sin(\\alpha) = \\frac{a}{a\\sqrt{3}} = \\frac{1}{\\sqrt{3}}, \\quad \\cos(\\alpha) = \\frac{a\\sqrt{2}}{a\\sqrt{3}} = \\frac{\\sqrt{2}}{\\sqrt{3}}','\\sin^2(\\alpha) + \\cos^2(\\alpha) = \\frac{1}{3} + \\frac{2}{3} = 1'],spec:MODES.alpha},
+  {t:'Weitere Winkel im Würfel',p:'Analog erhält man den Winkel zur Kante und den Schnittwinkel der Raumdiagonalen.',
+   x:['\\cos(\\beta) = \\frac{a}{a\\sqrt{3}} = \\frac{1}{\\sqrt{3}} \\;\\Rightarrow\\; \\beta \\approx 54{,}74^\\circ','\\sin\\left(\\frac{\\gamma}{2}\\right) = \\frac{a/2}{e/2} = \\frac{1}{\\sqrt{3}} \\;\\Rightarrow\\; \\gamma \\approx 70{,}53^\\circ','\\cos(\\gamma) = 1 - 2\\sin^2\\left(\\frac{\\gamma}{2}\\right) = \\frac{1}{3}'],
+   note:'Im Würfel hängen alle diese Winkel nicht von a ab. Im Quader dagegen ändern sie sich, sobald die Kanten verschieden lang sind. Probiere es mit den Schiebereglern aus.',spec:MODES.gamma}
+];
+function renderSteps(){
+  $('steps').innerHTML=STEPS.map((s,i)=>{const open=i<state.step;return '<li class="step'+(open?'':' locked')+(i===state.step-1?' current':'')+'" data-i="'+i+'">'+
+    '<span class="no">Schritt '+(i+1)+' von '+STEPS.length+'</span><h4>'+s.t+'</h4><div class="body"><p>'+s.p+'</p>'+
+    s.x.map(l=>'<div class="mrow">'+tex(l)+'</div>').join('')+(s.note?'<p class="note">'+s.note+'</p>':'')+'</div></li>';}).join('');
+  $('prevBtn').disabled=state.step<=1;$('nextBtn').disabled=state.step>=STEPS.length;
+  document.querySelectorAll('.step').forEach(el=>el.addEventListener('click',()=>{const i=+el.dataset.i;if(i<state.step)goStep(i+1);}));
+}
+function goStep(i){
+  state.step=Math.max(1,Math.min(STEPS.length,i));
+  setShape('cube',true);state.override=STEPS[state.step-1].spec;
+  if(STEPS[state.step-1].spec===MODES.alpha)state.mode='alpha';
+  if(STEPS[state.step-1].spec===MODES.gamma)state.mode='gamma';
+  renderSteps();refresh();
+}
+
+/* ---------- Steuerung ---------- */
+function setShape(s,silent){
+  state.shape=s;$('cubeBtn').setAttribute('aria-pressed',String(s==='cube'));$('boxBtn').setAttribute('aria-pressed',String(s==='box'));
+  $('rowb').hidden=s==='cube';$('rowc').hidden=s==='cube';$('sa').previousElementSibling.textContent='a';
+  state.custom=null;state.sel=[];
+  if(!silent)refresh();
+}
+function refresh(){
+  $('oa').textContent=nt(state.a,1)+' cm';$('ob').textContent=nt(state.b,1)+' cm';$('oc').textContent=nt(state.c,1)+' cm';
+  build();renderCalc();renderLengths();renderCustom();
+}
+$('cubeBtn').addEventListener('click',()=>setShape('cube'));
+$('boxBtn').addEventListener('click',()=>{state.override=null;setShape('box');});
+['a','b','c'].forEach(k=>$('s'+k).addEventListener('input',e=>{state[k]=+e.target.value;refresh();}));
+$('cf').addEventListener('change',e=>{state.showF=e.target.checked;build();});
+$('cr').addEventListener('change',e=>{state.showR=e.target.checked;build();});
+document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click',()=>{state.mode=b.dataset.mode;state.override=null;refresh();}));
+$('nextBtn').addEventListener('click',()=>goStep(state.step+1));
+$('prevBtn').addEventListener('click',()=>goStep(state.step-1));
+$('resetBtn').addEventListener('click',()=>{
+  Object.assign(state,{a:4,b:3,c:2.5,showF:true,showR:true,mode:'alpha',override:null,sel:[],custom:null,step:1});
+  $('sa').value=4;$('sb').value=3;$('sc').value=2.5;$('cf').checked=true;$('cr').checked=true;
+  resetCam();setShape('cube',true);renderSteps();refresh();
+});
+
+/* ---------- Hell und Dunkel ---------- */
+const mq=window.matchMedia('(prefers-color-scheme: dark)');
+function isDark(){const t=root.getAttribute('data-theme');return t?t==='dark':mq.matches;}
+function syncThemeBtn(){$('themeBtn').textContent=isDark()?'Heller Modus':'Dunkler Modus';$('themeBtn').setAttribute('aria-pressed',String(isDark()));}
+try{const saved=localStorage.getItem('wuerfel-theme');if(saved==='dark'||saved==='light')root.setAttribute('data-theme',saved);}catch(e){}
+$('themeBtn').addEventListener('click',()=>{
+  const next=isDark()?'light':'dark';root.setAttribute('data-theme',next);
+  try{localStorage.setItem('wuerfel-theme',next);}catch(e){}
+  syncThemeBtn();build();
+});
+mq.addEventListener&&mq.addEventListener('change',()=>{syncThemeBtn();build();});
+syncThemeBtn();
+
+/* ---------- Größe und Schleife ---------- */
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+new ResizeObserver(resize).observe(stage);resize();
+function loop(){controls.update();renderer.render(scene,camera);placeLabels();requestAnimationFrame(loop);}
+
+state.step=1;setShape('cube',true);renderSteps();refresh();loop();
+})();
+</script>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+function tex(s,display=true){
+  if(window.katex){try{return katex.renderToString(s,{output:'mathml',displayMode:display,throwOnError:false});}catch(e){}}
+  return '<code>'+s+'</code>';
+}
+const n=(x,d=2)=>{const r=Math.round(x*Math.pow(10,d))/Math.pow(10,d);return (Number.isInteger(r)?String(r):r.toFixed(d)).replace('.','{,}');};
+const nt=(x,d=2)=>x.toLocaleString('de-DE',{minimumFractionDigits:d,maximumFractionDigits:d});
+const D=Math.PI/180, deg=r=>r/D;
+const cm=x=>nt(x)+' cm', gr=x=>nt(x)+'°', qcm=x=>nt(x)+' cm²';
+
+/* ---------- Figuren ---------- */
+const FIG={
+ iso:{name:'Gleichschenkliges Dreieck',givens:{
+  ca:{label:'Basis und Schenkel',params:[['c','Basis c',6],['a','Schenkel a',5]]},
+  aal:{label:'Schenkel und Winkel',params:[['a','Schenkel a',5],['al','Basiswinkel α',50,'deg',1,89]]},
+  ch:{label:'Basis und Höhe',params:[['c','Basis c',6],['h','Höhe h',4]]}},
+  solve(g,v){
+   let a,c,h,al;const steps=[];
+   const intro={p:'Die Höhe h<sub>c</sub> halbiert die Basis und teilt das Dreieck in zwei gleiche rechtwinklige Dreiecke. Im Hilfsdreieck AMC liegt der rechte Winkel bei M. Die halbe Basis ist Ankathete von α, die Höhe ist Gegenkathete, der Schenkel a ist Hypotenuse.'};
+   steps.push(intro);
+   if(g==='ca'){a=v.a;c=v.c;if(c>=2*a)return{ok:false,msg:'Die Basis c muss kürzer sein als 2a = '+cm(2*a)+', sonst entsteht kein Dreieck.'};
+     al=Math.acos(c/2/a);h=a*Math.sin(al);
+     steps.push({h:'Basiswinkel',x:[`\\cos(\\alpha) = \\frac{c/2}{a} = \\frac{${n(c/2)}}{${n(a)}} \\approx ${n(c/2/a,4)}`,`\\alpha = \\cos^{-1}(${n(c/2/a,4)}) \\approx ${n(deg(al))}^\\circ`]});
+     steps.push({h:'Höhe',x:[`h_c = a\\cdot\\sin(\\alpha) = ${n(a)}\\cdot\\sin(${n(deg(al))}^\\circ) \\approx ${n(h)}\\,\\text{cm}`]});}
+   if(g==='aal'){a=v.a;al=v.al*D;c=2*a*Math.cos(al);h=a*Math.sin(al);
+     steps.push({h:'Halbe Basis und Basis',x:[`\\frac{c}{2} = a\\cdot\\cos(\\alpha) = ${n(a)}\\cdot\\cos(${n(v.al,0)}^\\circ) \\approx ${n(c/2)}\\,\\text{cm}`,`c = 2\\cdot\\frac{c}{2} \\approx ${n(c)}\\,\\text{cm}`]});
+     steps.push({h:'Höhe',x:[`h_c = a\\cdot\\sin(\\alpha) = ${n(a)}\\cdot\\sin(${n(v.al,0)}^\\circ) \\approx ${n(h)}\\,\\text{cm}`]});}
+   if(g==='ch'){c=v.c;h=v.h;al=Math.atan(h/(c/2));a=Math.hypot(c/2,h);
+     steps.push({h:'Basiswinkel',x:[`\\tan(\\alpha) = \\frac{h_c}{c/2} = \\frac{${n(h)}}{${n(c/2)}} \\approx ${n(h/(c/2),4)}`,`\\alpha = \\tan^{-1}(${n(h/(c/2),4)}) \\approx ${n(deg(al))}^\\circ`]});
+     steps.push({h:'Schenkel',x:[`a = \\frac{h_c}{\\sin(\\alpha)} = \\frac{${n(h)}}{\\sin(${n(deg(al))}^\\circ)} \\approx ${n(a)}\\,\\text{cm}`]});}
+   const ga=180-2*deg(al),A=c*h/2;
+   steps.push({h:'Winkel an der Spitze',x:[`\\gamma = 180^\\circ - 2\\alpha \\approx 180^\\circ - 2\\cdot ${n(deg(al))}^\\circ = ${n(ga)}^\\circ`]});
+   steps.push({h:'Flächeninhalt',x:[`A = \\frac{1}{2}\\cdot c\\cdot h_c \\approx \\frac{1}{2}\\cdot ${n(c)}\\cdot ${n(h)} \\approx ${n(A)}\\,\\text{cm}^2`]});
+   return{ok:true,pts:{A:[0,0],B:[c,0],C:[c/2,h],M:[c/2,0]},poly:['A','B','C'],aux:[['C','M','h_c']],auxPts:['M'],tri:[['A','M','C']],right:['M','A','C'],
+    angles:[['A','B','C','α'],['B','C','A','β'],['C','A','B','γ']],sides:[['A','B','c'],['B','C','a'],['C','A','a']],
+    results:[['Basis c',cm(c)],['Schenkel a = b',cm(a)],['Höhe h<sub>c</sub>',cm(h)],['Basiswinkel α = β',gr(deg(al))],['Winkel γ',gr(ga)],['Flächeninhalt A',qcm(A)]],steps};
+  }},
+ rhomb:{name:'Raute',givens:{
+  aal:{label:'Seite und Winkel',params:[['a','Seite a',5],['al','Winkel α',60,'deg',1,179]]},
+  ef:{label:'Diagonalen',params:[['e','Diagonale e',8],['f','Diagonale f',5]]},
+  ae:{label:'Seite und Diagonale',params:[['a','Seite a',5],['e','Diagonale e',8]]}},
+  solve(g,v){
+   let a,e,f,al;const steps=[{p:'Die Diagonalen einer Raute halbieren sich gegenseitig, stehen senkrecht aufeinander und halbieren die Innenwinkel. Im Hilfsdreieck AMB liegt der rechte Winkel bei M. An der Ecke A liegt der halbe Winkel α/2, die Seite a ist Hypotenuse.'}];
+   if(g==='aal'){a=v.a;al=v.al*D;e=2*a*Math.cos(al/2);f=2*a*Math.sin(al/2);
+     steps.push({h:'Halbe Diagonalen',x:[`\\frac{e}{2} = a\\cdot\\cos\\left(\\frac{\\alpha}{2}\\right) = ${n(a)}\\cdot\\cos(${n(v.al/2,1)}^\\circ) \\approx ${n(e/2)}\\,\\text{cm}`,`\\frac{f}{2} = a\\cdot\\sin\\left(\\frac{\\alpha}{2}\\right) = ${n(a)}\\cdot\\sin(${n(v.al/2,1)}^\\circ) \\approx ${n(f/2)}\\,\\text{cm}`,`e \\approx ${n(e)}\\,\\text{cm}, \\quad f \\approx ${n(f)}\\,\\text{cm}`]});}
+   if(g==='ef'){e=v.e;f=v.f;al=2*Math.atan(f/e);a=Math.hypot(e/2,f/2);
+     steps.push({h:'Winkel',x:[`\\tan\\left(\\frac{\\alpha}{2}\\right) = \\frac{f/2}{e/2} = \\frac{${n(f/2)}}{${n(e/2)}} \\approx ${n(f/e,4)}`,`\\frac{\\alpha}{2} \\approx ${n(deg(al)/2)}^\\circ \\quad\\Rightarrow\\quad \\alpha \\approx ${n(deg(al))}^\\circ`]});
+     steps.push({h:'Seite',x:[`a = \\frac{e/2}{\\cos\\left(\\frac{\\alpha}{2}\\right)} = \\frac{${n(e/2)}}{\\cos(${n(deg(al)/2)}^\\circ)} \\approx ${n(a)}\\,\\text{cm}`]});}
+   if(g==='ae'){a=v.a;e=v.e;if(e>=2*a)return{ok:false,msg:'Die Diagonale e muss kürzer sein als 2a = '+cm(2*a)+', sonst entsteht keine Raute.'};
+     al=2*Math.acos(e/2/a);f=2*a*Math.sin(al/2);
+     steps.push({h:'Winkel',x:[`\\cos\\left(\\frac{\\alpha}{2}\\right) = \\frac{e/2}{a} = \\frac{${n(e/2)}}{${n(a)}} \\approx ${n(e/2/a,4)}`,`\\frac{\\alpha}{2} \\approx ${n(deg(al)/2)}^\\circ \\quad\\Rightarrow\\quad \\alpha \\approx ${n(deg(al))}^\\circ`]});
+     steps.push({h:'Zweite Diagonale',x:[`\\frac{f}{2} = a\\cdot\\sin\\left(\\frac{\\alpha}{2}\\right) \\approx ${n(f/2)}\\,\\text{cm} \\quad\\Rightarrow\\quad f \\approx ${n(f)}\\,\\text{cm}`]});}
+   const be=180-deg(al),A=e*f/2,h=a*Math.sin(al);
+   steps.push({h:'Nachbarwinkel',x:[`\\beta = 180^\\circ - \\alpha \\approx ${n(be)}^\\circ`]});
+   steps.push({h:'Höhe und Flächeninhalt',x:[`h = a\\cdot\\sin(\\alpha) \\approx ${n(h)}\\,\\text{cm}`,`A = \\frac{e\\cdot f}{2} \\approx ${n(A)}\\,\\text{cm}^2`]});
+   return{ok:true,pts:{A:[-e/2,0],B:[0,-f/2],C:[e/2,0],D:[0,f/2],M:[0,0]},poly:['A','B','C','D'],aux:[['A','C',null],['B','D',null],['A','M','e/2'],['M','B','f/2']],auxPts:['M'],
+    tri:[['A','M','B']],right:['M','A','B'],angles:[['A','B','D','α'],['B','C','A','β'],['C','D','B','γ'],['D','A','C','δ']],
+    sides:[['A','B','a'],['B','C','a'],['C','D','a'],['D','A','a']],
+    results:[['Seite a',cm(a)],['Diagonale e = AC',cm(e)],['Diagonale f = BD',cm(f)],['Winkel α = γ',gr(deg(al))],['Winkel β = δ',gr(be)],['Höhe h',cm(h)],['Flächeninhalt A',qcm(A)]],steps};
+  }},
+ kite:{name:'Drachenviereck',givens:{
+  pqf:{label:'Diagonalabschnitte',params:[['p','Abschnitt p = AM',3],['q','Abschnitt q = MC',6],['f','Diagonale f',6]]},
+  abal:{label:'Seiten und Winkel',params:[['a','Seite a',4],['b','Seite b',6.5],['al','Winkel α',90,'deg',1,179]]}},
+  solve(g,v){
+   let a,b,p,q,f,al,ga;const steps=[{p:'Die Symmetrieachse AC halbiert die Diagonale BD senkrecht im Punkt M und halbiert die Winkel α und γ. So entstehen die rechtwinkligen Hilfsdreiecke AMB und CMB mit dem rechten Winkel bei M.'}];
+   if(g==='pqf'){p=v.p;q=v.q;f=v.f;al=2*Math.atan(f/2/p);ga=2*Math.atan(f/2/q);a=Math.hypot(p,f/2);b=Math.hypot(q,f/2);
+     steps.push({h:'Winkel α im Dreieck AMB',x:[`\\tan\\left(\\frac{\\alpha}{2}\\right) = \\frac{f/2}{p} = \\frac{${n(f/2)}}{${n(p)}} \\approx ${n(f/2/p,4)}`,`\\frac{\\alpha}{2} \\approx ${n(deg(al)/2)}^\\circ \\quad\\Rightarrow\\quad \\alpha \\approx ${n(deg(al))}^\\circ`]});
+     steps.push({h:'Winkel γ im Dreieck CMB',x:[`\\tan\\left(\\frac{\\gamma}{2}\\right) = \\frac{f/2}{q} = \\frac{${n(f/2)}}{${n(q)}} \\approx ${n(f/2/q,4)}`,`\\frac{\\gamma}{2} \\approx ${n(deg(ga)/2)}^\\circ \\quad\\Rightarrow\\quad \\gamma \\approx ${n(deg(ga))}^\\circ`]});
+     steps.push({h:'Seiten',x:[`a = \\frac{p}{\\cos\\left(\\frac{\\alpha}{2}\\right)} \\approx ${n(a)}\\,\\text{cm}, \\quad b = \\frac{q}{\\cos\\left(\\frac{\\gamma}{2}\\right)} \\approx ${n(b)}\\,\\text{cm}`]});}
+   if(g==='abal'){a=v.a;b=v.b;al=v.al*D;f=2*a*Math.sin(al/2);p=a*Math.cos(al/2);
+     if(b<=f/2+1e-9)return{ok:false,msg:'Die Seite b muss länger sein als f/2 ≈ '+cm(f/2)+', sonst schließt sich das Drachenviereck nicht.'};
+     ga=2*Math.asin(f/2/b);q=b*Math.cos(ga/2);
+     steps.push({h:'Dreieck AMB',x:[`\\frac{f}{2} = a\\cdot\\sin\\left(\\frac{\\alpha}{2}\\right) = ${n(a)}\\cdot\\sin(${n(v.al/2,1)}^\\circ) \\approx ${n(f/2)}\\,\\text{cm}`,`p = a\\cdot\\cos\\left(\\frac{\\alpha}{2}\\right) \\approx ${n(p)}\\,\\text{cm}`]});
+     steps.push({h:'Dreieck CMB',x:[`\\sin\\left(\\frac{\\gamma}{2}\\right) = \\frac{f/2}{b} = \\frac{${n(f/2)}}{${n(b)}} \\approx ${n(f/2/b,4)}`,`\\frac{\\gamma}{2} \\approx ${n(deg(ga)/2)}^\\circ \\quad\\Rightarrow\\quad \\gamma \\approx ${n(deg(ga))}^\\circ`,`q = b\\cdot\\cos\\left(\\frac{\\gamma}{2}\\right) \\approx ${n(q)}\\,\\text{cm}`]});}
+   const e=p+q,be=(360-deg(al)-deg(ga))/2,A=e*f/2;
+   steps.push({h:'Winkel β und δ',x:[`\\beta = \\delta = \\frac{360^\\circ - \\alpha - \\gamma}{2} \\approx ${n(be)}^\\circ`]});
+   steps.push({h:'Diagonale e und Flächeninhalt',x:[`e = p + q \\approx ${n(e)}\\,\\text{cm}`,`A = \\frac{e\\cdot f}{2} \\approx ${n(A)}\\,\\text{cm}^2`]});
+   return{ok:true,pts:{A:[-p,0],B:[0,-f/2],C:[q,0],D:[0,f/2],M:[0,0]},poly:['A','B','C','D'],aux:[['A','C',null],['B','D',null],['A','M','p'],['M','C','q'],['M','B','f/2']],auxPts:['M'],
+    tri:[['A','M','B'],['C','M','B']],right:['M','A','B'],angles:[['A','B','D','α'],['B','C','A','β'],['C','D','B','γ'],['D','A','C','δ']],
+    sides:[['A','B','a'],['B','C','b'],['C','D','b'],['D','A','a']],
+    results:[['Seite a = AB = AD',cm(a)],['Seite b = CB = CD',cm(b)],['Diagonale e = AC',cm(e)],['Diagonale f = BD',cm(f)],['Winkel α',gr(deg(al))],['Winkel γ',gr(deg(ga))],['Winkel β = δ',gr(be)],['Flächeninhalt A',qcm(A)]],steps};
+  }}
+};
+
+const ps={fig:'iso',given:{iso:'ca',rhomb:'aal',kite:'pqf'},vals:{}};
+function vals(){const k=ps.fig+'.'+ps.given[ps.fig];if(!ps.vals[k]){ps.vals[k]={};FIG[ps.fig].givens[ps.given[ps.fig]].params.forEach(p=>ps.vals[k][p[0]]=p[2]);}return ps.vals[k];}
+
+function renderControls(){
+  $('figSeg').innerHTML=Object.keys(FIG).map(k=>`<button type="button" data-fig="${k}" aria-pressed="${k===ps.fig}">${FIG[k].name}</button>`).join('');
+  const gv=FIG[ps.fig].givens;
+  $('givenSeg').innerHTML=Object.keys(gv).map(k=>`<button type="button" data-given="${k}" aria-pressed="${k===ps.given[ps.fig]}">${gv[k].label}</button>`).join('');
+  const v=vals();
+  $('psliders').innerHTML=gv[ps.given[ps.fig]].params.map(([k,label,def,type,min,max])=>{
+    const isDeg=type==='deg';const id='ps_'+ps.fig+'_'+k;
+    return `<div class="slider" style="grid-template-columns:minmax(0,9em) minmax(0,1fr) 5.4em"><label for="${id}" style="font-family:var(--body)">${label}</label><input id="${id}" data-k="${k}" type="range" min="${isDeg?min:0.5}" max="${isDeg?max:10}" step="${isDeg?1:0.1}" value="${v[k]}"><output>${isDeg?nt(v[k],0)+'°':nt(v[k],1)+' cm'}</output></div>`;}).join('');
+  $('figSeg').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{ps.fig=b.dataset.fig;renderControls();draw();}));
+  $('givenSeg').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{ps.given[ps.fig]=b.dataset.given;renderControls();draw();}));
+  $('psliders').querySelectorAll('input').forEach(inp=>inp.addEventListener('input',()=>{
+    const k=inp.dataset.k;vals()[k]=+inp.value;const isDeg=inp.step==='1';
+    inp.nextElementSibling.textContent=isDeg?nt(+inp.value,0)+'°':nt(+inp.value,1)+' cm';draw();}));
+}
+
+/* ---------- Zeichnen ---------- */
+const W=640,H=480,PAD=60;
+function draw(){
+  const r=FIG[ps.fig].solve(ps.given[ps.fig],vals());const svg=$('psvg');
+  $('pwarn').hidden=r.ok;
+  if(!r.ok){$('pwarn').textContent=r.msg;svg.innerHTML=`<text x="${W/2}" y="${H/2}" text-anchor="middle" style="fill:var(--muted);font:600 18px var(--body)">Mit diesen Werten gibt es keine Figur.</text>`;
+    $('presults').innerHTML='';$('pcalc').innerHTML='';return;}
+  const xs=Object.values(r.pts).map(p=>p[0]),ys=Object.values(r.pts).map(p=>p[1]);
+  const minx=Math.min(...xs),maxx=Math.max(...xs),miny=Math.min(...ys),maxy=Math.max(...ys);
+  const s=Math.min((W-2*PAD)/Math.max(maxx-minx,1e-6),(H-2*PAD-20)/Math.max(maxy-miny,1e-6));
+  const ox=(W-(maxx-minx)*s)/2,oy=(H+(maxy-miny)*s)/2+10;
+  const T={};for(const k in r.pts){T[k]=[ox+(r.pts[k][0]-minx)*s,oy-(r.pts[k][1]-miny)*s];}
+  const cen=r.poly.reduce((acc,k)=>[acc[0]+T[k][0]/r.poly.length,acc[1]+T[k][1]/r.poly.length],[0,0]);
+  const pts=a=>a.map(k=>T[k].join(',')).join(' ');
+  let out='';
+  r.tri.forEach((t,i)=>out+=`<polygon points="${pts(t)}" style="fill:var(--tri);fill-opacity:${i?0.18:0.32};stroke:none"/>`);
+  out+=`<polygon points="${pts(r.poly)}" style="fill:var(--face);fill-opacity:.08;stroke:var(--edge);stroke-width:2.5;stroke-linejoin:round"/>`;
+  r.aux.forEach(([p,q,lab])=>{if(lab)return;out+=`<line x1="${T[p][0]}" y1="${T[p][1]}" x2="${T[q][0]}" y2="${T[q][1]}" style="stroke:var(--fdiag);stroke-width:2;stroke-dasharray:7 5"/>`;});
+  r.aux.forEach(([p,q,lab])=>{if(!lab)return;if(!r.aux.some(x=>!x[2]))out+=`<line x1="${T[p][0]}" y1="${T[p][1]}" x2="${T[q][0]}" y2="${T[q][1]}" style="stroke:var(--fdiag);stroke-width:2;stroke-dasharray:7 5"/>`;});
+  // Winkelbögen
+  r.angles.forEach(([V,P,Q,sym])=>{
+    const v=T[V],u=[T[P][0]-v[0],T[P][1]-v[1]],w=[T[Q][0]-v[0],T[Q][1]-v[1]];
+    const lu=Math.hypot(...u),lw=Math.hypot(...w);const rad=Math.max(14,Math.min(32,0.3*Math.min(lu,lw)));
+    const s1=[v[0]+u[0]/lu*rad,v[1]+u[1]/lu*rad],s2=[v[0]+w[0]/lw*rad,v[1]+w[1]/lw*rad];
+    const cr=u[0]*w[1]-u[1]*w[0];
+    out+=`<path d="M${v[0]},${v[1]} L${s1[0]},${s1[1]} A${rad},${rad} 0 0 ${cr>0?1:0} ${s2[0]},${s2[1]} Z" style="fill:var(--arc);fill-opacity:.28;stroke:var(--arc);stroke-width:1.5"/>`;
+    let bx=u[0]/lu+w[0]/lw,by=u[1]/lu+w[1]/lw;const bl=Math.hypot(bx,by)||1;bx/=bl;by/=bl;
+    out+=`<text x="${v[0]+bx*(rad+14)}" y="${v[1]+by*(rad+14)}" text-anchor="middle" dominant-baseline="central" style="fill:var(--arc);font:700 19px var(--display)">${sym}</text>`;
+  });
+  // rechter Winkel
+  {const [R,P,Q]=r.right.map(k=>T[k]);const d1=[P[0]-R[0],P[1]-R[1]],d2=[Q[0]-R[0],Q[1]-R[1]];const l1=Math.hypot(...d1),l2=Math.hypot(...d2);const q=Math.min(13,l1*.3,l2*.3);
+   const a1=[R[0]+d1[0]/l1*q,R[1]+d1[1]/l1*q],a2=[R[0]+d2[0]/l2*q,R[1]+d2[1]/l2*q],a3=[a1[0]+d2[0]/l2*q,a1[1]+d2[1]/l2*q];
+   out+=`<polyline points="${a1.join(',')} ${a3.join(',')} ${a2.join(',')}" style="fill:none;stroke:var(--edge);stroke-width:1.6"/><circle cx="${(R[0]+a3[0])/2}" cy="${(R[1]+a3[1])/2}" r="1.8" style="fill:var(--edge)"/>`;}
+  // Seitenbeschriftungen
+  const lab=(p,q,text,outward,color)=>{const m=[(T[p][0]+T[q][0])/2,(T[p][1]+T[q][1])/2];let nx=-(T[q][1]-T[p][1]),ny=T[q][0]-T[p][0];const l=Math.hypot(nx,ny)||1;nx/=l;ny/=l;
+    if(outward&&((m[0]-cen[0])*nx+(m[1]-cen[1])*ny)<0){nx=-nx;ny=-ny;}
+    out+=`<text x="${m[0]+nx*15}" y="${m[1]+ny*15}" text-anchor="middle" dominant-baseline="central" style="fill:${color};font:italic 600 16px var(--body)">${text.replace('_c','<tspan baseline-shift="sub" style="font-size:11px">c</tspan>')}</text>`;};
+  r.sides.forEach(([p,q,t])=>lab(p,q,t,true,'var(--ink)'));
+  r.aux.forEach(([p,q,t])=>{if(t)lab(p,q,t,false,'var(--fdiag)');});
+  // Punkte
+  Object.keys(T).forEach(k=>{const isAux=r.auxPts.includes(k);const p=T[k];
+    out+=`<circle cx="${p[0]}" cy="${p[1]}" r="${isAux?3.5:4.5}" style="fill:${isAux?'var(--tri)':'var(--edge)'}"/>`;
+    let dx=p[0]-cen[0],dy=p[1]-cen[1];const l=Math.hypot(dx,dy);
+    if(l<1||isAux){dx=0.7;dy=-0.7;}else{dx/=l;dy/=l;}
+    const off=isAux?16:22;
+    out+=`<text x="${p[0]+dx*off}" y="${p[1]+dy*off}" text-anchor="middle" dominant-baseline="central" style="fill:var(--ink);font:600 16px var(--mono)">${k}</text>`;});
+  svg.innerHTML=out;
+  $('presults').innerHTML=r.results.map(([k,v])=>`<tr><td>${k}</td><td>${v}</td></tr>`).join('');
+  $('pcalc').innerHTML=r.steps.map(st=>(st.h?'<h4>'+st.h+'</h4>':'')+(st.p?'<p>'+st.p+'</p>':'')+(st.x||[]).map(l=>'<div class="mrow">'+tex(l)+'</div>').join('')).join('');
+}
+
+/* ---------- Reiter ---------- */
+function showTab(t){
+  const is2=t==='2d';$('view3d').hidden=is2;$('view2d').hidden=!is2;
+  $('tab3d').setAttribute('aria-selected',String(!is2));$('tab2d').setAttribute('aria-selected',String(is2));
+  try{localStorage.setItem('wuerfel-tab',t);}catch(e){}
+}
+$('tab3d').addEventListener('click',()=>showTab('3d'));
+$('tab2d').addEventListener('click',()=>showTab('2d'));
+$('resetBtn').addEventListener('click',()=>{if($('view2d').hidden)return;ps.vals={};renderControls();draw();});
+try{if(localStorage.getItem('wuerfel-tab')==='2d')showTab('2d');}catch(e){}
+renderControls();draw();
+})();
+</script>
+
+</body></html>

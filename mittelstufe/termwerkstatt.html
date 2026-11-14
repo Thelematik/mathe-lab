@@ -1,0 +1,621 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Termwerkstatt</title>
+<link rel="stylesheet" href="../assets/fonts/fonts.css">
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: Karopapier als Grund, kompakte Kopfzeile mit Reitern, darunter je Reiter Merke, Beispiel, Anschauung, Übung */
+:root{
+  --paper:#f6f8fb; --grid:#e2e9f1; --panel:#ffffff; --ink:#18212c; --muted:#56616f; --line:#cdd6e1;
+  --x:#1c5fd1; --x-soft:#dde8fb; --y:#11804a; --y-soft:#d9f1e4; --v:#7a3ec0; --v-soft:#ede3f8;
+  --red:#c2302a; --red-soft:#fbe4e1; --n:#5f6a78; --n-soft:#eceff3;
+  --hl:#ffe680; --hl-ink:#18212c; --merke:#fff9de; --merke-line:#d9b84a; --btn:#18212c; --btn-ink:#ffffff;
+  --f-ui:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --f-math:"STIX Two Text","Cambria Math","Times New Roman",serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#10151c; --grid:#1a222c; --panel:#171f29; --ink:#e7edf4; --muted:#9ca8b6; --line:#2c3746;
+  --x:#7eabff; --x-soft:#1c2c48; --y:#5fd39a; --y-soft:#163426; --v:#c59eff; --v-soft:#2b2140;
+  --red:#ff7f72; --red-soft:#3c1f1c; --n:#a9b3bf; --n-soft:#242d38;
+  --hl:#6a5812; --hl-ink:#fff5cc; --merke:#25220f; --merke-line:#8c762a; --btn:#e7edf4; --btn-ink:#10151c;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#10151c; --grid:#1a222c; --panel:#171f29; --ink:#e7edf4; --muted:#9ca8b6; --line:#2c3746;
+  --x:#7eabff; --x-soft:#1c2c48; --y:#5fd39a; --y-soft:#163426; --v:#c59eff; --v-soft:#2b2140;
+  --red:#ff7f72; --red-soft:#3c1f1c; --n:#a9b3bf; --n-soft:#242d38;
+  --hl:#6a5812; --hl-ink:#fff5cc; --merke:#25220f; --merke-line:#8c762a; --btn:#e7edf4; --btn-ink:#10151c;
+  color-scheme:dark}
+html{font-size:18px}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-ui);font-size:1rem;line-height:1.5;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:22px 22px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--panel)}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--panel);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding-block:10px 4px;max-width:1500px;margin:0 auto}
+.brand{display:flex;align-items:baseline;gap:12px;flex:1 1 auto;min-width:0}
+.brand h1{margin:0;font-size:1.35rem;letter-spacing:.01em}
+.brand h1 i{font-family:var(--f-math);color:var(--x);font-weight:600}
+.brand span{color:var(--muted);font-size:.9rem}
+.tools{display:flex;gap:6px;align-items:center}
+.tools button{font:inherit;font-size:.85rem;font-weight:700;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;min-height:40px;min-width:44px;padding:0 10px;cursor:pointer}
+.tabs{display:flex;gap:4px;overflow-x:auto;max-width:1500px;margin:0 auto;padding-block:6px 0;scrollbar-width:thin}
+.tb{flex:0 0 auto;display:flex;align-items:center;gap:8px;font:inherit;font-size:.92rem;color:var(--muted);background:none;border:0;border-bottom:3px solid transparent;padding:8px 10px 9px;cursor:pointer;min-height:48px;white-space:nowrap}
+.tb .tn{display:inline-grid;place-items:center;width:1.7em;height:1.7em;border-radius:50%;border:1.5px solid var(--line);font-weight:700;font-size:.85em;font-variant-numeric:tabular-nums}
+.tb[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink);font-weight:700}
+.tb[aria-selected="true"] .tn{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.tb:hover{color:var(--ink)}
+main{max-width:1500px;margin:0 auto;padding-block:22px 40px}
+section[role=tabpanel]{display:grid;gap:20px}
+.lead{display:grid;grid-template-columns:1.25fr 1fr;gap:20px;align-items:start}
+.intro{min-width:0}
+.eyebrow{margin:0 0 4px;text-transform:uppercase;letter-spacing:.08em;font-size:.75rem;font-weight:700;color:var(--muted)}
+.intro h2{margin:0 0 8px;font-size:2.1rem;line-height:1.15;text-wrap:balance}
+.intro p{margin:0;max-width:62ch;font-size:1.05rem}
+.merke{position:relative;background:var(--merke);border:2px solid var(--merke-line);border-radius:6px;padding:22px 20px 16px;min-width:0}
+.merke h3{position:absolute;top:-.85em;left:14px;margin:0;background:var(--merke-line);color:#1b1b12;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;padding:2px 10px;border-radius:4px}
+.merke div{font-size:1.05rem}
+.merke ol{margin:.2em 0 0;padding-left:1.6em}
+.merke li{margin:.25em 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.grid2.b{grid-template-columns:1.4fr 1fr}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 20px;min-width:0}
+.ch{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.card h3{margin:0;font-size:1.1rem}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chipb{font:inherit;font-size:.85rem;border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:999px;padding:6px 12px;min-height:40px;cursor:pointer}
+.chipb.on{background:var(--ink);color:var(--panel);border-color:var(--ink);font-weight:700}
+.steps{min-height:9rem;display:grid;gap:2px;align-content:start;margin-bottom:12px}
+.step{padding:8px 4px 10px;border-bottom:1px dashed var(--line);overflow-x:auto}
+.step:last-child{border-bottom:0}
+.sm{font-family:var(--f-math);font-size:2rem;line-height:1.35;white-space:nowrap}
+.sn{color:var(--muted);font-size:.98rem;margin-top:2px}
+.step.cur .sm{animation:pop .35s ease-out}
+.step.cur .sn{color:var(--ink)}
+@keyframes pop{from{opacity:.2;transform:translateY(6px)}to{opacity:1;transform:none}}
+.ph{color:var(--muted);font-style:italic;margin:.5rem 0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{font:inherit;font-weight:700;font-size:.95rem;border:1.5px solid var(--ink);background:var(--panel);color:var(--ink);border-radius:8px;padding:8px 16px;min-height:48px;cursor:pointer}
+.btn.pri{background:var(--btn);color:var(--btn-ink);border-color:var(--btn)}
+.btn.ghost{border-color:var(--line);color:var(--muted)}
+.btn:disabled{opacity:.35;cursor:default}
+button:focus-visible{outline:3px solid var(--x);outline-offset:2px}
+input[type=range]:focus-visible{outline:3px solid var(--x);outline-offset:4px}
+.cnt{color:var(--muted);font-size:.85rem;margin-left:auto;font-variant-numeric:tabular-nums}
+.task{font-size:1.15rem;margin:0 0 10px}
+.trap{background:var(--red-soft);border-color:var(--red)}
+.trap h3{color:var(--red);display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.bang{display:inline-grid;place-items:center;width:1.6em;height:1.6em;border-radius:50%;background:var(--red);color:var(--panel);font-weight:700}
+.trap div{font-size:1.05rem}
+/* Mathe */
+.mi{font-family:var(--f-math);font-size:1.15em;white-space:nowrap}
+.v{font-style:italic}
+.vx{color:var(--x)} .vy{color:var(--y)} .vo{color:inherit}
+.op{margin:0 .26em}
+.gap{display:inline-block;width:.8em}
+.tx{font-family:var(--f-ui);font-size:.75em}
+sup{font-size:.62em;line-height:0;vertical-align:baseline;position:relative;top:-.62em;margin-left:.04em}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .15em;line-height:1.15}
+.fr .fn{border-bottom:1.5px solid currentColor;padding:0 .2em}
+.fr .fd{padding:0 .2em}
+.hl{background:var(--hl);color:var(--hl-ink);border-radius:4px;padding:0 .12em}
+.hl .vx,.hl .vy{color:inherit}
+/* Anschauung */
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:8px}
+.seg button{font:inherit;font-size:.9rem;border:0;background:var(--panel);color:var(--muted);padding:6px 14px;min-height:42px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button.on{background:var(--ink);color:var(--panel);font-weight:700}
+.fig{overflow-x:auto}
+.sv{display:block;width:100%;height:auto;max-height:46vh}
+.sv text{font-family:var(--f-math);fill:var(--ink)}
+.sv .t-x{fill:var(--x)} .sv .t-y{fill:var(--y)} .sv .t-o{fill:var(--ink)}
+.sv rect{stroke-width:2}
+.a-x{fill:var(--x-soft);stroke:var(--x)} .a-y{fill:var(--y-soft);stroke:var(--y)}
+.a-v{fill:var(--v-soft);stroke:var(--v)} .a-n{fill:var(--n-soft);stroke:var(--n)}
+.a-r{fill:var(--red);fill-opacity:.25;stroke:var(--red)}
+.gone{fill:none;stroke:var(--muted);stroke-dasharray:6 5}
+.gl{stroke:var(--x);stroke-opacity:.3;stroke-width:1}
+.stk{stroke:var(--x);stroke-width:7;stroke-linecap:round}
+.stk.first{stroke:var(--red)}
+.head{fill:var(--ink)}
+.ctrl{display:flex;gap:14px 24px;flex-wrap:wrap;margin:10px 0}
+.sl{display:grid;gap:2px;flex:1 1 150px;min-width:0}
+.sl-l{font-size:.95rem}
+.sl-l b{font-family:var(--f-math);font-size:1.2em;font-variant-numeric:tabular-nums}
+.sl input{width:100%;accent-color:var(--x);height:32px}
+.live{display:grid;gap:4px;font-size:1.3rem;overflow-x:auto;padding:4px 0}
+.unit{font-family:var(--f-ui);font-size:.7em;color:var(--muted);margin-left:.4em}
+.cap{color:var(--muted);margin:8px 0 0;font-size:.95rem}
+.cmp{display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap;margin-top:10px;padding:10px 14px;border:1px dashed var(--line);border-radius:8px;font-size:1.15rem}
+.cmp p{flex-basis:100%;margin:0;font-size:.9rem;color:var(--muted)}
+.cmp .ne{color:var(--red);font-size:1.6rem;font-family:var(--f-math)}
+.arcs{display:block;width:100%;height:auto;max-height:200px}
+.arcwrap{overflow-x:auto;margin:-4px 0 4px}
+.arc{fill:none;stroke-width:3}
+.c1{stroke:var(--x)} .c2{stroke:var(--v)} .c3{stroke:var(--red)} .c4{stroke:var(--y)}
+.mk{stroke:none} .mk.c1{fill:var(--x)} .mk.c2{fill:var(--v)} .mk.c3{fill:var(--red)} .mk.c4{fill:var(--y)}
+.badge{fill:var(--panel);stroke-width:2.5}
+.sv text.bt,.arcs text.bt{font-family:var(--f-ui);font-weight:700;fill:var(--ink)}
+/* Sortierer */
+.sorter{display:grid;gap:10px;min-height:9rem;align-content:start}
+.srow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{display:inline-flex;align-items:baseline;gap:.15em;font-family:var(--f-math);font-size:1.5rem;padding:4px 12px;border-radius:8px;border:2px solid;animation:pop .35s ease-out}
+.chip b{font-weight:400}
+.k-x{background:var(--x-soft);border-color:var(--x)} .k-y{background:var(--y-soft);border-color:var(--y)} .k-n{background:var(--n-soft);border-color:var(--n)}
+.chip .v{color:inherit}
+.lane{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ll{width:6.5em;color:var(--muted);font-size:.9rem}
+.eq{font-family:var(--f-math);font-size:1.5rem}
+.chip.res{font-weight:600;border-style:double;border-width:4px}
+.big{font-size:1.8rem;overflow-x:auto}
+/* Minusklammer */
+.flip{font-family:var(--f-math);font-size:2.3rem;padding:18px 0 8px;white-space:nowrap;overflow-x:auto}
+.flip span{display:inline-block;transition:opacity .3s,color .3s,background .3s}
+.fl-out.off{opacity:.25;color:var(--red);text-decoration:line-through}
+.fl-s{min-width:.2em;margin:0 .22em;border-radius:6px}
+.fl-s.hit{background:var(--red-soft);color:var(--red);font-weight:600;padding:0 .12em}
+.flip-res{font-size:1.6rem;min-height:2.6rem;margin-bottom:8px}
+/* Entscheidungshilfe */
+.dec{list-style:none;margin:0;padding:0;display:grid;gap:10px;counter-reset:d}
+.dec li{counter-increment:d;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;padding:12px 14px;border:1.5px solid var(--line);border-radius:8px;transition:background .25s,border-color .25s}
+.dec li::before{content:counter(d);grid-row:span 2;display:grid;place-items:center;width:2em;height:2em;border-radius:50%;border:1.5px solid var(--line);font-weight:700}
+.dec .dq{font-weight:700}
+.dec .da{color:var(--muted)}
+.dec li.on{background:var(--hl);border-color:var(--merke-line);color:var(--hl-ink)}
+.dec li.on .da{color:var(--hl-ink)}
+.dec li.on::before{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+@media (max-width:980px){.lead,.grid2,.grid2.b{grid-template-columns:1fr}}
+@media (max-width:560px){html{font-size:16px}.sm{font-size:1.45rem}.intro h2{font-size:1.6rem}.tb .tl{font-size:.85rem}.flip{font-size:1.7rem}.chip{font-size:1.2rem}.brand span{display:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<header class="top">
+  <div class="bar gut">
+    <div class="brand"><h1>Term<i>werkstatt</i></h1><span>Grundlagen der Algebra, Klasse 8</span></div>
+    <div class="tools">
+      <button id="fsm" title="Schrift kleiner" aria-label="Schrift kleiner">A−</button>
+      <button id="fsp" title="Schrift größer" aria-label="Schrift größer">A+</button>
+      <button id="theme" aria-label="Hell oder dunkel umschalten">Dunkel</button>
+      <button id="full">Vollbild</button>
+    </div>
+  </div>
+  <nav class="tabs gut" role="tablist" aria-label="Themen"></nav>
+</header>
+<main class="gut"></main>
+
+<script>
+/* ---------- Hilfsfunktionen ---------- */
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[rnd(0,a.length-1)];
+const nz=(a,b)=>{let v;do v=rnd(a,b);while(v===0);return v};
+const sgn=()=>Math.random()<.5?-1:1;
+const gcd=(a,b)=>{a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a};
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=rnd(0,i);[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const sn=n=>n<0?`(${n})`:`${n}`;
+function mono(c,v,first){const a=Math.abs(c);const body=v?(a===1?'':a)+v:String(a);return first?(c<0?'-':'')+body:(c<0?' - ':' + ')+body}
+function poly(ts){const f=ts.filter(t=>t[0]!==0);if(!f.length)return'0';return f.map((t,k)=>mono(t[0],t[1],k===0)).join('')}
+function combine(ts){const m=new Map();ts.forEach(([c,v])=>m.set(v,(m.get(v)||0)+c));return[...m].map(([v,c])=>[c,v])}
+
+/* Mini-Satz für Terme: Variablen kursiv und farbig, Malpunkt, Minuszeichen, Hochzahl, Bruch, [[Markierung]], "Text" */
+function M(src){
+  let i=0,last='start';const isD=c=>c>='0'&&c<='9';
+  const vc=c=>c==='x'?'vx':c==='y'?'vy':'vo';
+  function go(end){
+    let h='';
+    while(i<src.length){
+      if(end&&src.startsWith(end,i)){i+=end.length;return h}
+      const c=src[i];
+      if(src.startsWith('[[',i)){i+=2;h+='<span class="hl">'+go(']]')+'</span>';continue}
+      if(src.startsWith('frac{',i)){i+=5;const a=go('}');if(src[i]==='{')i++;const b=go('}');h+=`<span class="fr"><span class="fn">${a}</span><span class="fd">${b}</span></span>`;last='atom';continue}
+      if(c==='"'){const j=src.indexOf('"',i+1);h+='<span class="tx">'+esc(src.slice(i+1,j))+'</span>';i=j+1;last='op';continue}
+      if(c===' '){i++;continue}
+      if(isD(c)){let j=i;while(j<src.length&&isD(src[j]))j++;h+=src.slice(i,j);i=j;last='atom';continue}
+      if(/[a-zA-Z]/.test(c)){h+=`<i class="v ${vc(c)}">${c}</i>`;i++;last='atom';continue}
+      if(c==='^'){i++;let j=i;while(j<src.length&&isD(src[j]))j++;if(j===i)j=i+1;h+='<sup>'+esc(src.slice(i,j))+'</sup>';i=j;last='atom';continue}
+      i++;
+      if(c==='*'){h+='<span class="op">·</span>';last='op';continue}
+      if(c==='+'||c==='='||c==='≠'){h+=`<span class="op">${c}</span>`;last='op';continue}
+      if(c==='-'){h+=last==='atom'?'<span class="op">−</span>':'−';last='op';continue}
+      if(c===':'){h+=src[i-2]===' '?'<span class="op">:</span>':':<span class="gap"></span>';last='op';continue}
+      if(c===','){h+=',<span class="gap"></span>';last='op';continue}
+      if(c==='('){h+='(';last='open';continue}
+      if(c===')'){h+=')';last='atom';continue}
+      h+=esc(c);last='atom';
+    }
+    return h;
+  }
+  return go(null);
+}
+const T=s=>s.replace(/\$([^$]+)\$/g,(_,m)=>`<span class="mi">${M(m)}</span>`);
+const mi=s=>`<div class="mi">${M(s)}</div>`;
+
+/* SVG-Bausteine */
+function sv(str,fs){let h='',back=false;
+  for(let i=0;i<str.length;i++){const c=str[i];let p;
+    if(c===' ')continue;
+    if(c==='^'){h+=`<tspan dy="${-0.42*fs}" font-size="${0.66*fs}">${esc(str[++i])}</tspan>`;back=true;continue}
+    if(/[a-z]/.test(c))p=`<tspan class="t-${c==='x'?'x':c==='y'?'y':'o'}" font-style="italic">${c}</tspan>`;
+    else if(c==='-')p=' − ';else if(c==='+')p=' + ';else if(c==='*')p='·';else p=esc(c);
+    if(back){p=`<tspan dy="${0.42*fs}">${p}</tspan>`;back=false}
+    h+=p}
+  if(back)h+=`<tspan dy="${0.42*fs}">​</tspan>`;
+  return h}
+const svg=(w,h,inner)=>`<svg class="sv" viewBox="0 0 ${w} ${h}" role="img" aria-hidden="true">${inner}</svg>`;
+const tx=(x,y,str,fs,cls='',anchor='middle')=>`<text class="${cls}" x="${x}" y="${y}" font-size="${fs}" text-anchor="${anchor}" xml:space="preserve">${sv(str,fs)}</text>`;
+function box(x,y,w,h,cls,label){
+  let s=cls?`<rect class="${cls}" x="${x}" y="${y}" width="${w}" height="${h}" rx="2"/>`:'';
+  if(label){const len=label.replace(/\^./g,'').replace(/ /g,'').length+(/[-+]/.test(label)?1.2:0);
+    const fs=Math.min(28,h*0.42,(w-8)/(len*0.62));if(fs>=11)s+=tx(x+w/2,y+h/2+fs*0.34,label,fs)}
+  return s}
+const sl=(id,name,min,max,val,suf='')=>`<label class="sl" for="${id}"><span class="sl-l"><span class="mi">${M(name)}</span> = <b id="${id}-v">${val}</b>${suf?`<span class="mi">${M(suf)}</span>`:''}</span><input type="range" id="${id}" min="${min}" max="${max}" value="${val}" step="1"></label>`;
+
+let arcN=0;
+function arcFig(tokens,arcs){
+  const fs=38,id='af'+(arcN++),base=118;
+  const ws=tokens.map(t=>{const n=t.replace(/\^./g,'').length+(/\^/.test(t)?.5:0);return n*fs*.56+(/^[+\-*]$/.test(t)?24:6)});
+  let x=24;const cx=ws.map(w=>{const c=x+w/2;x+=w;return c});
+  const below=arcs.some(a=>a[3]==='b'),H=below?226:140,cls=['c1','c2','c3','c4'];
+  let h='';
+  arcs.forEach(([i,j,lvl,side,num],k)=>{const up=side!=='b',y0=up?base-fs*.82:base+12,hh=(lvl===1?30:56)*(up?-1:1),c=cls[(num||k+1)-1],mx=(cx[i]+cx[j])/2;
+    h+=`<path class="arc ${c}" d="M${cx[i]} ${y0} Q${mx} ${y0+2*hh} ${cx[j]} ${y0}" marker-end="url(#${id}-${c})"/>`;
+    if(num)h+=`<circle class="badge ${c}" cx="${mx}" cy="${y0+hh}" r="13"/><text class="bt" x="${mx}" y="${y0+hh+5}" font-size="15" text-anchor="middle">${num}</text>`});
+  const mk=cls.map(c=>`<marker id="${id}-${c}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="mk ${c}" d="M0 0L10 5L0 10z"/></marker>`).join('');
+  const t=tokens.map((s,k)=>`<text x="${cx[k]}" y="${base}" font-size="${fs}" text-anchor="middle">${sv(s,fs)}</text>`).join('');
+  return `<svg class="arcs sv" viewBox="0 0 ${x+24} ${H}" style="max-width:${(x+24)*1.1}px" role="img" aria-hidden="true"><defs>${mk}</defs>${h}${t}</svg>`;
+}
+
+/* ---------- Schrittanzeige ---------- */
+function makeStepper(box,{start=1,onStep}={}){
+  let steps=[],k=start;const list=box.querySelector('.steps');
+  function render(){
+    if(k===0)list.innerHTML='<p class="ph">Erst selbst rechnen, dann Schritt für Schritt aufdecken.</p>';
+    else list.innerHTML=steps.slice(0,k).map((s,j)=>`<div class="step${j===k-1&&k>start?' cur':''}"><div class="sm">${M(s.m)}</div>${s.n?`<div class="sn">${T(s.n)}</div>`:''}</div>`).join('');
+    box.querySelectorAll('[data-a=next],[data-a=all]').forEach(b=>b.disabled=k>=steps.length);
+    box.querySelectorAll('[data-a=prev]').forEach(b=>b.disabled=k<=start);
+    const c=box.querySelector('.cnt');if(c)c.textContent=`Schritt ${k-start} von ${steps.length-start}`;
+    onStep&&onStep(steps[k-1]);
+  }
+  return{load(s){steps=s;k=start;render()},next(){if(k<steps.length){k++;render()}},prev(){if(k>start){k--;render()}},reset(){k=start;render()},all(){k=steps.length;render()}};
+}
+
+/* ---------- Anschauungen ---------- */
+function vis1(el,t,p){
+  el.innerHTML=`<div class="seg"><button class="on" data-m="r">Rechteck</button><button data-m="s">Streichhölzer</button></div><div class="fig"></div><div class="ctrl">${sl(p+'v','x',1,8,3)}</div><div class="live"></div>`;
+  const fig=el.querySelector('.fig'),live=el.querySelector('.live'),inp=el.querySelector('#'+p+'v'),vv=el.querySelector('#'+p+'v-v'),nm=el.querySelector('.sl-l .mi');
+  let mode='r';
+  function draw(){const v=+inp.value;vv.textContent=v;
+    if(mode==='r'){const L=2*v+1,u=Math.min(440/L,180/v,34),w=L*u,h=v*u,x0=(560-w)/2,y0=56;let g='';
+      for(let i=1;i<L;i++)g+=`<line class="gl" x1="${x0+i*u}" y1="${y0}" x2="${x0+i*u}" y2="${y0+h}"/>`;
+      for(let j=1;j<v;j++)g+=`<line class="gl" x1="${x0}" y1="${y0+j*u}" x2="${x0+w}" y2="${y0+j*u}"/>`;
+      fig.innerHTML=svg(560,290,`<rect class="a-x" x="${x0}" y="${y0}" width="${w}" height="${h}" style="fill-opacity:.7"/>${g}`+tx(280,y0-16,'2x+1',26)+tx(280,y0+h+36,'2x+1',26)+tx(x0-14,y0+h/2+9,'x',26,'','end')+tx(x0+w+14,y0+h/2+9,'x',26,'','start'));
+      live.innerHTML=mi(`l = 2*${v} + 1 = ${L}, b = ${v}`)+`<div class="mi">${M(`U = 6*${v} + 2 = ${6*v+2}`)}<span class="unit">Kästchenlängen</span></div>`;
+    }else{const n=v,s=Math.min(58,460/n),x0=(560-n*s)/2,y0=110,r=Math.max(4,s*.1);
+      const st=(x1,y1,x2,y2,c)=>`<line class="stk ${c}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/><circle class="head" cx="${x2}" cy="${y2}" r="${r}"/>`;
+      let g=st(x0,y0+s-5,x0,y0+5,'first');
+      for(let i=0;i<n;i++){const a=x0+i*s;g+=st(a+5,y0,a+s-5,y0,'')+st(a+5,y0+s,a+s-5,y0+s,'')+st(a+s,y0+s-5,a+s,y0+5,'')}
+      fig.innerHTML=svg(560,290,g);
+      live.innerHTML=`<div class="mi">${M(`n = ${n}: H = 3*${n} + 1 = ${3*n+1}`)}<span class="unit">Hölzer</span></div><p class="cap">Rot: das erste Holz (die 1). Blau: je 3 Hölzer pro Quadrat.</p>`;
+    }}
+  el.querySelector('.seg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;mode=b.dataset.m;el.querySelectorAll('.seg button').forEach(x=>x.classList.toggle('on',x===b));nm.innerHTML=M(mode==='r'?'x':'n');draw()});
+  inp.addEventListener('input',draw);draw();
+}
+
+function vis2(el){
+  el.innerHTML=`<div class="sorter" aria-live="polite"></div><div class="row" style="margin-top:12px"><button class="btn pri" data-a="sort">Sortieren</button><button class="btn" data-a="new">Neuer Term</button></div><p class="cap">Jedes Glied nimmt sein Vorzeichen mit. Nur Glieder derselben Sorte landen in einer Reihe.</p>`;
+  const box=el.querySelector('.sorter'),kc=['k-x','k-y','k-n'];let set,ts,sorted=false;
+  const chip=t=>`<span class="chip ${kc[set.indexOf(t[1])]}"><b>${t[0]<0?'−':'+'}</b><span>${M(mono(Math.abs(t[0]),t[1],true))}</span></span>`;
+  function make(){set=pick([['x','y',''],['x^2','x','']]);ts=[];set.forEach(v=>ts.push([nz(-9,9),v],[nz(-9,9),v]));ts=shuffle(ts);sorted=false;render()}
+  function render(){
+    if(!sorted)box.innerHTML=`<div class="srow">${ts.map(chip).join('')}</div><div class="mi big">${M(poly(ts))}</div>`;
+    else box.innerHTML=set.map(v=>{const g=ts.filter(t=>t[1]===v),s=g.reduce((a,t)=>a+t[0],0);return`<div class="lane"><span class="ll">${v?T(`mit $${v}$`):'Zahlen'}</span><div class="srow">${g.map(chip).join('')}</div><span class="eq">=</span><span class="chip res ${kc[set.indexOf(v)]}"><span>${M(s===0?'0':mono(s,v,true))}</span></span></div>`}).join('')+`<div class="mi big">${M(poly(combine(set.flatMap(v=>ts.filter(t=>t[1]===v)))))}</div>`;
+    el.querySelector('[data-a=sort]').textContent=sorted?'Wieder mischen':'Sortieren'}
+  el.addEventListener('click',e=>{const a=e.target.closest('[data-a]')?.dataset.a;if(a==='sort'){sorted=!sorted;render()}if(a==='new')make()});
+  make();
+}
+
+function vis3(el,t,p){
+  el.innerHTML=`<div class="fig"></div><div class="ctrl">${sl(p+'a','"Breite"',1,4,3,'x')}${sl(p+'b','"Höhe"',1,4,2,'x')}</div><div class="live"></div><p class="cap">${T('Jedes kleine Quadrat hat die Seitenlänge $x$ und damit den Flächeninhalt $x * x = x^2$.')}</p>`;
+  const fig=el.querySelector('.fig'),live=el.querySelector('.live'),ia=el.querySelector('#'+p+'a'),ib=el.querySelector('#'+p+'b');
+  function draw(){const a=+ia.value,b=+ib.value;el.querySelector('#'+p+'a-v').textContent=a;el.querySelector('#'+p+'b-v').textContent=b;
+    const s=Math.min(64,420/a,220/b),x0=(560-a*s)/2,y0=40;let g='';
+    for(let i=0;i<a;i++){g+=tx(x0+i*s+s/2,y0-10,'x',20);for(let j=0;j<b;j++)g+=box(x0+i*s,y0+j*s,s,s,'a-x','x^2')}
+    for(let j=0;j<b;j++)g+=tx(x0-10,y0+j*s+s/2+7,'x',20,'','end');
+    fig.innerHTML=svg(560,280,g);
+    live.innerHTML=mi(`${mono(a,'x',true)} * ${mono(b,'x',true)} = ${a}*${b}*x*x = ${mono(a*b,'x^2',true)}`)}
+  ia.addEventListener('input',draw);ib.addEventListener('input',draw);draw();
+}
+
+function vis4(el,t,p){
+  el.innerHTML=`<div class="fig"></div><div class="ctrl">${sl(p+'a','a',1,5,3)}${sl(p+'b','b',1,6,4)}${sl(p+'x','x',1,6,3)}</div><div class="live"></div><p class="cap">${T('Das Rechteck $a(x + b)$ zerfällt in zwei Teile: $a * x$ und $a * b$. Zusammen sind sie genauso groß wie das ganze Rechteck.')}</p>`;
+  const fig=el.querySelector('.fig'),live=el.querySelector('.live'),q=id=>el.querySelector('#'+p+id);
+  function draw(){const a=+q('a').value,b=+q('b').value,x=+q('x').value;['a','b','x'].forEach(k=>q(k+'-v').textContent=q(k).value);
+    const u=Math.min(420/(x+b),190/a,46),x0=(560-(x+b)*u)/2,y0=52,H=a*u;
+    fig.innerHTML=svg(560,270,box(x0,y0,x*u,H,'a-x',`${a}*x`)+box(x0+x*u,y0,b*u,H,'a-n',`${a}*${b}`)+tx(x0+x*u/2,y0-14,'x',24)+tx(x0+x*u+b*u/2,y0-14,`${b}`,24)+tx(x0-14,y0+H/2+8,`${a}`,24,'','end'));
+    live.innerHTML=mi(`${a}*(x + ${b}) = ${mono(a,'x',true)} + ${a*b}`)+mi(`"Probe für "x = ${x}": "${a}*(${x} + ${b}) = ${a*(x+b)}, ${a}*${x} + ${a*b} = ${a*x+a*b} ✓`)}
+  ['a','b','x'].forEach(k=>q(k).addEventListener('input',draw));draw();
+}
+
+function vis5(el){
+  el.innerHTML=`<div class="flip" aria-live="polite"></div><div class="flip-res"></div><div class="row"><button class="btn pri" data-a="go">Klammer auflösen</button><button class="btn" data-a="new">Neues Beispiel</button></div><p class="cap">Beobachte, wie sich jedes einzelne Vorzeichen in der Klammer umdreht.</p>`;
+  const f=el.querySelector('.flip'),res=el.querySelector('.flip-res'),go=el.querySelector('[data-a=go]');let pre,ts,done,timers=[];
+  const sg=(c,i,after)=>i===0&&c>0&&!(after&&pre)?'':(c<0?'−':'+');
+  function make(){timers.forEach(clearTimeout);pre=pick(['','5','3x','7','2y','']);ts=shuffle([[nz(-7,7),'x'],[nz(-9,9),''],[nz(-5,5),'y']]).slice(0,rnd(2,3));done=false;render()}
+  function render(){f.innerHTML=(pre?`<span>${M(pre)}</span>`:'')+`<span class="fl-out">${pre?'<span class="op">−</span>':'−'}</span><span class="fl-out">(</span>`+ts.map((t,i)=>`<span class="fl-s">${sg(t[0],i,false)}</span><span>${M(mono(Math.abs(t[0]),t[1],true))}</span>`).join('')+`<span class="fl-out">)</span>`;res.innerHTML='';go.disabled=false}
+  function run(){if(done)return;done=true;go.disabled=true;const rm=matchMedia('(prefers-reduced-motion: reduce)').matches,d=rm?0:550;
+    f.querySelectorAll('.fl-out').forEach(o=>o.classList.add('off'));
+    f.querySelectorAll('.fl-s').forEach((s,i)=>timers.push(setTimeout(()=>{s.textContent=sg(-ts[i][0],i,true);s.classList.add('hit')},d*(i+1))));
+    timers.push(setTimeout(()=>{const fl=ts.map(t=>[-t[0],t[1]]);res.innerHTML=mi('= '+(pre?pre+fl.map(t=>mono(t[0],t[1],false)).join(''):poly(fl)))},d*(ts.length+1)))}
+  el.addEventListener('click',e=>{const a=e.target.closest('[data-a]')?.dataset.a;if(a==='go')run();if(a==='new')make()});
+  make();
+}
+
+function vis6(el){
+  el.innerHTML=`<div class="fig"></div><div class="live"></div><div class="row"><button class="btn pri" data-a="show">Gemeinsamen Faktor zeigen</button><button class="btn" data-a="new">Neues Beispiel</button></div><p class="cap">${T('Beide Rechtecke haben dieselbe Höhe. Diese gemeinsame Seite ist der Faktor, den man ausklammert. Die Breiten stehen danach in der Klammer.')}</p>`;
+  const fig=el.querySelector('.fig'),live=el.querySelector('.live'),btn=el.querySelector('[data-a=show]');let g,a,b,show;
+  function make(){g=rnd(2,5);a=rnd(1,3);do b=rnd(1,6);while(gcd(a,b)!==1);show=false;draw()}
+  function draw(){const u=Math.min(420/(a*3+b),170/g,40),w1=a*3*u,w2=b*u,H=g*u,x0=(560-w1-w2)/2,y0=56;
+    const term=poly([[g*a,'x'],[g*b,'']]),inner=poly([[a,'x'],[b,'']]);
+    fig.innerHTML=svg(560,260,box(x0,y0,w1,H,'a-x',mono(g*a,'x',true))+box(x0+w1,y0,w2,H,'a-n',`${g*b}`)+tx(x0-14,y0+H/2+9,show?`${g}`:'?',26,'','end')+tx(x0+w1/2,y0-14,show?mono(a,'x',true):'?',24)+tx(x0+w1+w2/2,y0-14,show?`${b}`:'?',24));
+    live.innerHTML=show?mi(`${term} = [[${g}]](${inner})`):mi(`${term} = ? * (? + ?)`);btn.textContent=show?'Wieder verdecken':'Gemeinsamen Faktor zeigen'}
+  el.addEventListener('click',e=>{const k=e.target.closest('[data-a]')?.dataset.a;if(k==='show'){show=!show;draw()}if(k==='new')make()});
+  make();
+}
+
+function vis7(el,t,p){
+  el.innerHTML=`<div class="fig"></div><div class="ctrl">${sl(p+'a','a',1,5,3)}${sl(p+'b','b',1,5,2)}${sl(p+'x','x',2,6,4)}</div><div class="live"></div><p class="cap">${T('Das Rechteck $(x + a)(x + b)$ besteht aus vier Teilflächen. Das sind genau die vier Produkte beim Ausmultiplizieren.')}</p>`;
+  const fig=el.querySelector('.fig'),live=el.querySelector('.live'),q=id=>el.querySelector('#'+p+id);
+  function draw(){const a=+q('a').value,b=+q('b').value,x=+q('x').value;['a','b','x'].forEach(k=>q(k+'-v').textContent=q(k).value);
+    const u=Math.min(420/(x+b),226/(x+a),40),x0=(560-(x+b)*u)/2,y0=44,X=x*u,A=a*u,B=b*u;
+    fig.innerHTML=svg(560,290,box(x0,y0,X,X,'a-x','x^2')+box(x0+X,y0,B,X,'a-v',mono(b,'x',true))+box(x0,y0+X,X,A,'a-v',mono(a,'x',true))+box(x0+X,y0+X,B,A,'a-n',`${a*b}`)
+      +tx(x0+X/2,y0-12,'x',22)+tx(x0+X+B/2,y0-12,`${b}`,22)+tx(x0-12,y0+X/2+8,'x',22,'','end')+tx(x0-12,y0+X+A/2+8,`${a}`,22,'','end'));
+    live.innerHTML=mi(`(x + ${a})(x + ${b}) = x^2 + ${mono(b,'x',true)} + ${mono(a,'x',true)} + ${a*b}`)+mi(`= x^2 + ${mono(a+b,'x',true)} + ${a*b}`)+mi(`"Probe für "x = ${x}": "${x+a}*${x+b} = ${(x+a)*(x+b)}, ${x*x} + ${b*x} + ${a*x} + ${a*b} = ${x*x+(a+b)*x+a*b} ✓`)}
+  ['a','b','x'].forEach(k=>q(k).addEventListener('input',draw));draw();
+}
+
+function vis8(el,t,p){
+  el.innerHTML=`<div class="seg">${[1,2,3].map(i=>`<button data-f="${i}" class="${i===1?'on':''}">${i}. Formel</button>`).join('')}</div><div class="fig"></div><div class="ctrl">${sl(p+'a','a',2,8,5)}${sl(p+'b','b',1,5,2)}</div><div class="live"></div><p class="cap"></p><div class="cmp"></div>`;
+  const fig=el.querySelector('.fig'),live=el.querySelector('.live'),cap=el.querySelector('.cap'),cmp=el.querySelector('.cmp'),ia=el.querySelector('#'+p+'a'),ib=el.querySelector('#'+p+'b');let f=1;
+  function draw(){let a=+ia.value,b=+ib.value;if(f>1&&b>=a){b=a-1;ib.value=b}el.querySelector('#'+p+'a-v').textContent=a;el.querySelector('#'+p+'b-v').textContent=b;let g='';
+    if(f===1){const u=Math.min(280/(a+b),40),A=a*u,B=b*u,x0=(560-A-B)/2,y0=34;
+      g=box(x0,y0,A,A,'a-x','a^2')+box(x0+A,y0,B,A,'a-v','ab')+box(x0,y0+A,A,B,'a-v','ab')+box(x0+A,y0+A,B,B,'a-y','b^2')+tx(x0+A/2,y0-10,'a',22)+tx(x0+A+B/2,y0-10,'b',22)+tx(x0-10,y0+A/2+8,'a',22,'','end')+tx(x0-10,y0+A+B/2+8,'b',22,'','end');
+      live.innerHTML=mi('(a + b)^2 = a^2 + 2ab + b^2')+mi(`(${a} + ${b})^2 = ${a*a} + ${2*a*b} + ${b*b} = ${(a+b)**2}`);
+      cap.innerHTML=T('Das große Quadrat mit der Seite $a + b$ besteht aus vier Teilen: $a^2$, $b^2$ und zweimal dem Rechteck $ab$.');
+      cmp.hidden=false;cmp.innerHTML=`<div>${mi(`(${a} + ${b})^2 = ${(a+b)**2}`)}</div><div class="ne">≠</div><div>${mi(`${a}^2 + ${b}^2 = ${a*a+b*b}`)}</div><p>${T(`Bei $a^2 + b^2$ fehlen die beiden violetten Rechtecke, also $2ab = ${2*a*b}$.`)}</p>`;
+    }else if(f===2){const u=Math.min(270/a,40),S=a*u,C=(a-b)*u,B=b*u,x0=(560-S)/2,y0=34;
+      g=`<rect class="a-n" x="${x0}" y="${y0}" width="${S}" height="${S}"/>`+box(x0,y0,C,C,'a-x','(a-b)^2')+`<rect class="a-r" x="${x0+C}" y="${y0}" width="${B}" height="${S}"/><rect class="a-r" x="${x0}" y="${y0+C}" width="${S}" height="${B}"/>`
+        +box(x0+C,y0,B,C,null,'ab')+box(x0,y0+C,C,B,null,'ab')+box(x0+C,y0+C,B,B,null,'b^2')
+        +tx(x0+C/2,y0-10,'a-b',20)+tx(x0+C+B/2,y0-10,'b',20)+tx(x0-10,y0+C/2+7,'a-b',20,'','end')+tx(x0-10,y0+C+B/2+7,'b',20,'','end')+tx(x0+S/2,y0+S+28,'a',22);
+      live.innerHTML=mi('(a - b)^2 = a^2 - 2ab + b^2')+mi(`(${a} - ${b})^2 = ${a*a} - ${2*a*b} + ${b*b} = ${(a-b)**2}`);
+      cap.innerHTML=T('Vom Quadrat $a^2$ werden zwei rote Streifen $ab$ abgezogen. Das Eckquadrat $b^2$ wurde dabei doppelt abgezogen und wird deshalb einmal wieder addiert.');cmp.hidden=true;
+    }else{const u=Math.min(440/(2*a+b+1.5),250/a,36),A=a*u,B=b*u,C=(a-b)*u,gp=1.5*u,x0=(520-(2*A+B+gp))/2,y0=40,xr=x0+A+gp;
+      g=box(x0,y0,A,C,'a-x','a(a-b)')+box(x0,y0+C,C,B,'a-v','b(a-b)')+`<rect class="gone" x="${x0+C}" y="${y0+C}" width="${B}" height="${B}"/>`+box(x0+C,y0+C,B,B,null,'b^2')
+        +box(xr,y0,A,C,'a-x','a(a-b)')+box(xr+A,y0,B,C,'a-v','b(a-b)')+tx(x0+A+gp/2,y0+C/2+10,'→',30)
+        +tx(x0+A/2,y0-10,'a',20)+tx(x0-10,y0+A/2+7,'a',20,'','end')+tx(xr+A/2,y0-10,'a',20)+tx(xr+A+B/2,y0-10,'b',20)+tx(xr+A+B+10,y0+C/2+7,'a-b',20,'','start')+tx(xr+(A+B)/2,y0+C+28,'a+b',20);
+      live.innerHTML=mi('(a + b)(a - b) = a^2 - b^2')+mi(`(${a} + ${b})(${a} - ${b}) = ${a+b}*${a-b} = ${(a+b)*(a-b)}`)+mi(`${a}^2 - ${b}^2 = ${a*a} - ${b*b} = ${a*a-b*b}`);
+      cap.innerHTML=T('Schneidet man aus dem Quadrat $a^2$ das Eckquadrat $b^2$ heraus und legt das violette Stück neben das blaue, entsteht ein Rechteck mit den Seiten $a + b$ und $a - b$.');cmp.hidden=true}
+    fig.innerHTML=svg(560,340,g)}
+  el.querySelector('.seg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;f=+b.dataset.f;el.querySelectorAll('.seg button').forEach(x=>x.classList.toggle('on',x===b));draw()});
+  ia.addEventListener('input',draw);ib.addEventListener('input',draw);draw();
+}
+
+function vis9(el,t){
+  el.innerHTML=`<ol class="dec">
+    <li data-q="1"><span class="dq">Haben alle Glieder einen gemeinsamen Faktor?</span><span class="da">Ja: ausklammern (Reiter 6)</span></li>
+    <li data-q="2"><span class="dq">${T('Zwei Quadrate mit Minus dazwischen, also $a^2 - b^2$?')}</span><span class="da">${T('Ja: 3. binomische Formel, $(a + b)(a - b)$')}</span></li>
+    <li data-q="3"><span class="dq">Drei Glieder: zwei Quadrate und das doppelte Produkt?</span><span class="da">${T('Ja: 1. oder 2. binomische Formel, $(a + b)^2$ bzw. $(a - b)^2$')}</span></li>
+  </ol><p class="cap">Nach jedem Schritt erneut prüfen, ob sich die Klammer noch weiter zerlegen lässt. Die gerade passende Frage wird beim Rechnen markiert.</p>`;
+  t.setQ=q=>el.querySelectorAll('.dec li').forEach(li=>li.classList.toggle('on',+li.dataset.q===q));
+}
+
+/* ---------- Aufgabengeneratoren ---------- */
+function gen1(){const a=rnd(1,3),b=rnd(1,6),c=rnd(1,3),k=rnd(2,5);
+  const raw=[[a,'x'],[b,''],[c,'x'],[a,'x'],[b,''],[c,'x']],sorted=[[a,'x'],[a,'x'],[c,'x'],[c,'x'],[b,''],[b,'']],A=2*a+2*c;
+  return{task:`Ein Rechteck hat die Länge $l = ${poly([[a,'x'],[b,'']])}$ und die Breite $b = ${mono(c,'x',true)}$. Stelle einen Term für den Umfang $U$ auf und berechne ihn für $x = ${k}$.`,
+  steps:[{m:'U = l + b + l + b',n:'Umfang: alle vier Seiten addieren'},{m:'U = '+poly(raw),n:'Seitenlängen einsetzen'},{m:'U = '+poly(sorted),n:'Gleichartige Glieder sortieren'},{m:'U = '+poly([[A,'x'],[2*b,'']]),n:'Zusammenfassen'},{m:`"Für "x = ${k}": "U = ${A}*${k} + ${2*b} = ${A*k+2*b}`,n:'Termwert berechnen'}]}}
+function gen2(){const set=pick([['x','y',''],['x^2','x',''],['ab','a','b']]);let ts=[];set.forEach(v=>ts.push([nz(-9,9),v],[nz(-9,9),v]));ts=shuffle(ts);
+  const sorted=set.flatMap(v=>ts.filter(t=>t[1]===v));
+  return{task:`Fasse zusammen: $${poly(ts)}$`,steps:[{m:poly(sorted),n:'Nach Sorten ordnen, die Vorzeichen wandern mit'},{m:poly(combine(sorted)),n:'Koeffizienten jeder Sorte zusammenrechnen'}]}}
+function gen3(){const ty=rnd(1,4);
+  if(ty===1){const a=rnd(2,7)*sgn(),b=rnd(2,7)*sgn();return{task:`Multipliziere: $${mono(a,'x',true)} * ${b<0?`(${mono(b,'y',true)})`:mono(b,'y',true)}$`,steps:[{m:`${a}*${sn(b)}*x*y`,n:'Zahlen nach vorne, Variablen nach hinten'},{m:mono(a*b,'xy',true),n:'Zahlen multiplizieren, Vorzeichenregel beachten'}]}}
+  if(ty===2){const a=rnd(2,7)*sgn(),b=rnd(2,7)*sgn();return{task:`Multipliziere: $${mono(a,'x',true)} * ${b<0?`(${mono(b,'x',true)})`:mono(b,'x',true)}$`,steps:[{m:`${a}*${sn(b)}*x*x`,n:'Zahlen nach vorne, Variablen nach hinten'},{m:mono(a*b,'x^2',true),n:'$x * x = x^2$'}]}}
+  const a=rnd(2,6),b=rnd(2,8)*sgn(),N=a*b;
+  if(ty===3)return{task:`Dividiere: $${mono(N,'xy',true)} : ${a}x$`,steps:[{m:`frac{${mono(N,'xy',true)}}{${a}x}`,n:'Als Bruch schreiben'},{m:`frac{${N}}{${a}}*frac{x}{x}*y`,n:'Zahlen und Variablen getrennt betrachten'},{m:mono(b,'y',true),n:`Kürzen: $${N} : ${a} = ${b}$ und $x : x = 1$`}]};
+  return{task:`Dividiere: $${mono(N,'x^2',true)} : ${a}x$`,steps:[{m:`frac{${mono(N,'x^2',true)}}{${a}x}`,n:'Als Bruch schreiben'},{m:`frac{${N}}{${a}}*frac{x*x}{x}`,n:'$x^2 = x * x$, ein $x$ kürzt sich weg'},{m:mono(b,'x',true),n:`$${N} : ${a} = ${b}$`}]}}
+function gen4(){const wx=Math.random()<.4,a=rnd(2,7)*sgn(),b=rnd(1,5),c=nz(-9,9);const F=wx?mono(a,'x',true):String(a),Fp=a<0?`(${F})`:F;
+  return{task:`Löse die Klammer auf: $${F}(${poly([[b,'x'],[c,'']])})$`,steps:[{m:`${F}*${mono(b,'x',true)} + ${Fp}*${sn(c)}`,n:`Den Faktor $${F}$ mit jedem Glied der Klammer multiplizieren`},{m:poly(wx?[[a*b,'x^2'],[a*c,'x']]:[[a*b,'x'],[a*c,'']]),n:'Ausrechnen, Vorzeichenregeln beachten'}]}}
+function gen5(){const ty=rnd(1,4);let task,raw;const n1='Minus und Klammer weglassen, alle Vorzeichen in der Klammer umkehren';
+  if(ty===1){const a=rnd(2,9),b=rnd(1,6),c=nz(-9,9);task=`${mono(a,'x',true)} - (${poly([[b,'x'],[c,'']])})`;raw=[[a,'x'],[-b,'x'],[-c,'']]}
+  if(ty===2){const c=rnd(2,12),b=rnd(1,6),d=nz(-9,9);task=`${c} - (${poly([[b,'x'],[d,'']])})`;raw=[[c,''],[-b,'x'],[-d,'']]}
+  if(ty===3){const a=nz(-6,6),b=nz(-9,9),c=nz(-6,6);task=`-(${poly([[a,'x'],[b,'']])})${mono(c,'x',false)}`;raw=[[-a,'x'],[-b,''],[c,'x']]}
+  if(ty===4){const k=rnd(2,6),c=nz(-9,9);return{task:`Löse die Klammer auf: $-${k}(${poly([[1,'x'],[c,'']])})$`,steps:[{m:`-${k}*x + (-${k})*${sn(c)}`,n:`Den Faktor $-${k}$ mit jedem Glied multiplizieren`},{m:poly([[-k,'x'],[-k*c,'']]),n:'Ausrechnen: Minus mal Minus ergibt Plus'}]}}
+  return{task:`Löse die Klammer auf und fasse zusammen: $${task}$`,steps:[{m:poly(raw),n:n1},{m:poly(combine(raw)),n:'Gleichartige Glieder zusammenfassen'}]}}
+function gen6(){const g=rnd(2,6),a=rnd(1,5);let b;do b=nz(-9,9);while(gcd(a,b)!==1);const wx=Math.random()<.4;
+  const F=wx?mono(g,'x',true):String(g),term=poly(wx?[[g*a,'x^2'],[g*b,'x']]:[[g*a,'x'],[g*b,'']]),inner=poly([[a,'x'],[b,'']]);
+  return{task:`Klammere den größten gemeinsamen Faktor aus: $${term}$`,steps:[{m:`[[${F}]]*${mono(a,'x',true)} ${b<0?'-':'+'} [[${F}]]*${Math.abs(b)}`,n:`ggT von $${g*a}$ und $${Math.abs(g*b)}$ ist $${g}$`+(wx?', außerdem enthalten beide Glieder $x$':'')},{m:`${F}(${inner})`,n:'Gemeinsamen Faktor vor die Klammer schreiben'},{m:`${F}(${inner}) = ${term} ✓`,n:'Probe durch Ausmultiplizieren'}]}}
+function gen7(){const ty=rnd(1,3);
+  if(ty===1){const p=nz(-7,7),q=nz(-7,7),pr=[[1,'x^2'],[q,'x'],[p,'x'],[p*q,'']];
+    return{task:`Multipliziere aus: $(${poly([[1,'x'],[p,'']])})(${poly([[1,'x'],[q,'']])})$`,steps:[{m:`x*x + x*${sn(q)} + ${sn(p)}*x + ${sn(p)}*${sn(q)}`,n:'Jedes Glied mit jedem multiplizieren'},{m:poly(pr),n:'Die vier Produkte ausrechnen'},{m:poly(combine(pr)),n:'Gleichartige Glieder zusammenfassen'}]}}
+  if(ty===2){const a=rnd(2,3),b=rnd(1,3),p=nz(-5,5),q=nz(-5,5),A=mono(a,'x',true),B=mono(b,'x',true),pr=[[a*b,'x^2'],[a*q,'x'],[p*b,'x'],[p*q,'']];
+    return{task:`Multipliziere aus: $(${poly([[a,'x'],[p,'']])})(${poly([[b,'x'],[q,'']])})$`,steps:[{m:`${A}*${B} + ${A}*${sn(q)} + ${sn(p)}*${B} + ${sn(p)}*${sn(q)}`,n:'Jedes Glied mit jedem multiplizieren'},{m:poly(pr),n:'Die vier Produkte ausrechnen'},{m:poly(combine(pr)),n:'Gleichartige Glieder zusammenfassen'}]}}
+  const p=nz(-7,7),q=nz(-7,7);
+  return{task:`Multipliziere aus: $(${poly([[1,'x'],[p,'']])})(${poly([[1,'y'],[q,'']])})$`,steps:[{m:`x*y + x*${sn(q)} + ${sn(p)}*y + ${sn(p)}*${sn(q)}`,n:'Jedes Glied mit jedem multiplizieren'},{m:poly([[1,'xy'],[q,'x'],[p,'y'],[p*q,'']]),n:'Ausrechnen. Es gibt keine gleichartigen Glieder, fertig.'}]}}
+function gen8(){const ty=rnd(1,3),c=pick([1,1,2,3]),b=rnd(1,9),cx=mono(c,'x',true),sq=c===1?'x':`(${c}x)`;
+  if(ty===1)return{task:`Wende eine binomische Formel an: $(${cx} + ${b})^2$`,steps:[{m:`${sq}^2 + 2*${cx}*${b} + ${b}^2`,n:`1. binomische Formel mit $a = ${cx}$ und $b = ${b}$`},{m:poly([[c*c,'x^2'],[2*c*b,'x'],[b*b,'']]),n:'Ausrechnen'}]};
+  if(ty===2)return{task:`Wende eine binomische Formel an: $(${cx} - ${b})^2$`,steps:[{m:`${sq}^2 - 2*${cx}*${b} + ${b}^2`,n:`2. binomische Formel mit $a = ${cx}$ und $b = ${b}$`},{m:poly([[c*c,'x^2'],[-2*c*b,'x'],[b*b,'']]),n:'Ausrechnen'}]};
+  return{task:`Wende eine binomische Formel an: $(${cx} + ${b})(${cx} - ${b})$`,steps:[{m:`${sq}^2 - ${b}^2`,n:`3. binomische Formel mit $a = ${cx}$ und $b = ${b}$`},{m:poly([[c*c,'x^2'],[-b*b,'']]),n:'Ausrechnen'}]}}
+function gen9(){const ty=rnd(1,4),no={n:'Frage 1: kein gemeinsamer Faktor',q:1};
+  if(ty===1){const g=rnd(2,6),a=rnd(1,5);let b;do b=nz(-9,9);while(gcd(a,b)!==1);const wx=Math.random()<.5,F=wx?mono(g,'x',true):String(g);
+    const term=poly(wx?[[g*a,'x^2'],[g*b,'x']]:[[g*a,'x'],[g*b,'']]);
+    return{task:`Faktorisiere: $${term}$`,steps:[{m:`[[${F}]]*${mono(a,'x',true)} ${b<0?'-':'+'} [[${F}]]*${Math.abs(b)}`,n:`Frage 1: gemeinsamer Faktor? Ja, $${F}$`,q:1},{m:`${F}(${poly([[a,'x'],[b,'']])})`,n:'Ausklammern. In der Klammer geht nichts mehr, fertig.',q:1}]}}
+  if(ty===2){const c=pick([1,1,2,3]);let b;do b=rnd(1,9);while(gcd(c,b)!==1);const cx=mono(c,'x',true),sq=c===1?'x':`(${c}x)`,term=poly([[c*c,'x^2'],[-b*b,'']]);
+    return{task:`Faktorisiere: $${term}$`,steps:[{m:term,...no},{m:`${sq}^2 - ${b}^2`,n:'Frage 2: Differenz zweier Quadrate? Ja',q:2},{m:`(${cx} + ${b})(${cx} - ${b})`,n:'3. binomische Formel rückwärts',q:2}]}}
+  if(ty===3){const s=sgn(),c=pick([1,1,1,2]);let b;do b=rnd(1,9);while(gcd(c,b)!==1);const cx=mono(c,'x',true),sq=c===1?'x':`(${c}x)`,o=s<0?'-':'+',term=poly([[c*c,'x^2'],[2*s*c*b,'x'],[b*b,'']]);
+    return{task:`Faktorisiere: $${term}$`,steps:[{m:term,...no},{m:`${sq}^2 ${o} 2*${cx}*${b} + ${b}^2`,n:`Frage 3: Quadrate $${sq}^2$ und $${b}^2$, das mittlere Glied ist das doppelte Produkt`,q:3},{m:`(${cx} ${o} ${b})^2`,n:`${s<0?2:1}. binomische Formel rückwärts`,q:3}]}}
+  const g=rnd(2,5),s=sgn(),b=rnd(1,6),o=s<0?'-':'+';
+  return{task:`Faktorisiere: $${poly([[g,'x^2'],[2*s*g*b,'x'],[g*b*b,'']])}$`,steps:[{m:`${g}(${poly([[1,'x^2'],[2*s*b,'x'],[b*b,'']])})`,n:`Frage 1: gemeinsamer Faktor $${g}$, ausklammern`,q:1},{m:`${g}(x^2 ${o} 2*x*${b} + ${b}^2)`,n:'Frage 3: In der Klammer steht eine binomische Formel',q:3},{m:`${g}(x ${o} ${b})^2`,n:'Vollständig faktorisiert',q:3}]}}
+
+/* ---------- Inhalte ---------- */
+const S=(m,n,q)=>({m,n,q});
+const TABS=[
+{short:'Terme aufstellen',title:'Terme aufstellen',
+ intro:'Mit Variablen beschreibt man Größen, die sich ändern können. Ein Term ist eine Rechenvorschrift aus Zahlen, Variablen und Rechenzeichen. Einmal aufgestellt, gilt er für jede Zahl, die man für die Variable einsetzt.',
+ merke:'Ein <b>Term</b> beschreibt eine Größe allgemein, zum Beispiel den Umfang $U = 6x + 2$. Setzt man für die Variable eine Zahl ein, erhält man den <b>Termwert</b>. Zwischen Zahl und Variable steht ein unsichtbarer Malpunkt: $6x = 6 * x$.',
+ trap:'Beim Einsetzen den Malpunkt nicht vergessen: Für $x = 3$ ist $6x = 6 * 3 = 18$ und nicht $63$.',
+ examples:[
+  {label:'Rechteck',steps:[S('l = 2x + 1, b = x','Seitenlängen aus der Zeichnung ablesen'),S('U = l + b + l + b','Umfang: alle vier Seiten addieren'),S('U = 2x + 1 + x + 2x + 1 + x','Seitenlängen einsetzen'),S('U = 6x + 2','Gleichartige Glieder zusammenfassen (mehr dazu in Reiter 2)'),S('"Für "x = 3": "U = 6*3 + 2 = 20','Termwert: für $x$ eine Zahl einsetzen')]},
+  {label:'Streichhölzer',steps:[S('"1 Quadrat: "4", 2 Quadrate: "7", 3 Quadrate: "10','Hölzer in der Zeichnung zählen'),S('4, 7, 10, 13, ...','Mit jedem neuen Quadrat kommen 3 Hölzer dazu'),S('H = 1 + 3*n','Ein Holz ganz links, dann 3 Hölzer für jedes der $n$ Quadrate'),S('H = 3n + 1','Übliche Schreibweise: das Glied mit Variable zuerst'),S('"Für "n = 20": "H = 3*20 + 1 = 61','Mit dem Term zählt man, ohne zu zeichnen')]},
+  {label:'Kino',steps:[S('"Kinokarte: 9 €, Popcorn: 4 €"','Eine Gruppe kauft $k$ Kinokarten und $p$ Portionen Popcorn'),S('K = 9*k + 4*p','Anzahl mal Preis, dann addieren'),S('K = 9k + 4p','Den Malpunkt vor einer Variablen darf man weglassen'),S('"Für "k = 5, p = 3": "K = 9*5 + 4*3 = 57','Die Gruppe zahlt 57 €')]}],
+ vis:vis1,gen:gen1},
+{short:'Addieren, Subtrahieren',title:'Addieren und Subtrahieren von Termen',
+ intro:'Ein langer Term lässt sich oft kürzer schreiben. Dazu fasst man Glieder zusammen, die zur gleichen Sorte gehören.',
+ merke:'Nur <b>gleichartige Glieder</b> (gleiche Variablen mit gleichen Hochzahlen) dürfen zusammengefasst werden. Man rechnet mit den Koeffizienten, der Variablenteil bleibt: $3x + 5x = 8x$. Das Vorzeichen gehört immer zum Glied dahinter.',
+ trap:'$3x + 2y$ lässt sich nicht weiter zusammenfassen, das Ergebnis ist <b>nicht</b> $5xy$. Ebenso sind $x^2$ und $x$ verschiedene Sorten: $x^2 + x ≠ x^3$.',
+ examples:[
+  {label:'Beispiel 1',steps:[S('3x + 4y - x + 2 + 5y - 7','Ausgangsterm: Glieder mit $x$ blau, mit $y$ grün, Zahlen schwarz'),S('3x - x + 4y + 5y + 2 - 7','Nach Sorten ordnen. Das Vorzeichen wandert mit dem Glied mit.'),S('2x + 9y - 5','Zusammenrechnen: $3 - 1 = 2$, $4 + 5 = 9$, $2 - 7 = -5$')]},
+  {label:'Beispiel 2',steps:[S('4x^2 + 3x - x^2 + 5x - 2x^2','Ausgangsterm mit $x^2$ und $x$'),S('4x^2 - x^2 - 2x^2 + 3x + 5x','$x^2$ und $x$ sind verschiedene Sorten'),S('x^2 + 8x','$4 - 1 - 2 = 1$, also $1x^2 = x^2$, und $3 + 5 = 8$')]},
+  {label:'Beispiel 3',steps:[S('2ab + 3a - ab + 4b - a','Ausgangsterm mit $a$, $b$ und $ab$'),S('2ab - ab + 3a - a + 4b','$ab$ ist eine eigene Sorte, verschieden von $a$ und von $b$'),S('ab + 2a + 4b','Zusammenfassen')]}],
+ vis:vis2,gen:gen2},
+{short:'Multiplizieren, Dividieren',title:'Multiplizieren und Dividieren von Termen',
+ intro:'Beim Multiplizieren darf man die Faktoren beliebig umsortieren (Kommutativgesetz). So werden Produkte von Termen übersichtlich.',
+ merke:'Zahlen mit Zahlen multiplizieren, Variablen mit Variablen: $3x * 4y = 12xy$. Gleiche Variablen werden zur Potenz: $x * x = x^2$. Dividieren heißt kürzen: $12xy : 4x = 3y$.',
+ trap:'$x * x = x^2$ und nicht $2x$. Und bei $3x * 4 = 12x$ wird nur die Zahl mit der Zahl multipliziert.',
+ examples:[
+  {label:'Beispiel 1',steps:[S('3x * 4y','Ausgangsterm'),S('3*4*x*y','Faktoren umsortieren: Zahlen nach vorne'),S('12xy','Zahlen multiplizieren, Variablen alphabetisch dahinter')]},
+  {label:'Beispiel 2',steps:[S('2x * 5x','Ausgangsterm'),S('2*5*x*x','Faktoren umsortieren'),S('10x^2','$x * x = x^2$')]},
+  {label:'Beispiel 3',steps:[S('-3a * 2ab','Ausgangsterm'),S('-3*2*a*a*b','Faktoren umsortieren'),S('-6a^2b','Minus mal Plus ergibt Minus, $a * a = a^2$')]},
+  {label:'Division',steps:[S('12xy : 4x','Ausgangsterm'),S('frac{12xy}{4x}','Division als Bruch schreiben'),S('frac{12}{4}*frac{x}{x}*y','Zahlen und Variablen getrennt betrachten'),S('3*1*y = 3y','Kürzen: $12 : 4 = 3$ und $x : x = 1$')]}],
+ vis:vis3,gen:gen3},
+{short:'Klammer auflösen',title:'Auflösen einer Klammer',
+ intro:'Steht ein Faktor vor oder hinter einer Klammer, wird er auf jedes Glied in der Klammer verteilt. Das nennt man das Distributivgesetz.',
+ merke:'$a(b + c) = ab + ac$<br>Der Faktor vor der Klammer wird mit <b>jedem</b> Glied in der Klammer multipliziert.',
+ trap:'Der Faktor muss mit jedem Glied multipliziert werden: $3(x + 4) ≠ 3x + 4$.',
+ examples:[
+  {label:'Beispiel 1',arcs:{t:['3','(','x','+','4',')'],a:[[0,2,1],[0,4,2]]},steps:[S('3(x + 4)','Ausgangsterm'),S('3*x + 3*4','Die 3 mit jedem Glied der Klammer multiplizieren'),S('3x + 12','Ausrechnen')]},
+  {label:'Beispiel 2',arcs:{t:['2x','(','3x','-','5',')'],a:[[0,2,1],[0,4,2]]},steps:[S('2x(3x - 5)','Ausgangsterm'),S('2x*3x - 2x*5','$2x$ mit jedem Glied multiplizieren, das Minus bleibt stehen'),S('6x^2 - 10x','$2 * 3 = 6$ und $x * x = x^2$')]},
+  {label:'Faktor hinten',arcs:{t:['(','a','+','2b',')','*','4'],a:[[6,3,1],[6,1,2]]},steps:[S('(a + 2b)*4','Ausgangsterm'),S('a*4 + 2b*4','Ein Faktor hinter der Klammer wirkt genauso'),S('4a + 8b','Zahl vor die Variable schreiben')]}],
+ vis:vis4,gen:gen4},
+{short:'Minusklammern',title:'Minusklammern',
+ intro:'Ein Minuszeichen vor einer Klammer bedeutet: Die ganze Klammer wird abgezogen. Das ist dasselbe wie eine Multiplikation mit $-1$.',
+ merke:'Steht ein Minus vor der Klammer, lässt man Minus und Klammer weg und <b>kehrt alle Vorzeichen</b> in der Klammer um: $-(a - b + c) = -a + b - c$.',
+ trap:'Es ändern sich <b>alle</b> Vorzeichen in der Klammer, nicht nur das erste: $-(x - 3) ≠ -x - 3$. Richtig ist $-x + 3$.',
+ examples:[
+  {label:'Beispiel 1',steps:[S('-(x - 3)','Ausgangsterm'),S('-1*(x - 3)','Ein Minus vor der Klammer bedeutet „mal $-1$“'),S('-1*x + (-1)*(-3)','Klammer auflösen wie in Reiter 4'),S('-x + 3','Alle Vorzeichen in der Klammer haben sich umgedreht')]},
+  {label:'Beispiel 2',steps:[S('5 - (2x - 4)','Ausgangsterm'),S('5 - 2x + 4','Minus und Klammer weglassen, alle Vorzeichen umkehren'),S('9 - 2x','Zahlen zusammenfassen: $5 + 4 = 9$')]},
+  {label:'Beispiel 3',steps:[S('4x - (3x + 2) + 1','Ausgangsterm'),S('4x - 3x - 2 + 1','Aus $+3x$ wird $-3x$, aus $+2$ wird $-2$'),S('x - 1','Zusammenfassen')]},
+  {label:'Mit Faktor',steps:[S('-2(x - 3)','Ausgangsterm'),S('-2*x + (-2)*(-3)','Der Faktor $-2$ wird mit jedem Glied multipliziert'),S('-2x + 6','Minus mal Minus ergibt Plus')]}],
+ vis:vis5,gen:gen5},
+{short:'Ausklammern',title:'Ausklammern',
+ intro:'Ausklammern ist die Umkehrung des Klammerauflösens aus Reiter 4. Aus einer Summe wird ein Produkt.',
+ merke:'Suche den <b>größten gemeinsamen Faktor</b> aller Glieder und schreibe ihn vor die Klammer. In der Klammer bleibt, was übrig ist: $ab + ac = a(b + c)$. Mit der Probe (wieder ausmultiplizieren) lässt sich jedes Ergebnis prüfen.',
+ trap:'Wird ein Glied ganz ausgeklammert, bleibt in der Klammer eine $1$ stehen: $5x + 5 = 5(x + 1)$ und nicht $5x$.',
+ examples:[
+  {label:'Beispiel 1',steps:[S('6x + 9','Ausgangsterm'),S('[[3]]*2x + [[3]]*3','Der größte gemeinsame Faktor von 6 und 9 ist 3'),S('3(2x + 3)','Gemeinsamen Faktor vor die Klammer ziehen'),S('3(2x + 3) = 6x + 9 ✓','Probe: wieder ausmultiplizieren')]},
+  {label:'Beispiel 2',steps:[S('4x^2 - 10x','Ausgangsterm'),S('[[2x]]*2x - [[2x]]*5','Gemeinsam sind die Zahl 2 und die Variable $x$'),S('2x(2x - 5)','Ausklammern'),S('2x(2x - 5) = 4x^2 - 10x ✓','Probe')]},
+  {label:'Beispiel 3',steps:[S('12ab + 8a','Ausgangsterm'),S('[[4a]]*3b + [[4a]]*2','ggT von 12 und 8 ist 4, beide Glieder enthalten $a$'),S('4a(3b + 2)','Ausklammern'),S('4a(3b + 2) = 12ab + 8a ✓','Probe')]},
+  {label:'Rest 1',steps:[S('5x + 5','Ausgangsterm'),S('[[5]]*x + [[5]]*1','Das zweite Glied wird ganz ausgeklammert, es bleibt eine 1'),S('5(x + 1)','Ausklammern')]}],
+ vis:vis6,gen:gen6},
+{short:'Zwei Klammern',title:'Produkt aus zwei Klammern',
+ intro:'Werden zwei Summen miteinander multipliziert, muss jedes Glied der ersten Klammer mit jedem Glied der zweiten Klammer multipliziert werden.',
+ merke:'$(a + b)(c + d) = ac + ad + bc + bd$<br><b>Jedes mit jedem!</b> Bei zwei Gliedern pro Klammer entstehen immer vier Produkte. Danach gleichartige Glieder zusammenfassen.',
+ trap:'Es sind immer vier Produkte: $(x + 3)(x + 2) ≠ x^2 + 6$. Die beiden mittleren Glieder werden oft vergessen.',
+ examples:[
+  {label:'Beispiel 1',arcs:{t:['(','x','+','3',')','(','x','+','2',')'],a:[[1,6,1,'a',1],[1,8,2,'a',2],[3,6,1,'b',3],[3,8,2,'b',4]]},steps:[S('(x + 3)(x + 2)','Ausgangsterm'),S('x*x + x*2 + 3*x + 3*2','Jedes Glied der ersten Klammer mit jedem Glied der zweiten (Bögen 1 bis 4)'),S('x^2 + 2x + 3x + 6','Die vier Produkte ausrechnen'),S('x^2 + 5x + 6','Gleichartige Glieder zusammenfassen')]},
+  {label:'Beispiel 2',arcs:{t:['(','2a','-','1',')','(','a','+','4',')'],a:[[1,6,1,'a',1],[1,8,2,'a',2],[3,6,1,'b',3],[3,8,2,'b',4]]},steps:[S('(2a - 1)(a + 4)','Ausgangsterm'),S('2a*a + 2a*4 - 1*a - 1*4','Das Minus gehört zur 1 und wird mitgenommen'),S('2a^2 + 8a - a - 4','Ausrechnen'),S('2a^2 + 7a - 4','$8a - a = 7a$')]},
+  {label:'Beispiel 3',arcs:{t:['(','x','-','5',')','(','y','+','2',')'],a:[[1,6,1,'a',1],[1,8,2,'a',2],[3,6,1,'b',3],[3,8,2,'b',4]]},steps:[S('(x - 5)(y + 2)','Ausgangsterm'),S('x*y + x*2 - 5*y - 5*2','Jedes mit jedem'),S('xy + 2x - 5y - 10','Keine gleichartigen Glieder, fertig')]}],
+ vis:vis7,gen:gen7},
+{short:'Binomische Formeln',title:'Binomische Formeln',
+ intro:'Drei Produkte aus zwei Klammern kommen so oft vor, dass man sich ihr Ergebnis merkt. Es sind Sonderfälle von Reiter 7.',
+ merke:'<ol><li>$(a + b)^2 = a^2 + 2ab + b^2$</li><li>$(a - b)^2 = a^2 - 2ab + b^2$</li><li>$(a + b)(a - b) = a^2 - b^2$</li></ol>',
+ trap:'$(a + b)^2 ≠ a^2 + b^2$. Das doppelte Produkt $2ab$ wird oft vergessen. Und bei $(2x)^2$ wird auch die Zahl quadriert: $(2x)^2 = 4x^2$.',
+ examples:[
+  {label:'1. Formel',steps:[S('(x + 3)^2','Ausgangsterm'),S('x^2 + 2*x*3 + 3^2','1. binomische Formel mit $a = x$ und $b = 3$'),S('x^2 + 6x + 9','Ausrechnen')]},
+  {label:'2. Formel',steps:[S('(2x - 5)^2','Ausgangsterm'),S('(2x)^2 - 2*2x*5 + 5^2','2. binomische Formel mit $a = 2x$ und $b = 5$'),S('4x^2 - 20x + 25','Achtung: $(2x)^2 = 4x^2$')]},
+  {label:'3. Formel',steps:[S('(x + 4)(x - 4)','Ausgangsterm'),S('x^2 - 4^2','3. binomische Formel mit $a = x$ und $b = 4$'),S('x^2 - 16','Ausrechnen')]},
+  {label:'Kopfrechnen',steps:[S('21^2','Ausgangsterm'),S('(20 + 1)^2','In eine bequeme Summe zerlegen'),S('20^2 + 2*20*1 + 1^2','1. binomische Formel'),S('400 + 40 + 1 = 441','Binomische Formeln helfen auch beim Kopfrechnen')]}],
+ vis:vis8,gen:gen8},
+{short:'Faktorisieren',title:'Faktorisieren',
+ intro:'Faktorisieren heißt: Eine Summe wird in ein Produkt verwandelt. Dafür gibt es zwei Werkzeuge, das Ausklammern (Reiter 6) und die binomischen Formeln rückwärts (Reiter 8).',
+ merke:'Zuerst immer prüfen, ob man ausklammern kann. Danach nach binomischen Formeln suchen:<br>$a^2 + 2ab + b^2 = (a + b)^2$<br>$a^2 - 2ab + b^2 = (a - b)^2$<br>$a^2 - b^2 = (a + b)(a - b)$',
+ trap:'Immer zuerst nach einem gemeinsamen Faktor suchen. Und: Eine Summe wie $x^2 + 25$ lässt sich <b>nicht</b> mit der 3. binomischen Formel zerlegen, dafür braucht man ein Minus.',
+ examples:[
+  {label:'Ausklammern',steps:[S('5x^2 - 20x','Ausgangsterm'),S('[[5x]]*x - [[5x]]*4','Frage 1: gemeinsamer Faktor? Ja, $5x$',1),S('5x(x - 4)','Ausklammern, fertig',1)]},
+  {label:'3. Formel',steps:[S('x^2 - 49','Ausgangsterm'),S('x^2 - 7^2','Frage 1: kein gemeinsamer Faktor. Frage 2: Differenz zweier Quadrate? Ja',2),S('(x + 7)(x - 7)','3. binomische Formel rückwärts',2)]},
+  {label:'1. Formel',steps:[S('x^2 + 10x + 25','Ausgangsterm'),S('x^2 + 2*x*5 + 5^2','Frage 3: $x^2$ und $25 = 5^2$ sind Quadrate, und $2 * x * 5 = 10x$ passt',3),S('(x + 5)^2','1. binomische Formel rückwärts',3)]},
+  {label:'Kombiniert',steps:[S('3x^2 - 12x + 12','Ausgangsterm'),S('3(x^2 - 4x + 4)','Frage 1: gemeinsamen Faktor 3 ausklammern',1),S('3(x^2 - 2*x*2 + 2^2)','Frage 3: In der Klammer steht eine 2. binomische Formel',3),S('3(x - 2)^2','Vollständig faktorisiert',3)]}],
+ vis:vis9,gen:gen9}
+];
+
+/* ---------- Aufbau ---------- */
+function buildPanel(t,k,panel){
+  const p='t'+k;
+  panel.innerHTML=`
+  <div class="lead">
+    <div class="intro"><p class="eyebrow">Reiter ${k} von 9</p><h2>${t.title}</h2><p>${T(t.intro)}</p></div>
+    <aside class="merke"><h3>Merke</h3><div>${T(t.merke)}</div></aside>
+  </div>
+  <div class="grid2">
+    <article class="card ex">
+      <div class="ch"><h3>Beispiel</h3><div class="chips">${t.examples.map((e,j)=>`<button class="chipb${j?'':' on'}" data-e="${j}" aria-pressed="${!j}">${e.label}</button>`).join('')}</div></div>
+      <div class="arcwrap"></div>
+      <div class="steps" aria-live="polite"></div>
+      <div class="row"><button class="btn" data-a="prev">Zurück</button><button class="btn pri" data-a="next">Nächster Schritt →</button><button class="btn ghost" data-a="reset">Zurücksetzen</button><span class="cnt"></span></div>
+    </article>
+    <article class="card vis"><div class="ch"><h3>Anschauung</h3></div><div class="vb"></div></article>
+  </div>
+  <div class="grid2 b">
+    <article class="card prac">
+      <div class="ch"><h3>Selbst ausprobieren</h3></div>
+      <p class="task"></p>
+      <div class="steps" aria-live="polite"></div>
+      <div class="row"><button class="btn pri" data-a="next">Nächster Lösungsschritt</button><button class="btn" data-a="all">Ganze Lösung</button><button class="btn ghost" data-a="new">Neue Aufgabe</button></div>
+    </article>
+    <article class="card trap"><h3><span class="bang">!</span>Achtung, Fehlerfalle!</h3><div>${T(t.trap)}</div></article>
+  </div>`;
+  t.vis(panel.querySelector('.vb'),t,p);
+  const setQ=s=>t.setQ&&t.setQ(s&&s.q||0);
+  const ex=panel.querySelector('.ex'),st=makeStepper(ex,{start:1,onStep:setQ}),aw=ex.querySelector('.arcwrap');
+  function loadEx(j){ex.querySelectorAll('[data-e]').forEach(b=>{const on=+b.dataset.e===j;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});const e=t.examples[j];aw.innerHTML=e.arcs?arcFig(e.arcs.t,e.arcs.a):'';aw.hidden=!e.arcs;st.load(e.steps)}
+  ex.addEventListener('click',ev=>{const b=ev.target.closest('button');if(!b)return;if(b.dataset.e!==undefined)loadEx(+b.dataset.e);const a=b.dataset.a;if(a&&st[a])st[a]()});
+  const pr=panel.querySelector('.prac'),ps=makeStepper(pr,{start:0,onStep:s=>s&&setQ(s)});
+  function newTask(){const g=t.gen();pr.querySelector('.task').innerHTML=T(g.task);ps.load(g.steps)}
+  pr.addEventListener('click',ev=>{const a=ev.target.closest('[data-a]')?.dataset.a;if(a==='new')newTask();else if(a&&ps[a])ps[a]()});
+  loadEx(0);newTask();
+  panel._st=st;
+}
+
+function init(){
+  const nav=document.querySelector('.tabs'),main=document.querySelector('main');let cur=0;
+  nav.innerHTML=TABS.map((t,i)=>`<button role="tab" class="tb" id="tb-${i+1}" aria-controls="p-${i+1}" aria-selected="false"><span class="tn">${i+1}</span><span class="tl">${t.short}</span></button>`).join('');
+  main.innerHTML=TABS.map((t,i)=>`<section role="tabpanel" id="p-${i+1}" aria-labelledby="tb-${i+1}" hidden></section>`).join('');
+  function show(k,push=true){if(k<1||k>9)return;cur=k;
+    TABS.forEach((t,i)=>{const on=i+1===k,b=document.getElementById('tb-'+(i+1)),pn=document.getElementById('p-'+(i+1));b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1;pn.hidden=!on;if(on&&!pn.dataset.built){buildPanel(t,k,pn);pn.dataset.built=1}});
+    document.getElementById('tb-'+k).scrollIntoView({block:'nearest',inline:'nearest'});
+    if(push&&location.hash!=='#reiter-'+k)history.replaceState(null,'','#reiter-'+k)}
+  nav.addEventListener('click',e=>{const b=e.target.closest('.tb');if(b)show(+b.id.slice(3))});
+  const fromHash=()=>{const m=/^#reiter-([1-9])$/.exec(location.hash);return m?+m[1]:1};
+  window.addEventListener('hashchange',()=>show(fromHash(),false));
+  show(fromHash(),false);
+  document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey||e.target.matches('input,textarea'))return;
+    const st=document.getElementById('p-'+cur)._st;
+    if(e.key==='ArrowRight'&&!e.target.closest('.tabs')){st&&st.next();e.preventDefault()}
+    else if(e.key==='ArrowLeft'&&!e.target.closest('.tabs')){st&&st.prev();e.preventDefault()}
+    else if(/^[1-9]$/.test(e.key))show(+e.key)});
+  const scales=[.8,.9,1,1.12,1.25,1.4,1.6];let si=2;
+  try{const v=+localStorage.getItem('tw-scale');if(v>=0&&v<scales.length)si=v}catch(_){}
+  const applyScale=()=>{document.documentElement.style.fontSize=(18*scales[si])+'px';try{localStorage.setItem('tw-scale',si)}catch(_){}};applyScale();
+  document.getElementById('fsm').onclick=()=>{if(si>0){si--;applyScale()}};
+  document.getElementById('fsp').onclick=()=>{if(si<scales.length-1){si++;applyScale()}};
+  const root=document.documentElement,tb=document.getElementById('theme');
+  const isDark=()=>root.dataset.theme?root.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+  const setTheme=m=>{root.dataset.theme=m;tb.textContent=m==='dark'?'Hell':'Dunkel';tb.title=m==='dark'?'Zum hellen Modus wechseln':'Zum dunklen Modus wechseln'};
+  try{const s=localStorage.getItem('tw-theme');if(s==='dark'||s==='light')setTheme(s);else setTheme(isDark()?'dark':'light')}catch(_){setTheme(isDark()?'dark':'light')}
+  tb.onclick=()=>{const m=isDark()?'light':'dark';setTheme(m);try{localStorage.setItem('tw-theme',m)}catch(_){}};
+  const fb=document.getElementById('full');
+  if(!document.documentElement.requestFullscreen)fb.hidden=true;
+  fb.onclick=()=>{try{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen().catch(()=>{})}catch(_){}};
+  document.addEventListener('fullscreenchange',()=>fb.textContent=document.fullscreenElement?'Vollbild beenden':'Vollbild');
+}
+if(typeof window!=='undefined')init();
+</script>
+
+</body></html>
