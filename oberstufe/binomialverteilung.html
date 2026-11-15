@@ -64,9 +64,17 @@ svg text{font-family:var(--mono);fill:var(--muted);font-size:14.5px}
 @media (max-width:860px){.lower{grid-template-columns:1fr}}
 .formula{overflow-x:auto;padding:4px 0}
 .formula .katex{font-size:1.3em}
+@media (max-width:600px){.formula .katex{font-size:1.02em}}
 .formula .katex-display{margin:.4em 0;text-align:left}
 .formula .katex-display>.katex{text-align:left}
 .formula .gen{color:var(--muted)}
+.notation{display:inline-flex;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:2px 0 6px}
+.notation[hidden]{display:none}
+.notation button{border:0;background:transparent;color:var(--muted);padding:5px 12px;font-size:.9rem;font-weight:600;cursor:pointer}
+.notation button+button{border-left:1px solid var(--line)}
+.notation button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.calchint{font-size:.88rem;color:var(--muted);margin:6px 0 0}
+.calchint[hidden]{display:none}
 .result{font-family:var(--mono);font-size:1.35rem;font-weight:600;color:var(--hit);margin-top:6px}
 .kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-family:var(--mono);font-variant-numeric:tabular-nums}
 .kv dt{font-family:var(--display);font-style:italic}
@@ -143,9 +151,14 @@ tr.on td{background:var(--hit-soft)}
   <div class="lower">
     <section class="panel" aria-label="Formel">
       <p class="eyebrow" id="fTitle">Formel von Bernoulli</p>
+      <div class="notation" id="notation" role="group" aria-label="Schreibweise" hidden>
+        <button type="button" data-not="sum" aria-pressed="true">Summenformel</button>
+        <button type="button" data-not="F" aria-pressed="false">F(n; p; k)</button>
+      </div>
       <div class="formula gen" id="fGen"></div>
       <div class="formula" id="fNum"></div>
       <div class="result" id="res"></div>
+      <p class="calchint" id="calcHint" hidden>Im Taschenrechner über die kumulierte Binomialverteilung (je nach Modell z.&nbsp;B. „Binomial-KD“ oder „binomcdf“) mit n, p und k als Obergrenze. Das funktioniert auch für große n.</p>
     </section>
     <section class="panel" aria-label="Kenngrößen">
       <p class="eyebrow">Kenngrößen</p>
@@ -188,7 +201,7 @@ const de=(x,d)=>x.toFixed(d).replace(".",",");
 const tde=(x,d)=>x.toFixed(d).replace(".","{,}");
 const fmtP=x=>{const s=x.toFixed(2).replace(/0+$/,"").replace(/\.$/,"");return s.replace(".","{,}")};
 
-const S={n:20,p:0.3,k:6,a:4,b:8,mode:"eq",fix:false,ymax:null,sig:true};
+const S={n:20,p:0.3,k:6,a:4,b:8,mode:"eq",fix:false,ymax:null,sig:true,not:"sum"};
 
 function link(r,num,key,isP){
   const set=v=>{
@@ -203,6 +216,7 @@ function link(r,num,key,isP){
 link($("nR"),$("nN"),"n");link($("pR"),$("pN"),"p",true);
 link($("kR"),$("kN"),"k");link($("aR"),$("aN"),"a");link($("bR"),$("bN"),"b");
 $("mode").addEventListener("change",e=>{S.mode=e.target.value;render()});
+document.querySelectorAll("#notation button").forEach(b=>b.addEventListener("click",()=>{S.not=b.dataset.not;document.querySelectorAll("#notation button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));render()}));
 $("fix").addEventListener("change",e=>{S.fix=e.target.checked;S.ymax=null;render()});
 $("sig").addEventListener("change",e=>{S.sig=e.target.checked;render()});
 
@@ -281,6 +295,9 @@ function drawCdf(F){
   el("line",{x1:L,x2:W-R,y1:H-B,y2:H-B,stroke:"var(--muted)"},svg);
 }
 
+/* Rechenkette untereinander setzen: jedes weitere Gleichheitszeichen (außerhalb von Klammern) beginnt eine neue Zeile */
+function al(s){if(s.startsWith("\\begin"))return s;let d=0,parts=[],cur="";for(const ch of s){if(ch==="{")d++;if(ch==="}")d--;if(ch==="="&&d===0){parts.push(cur);cur="";}else cur+=ch;}parts.push(cur);
+  if(parts.length<3)return s;return "\\begin{aligned}"+parts[0]+"&="+parts.slice(1).join("\\\\[2pt]&=")+"\\end{aligned}";}
 function tex(id,s){try{katex.render(s,$(id),{throwOnError:false,displayMode:true})}catch(e){$(id).textContent=s}}
 
 function render(){
@@ -311,8 +328,18 @@ function render(){
       num=`P(X> ${k})=1-P(X\\le ${k})=1-${de(cum(0,k),4).replace(",","{,}")}`}
     if(mode==="ab"){gen=`P(a\\le X\\le b)=P(X\\le b)-P(X\\le a-1)=\\sum_{i=a}^{b}${gTerm}`;val=cum(a,b);lbl=`P(${a} ≤ X ≤ ${b})`;
       num=a===0?`P(0\\le X\\le ${b})=P(X\\le ${b})=${sumT(0,b)}`:`P(${a}\\le X\\le ${b})=P(X\\le ${b})-P(X\\le ${a-1})=${tde(cum(0,b),4)}-${tde(cum(0,a-1),4)}`}
+    if(S.not==="F"){
+      /* Schreibweise mit der kumulierten Verteilungsfunktion F(n; p; k), wie im Taschenrechner und im Abitur */
+      const Fg=x=>`F(n;\\,p;\\,${x})`, Fn=x=>`F(${n};\\,${ps};\\,${x})`;
+      if(mode==="le"){gen=`P(X\\le k)=${Fg("k")}`;num=`P(X\\le ${k})=${Fn(k)}`}
+      if(mode==="lt"){gen=`P(X< k)=P(X\\le k-1)=${Fg("k-1")}`;num=`P(X<${k})=P(X\\le ${k-1})=${Fn(k-1)}`}
+      if(mode==="ge"){gen=`P(X\\ge k)=1-P(X\\le k-1)=1-${Fg("k-1")}`;num=k===0?`P(X\\ge 0)=1`:`P(X\\ge ${k})=1-${Fn(k-1)}=1-${tde(cum(0,k-1),4)}`}
+      if(mode==="gt"){gen=`P(X> k)=1-P(X\\le k)=1-${Fg("k")}`;num=`P(X> ${k})=1-${Fn(k)}=1-${tde(cum(0,k),4)}`}
+      if(mode==="ab"){gen=`\\begin{aligned}P(a\\le X\\le b)&=${Fg("b")}\\\\[2pt]&\\quad-${Fg("a-1")}\\end{aligned}`;num=a===0?`P(0\\le X\\le ${b})=${Fn(b)}`:`\\begin{aligned}P(${a}\\le X\\le ${b})&=${Fn(b)}\\\\[2pt]&\\quad-${Fn(a-1)}\\\\[2pt]&=${tde(cum(0,b),4)}-${tde(cum(0,a-1),4)}\\end{aligned}`}
+    }
   }
-  tex("fGen",gen);tex("fNum",num);
+  $("notation").hidden=mode==="eq";$("calcHint").hidden=mode==="eq"||S.not!=="F";
+  tex("fGen",al(gen));tex("fNum",al(num));
   $("res").textContent=`${lbl} ≈ ${de(val,4)} = ${de(val*100,2)} %`;
 
   const mu=n*p,v=n*p*q,sd=Math.sqrt(v);

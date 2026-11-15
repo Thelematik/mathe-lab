@@ -80,7 +80,9 @@ select{font-family:var(--font-body)}
 .toggle input{width:18px;height:18px;accent-color:var(--curve)}
 .state{display:inline-flex;align-items:center;gap:6px;font:600 .85rem var(--font-body);padding:3px 10px;border-radius:999px;border:1px solid currentColor}
 .state.ok{color:var(--good)} .state.no{color:var(--reject)}
-.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:.95rem;margin:0}
+.kv{display:grid;grid-template-columns:minmax(0,1fr);gap:2px;font-size:.95rem;margin:0}
+.kv dt:not(:first-child){margin-top:8px}
+.kv dd{white-space:nowrap;overflow-x:auto}
 .kv dt{color:var(--muted)} .kv dd{margin:0;font-family:var(--font-mono);font-variant-numeric:tabular-nums}
 .result{font:600 1.4rem var(--font-mono);font-variant-numeric:tabular-nums;margin:2px 0;overflow-wrap:anywhere}
 .result small{display:block;font:400 .9rem var(--font-body);color:var(--muted)}
