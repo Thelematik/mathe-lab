@@ -136,6 +136,20 @@ code,kbd,samp,pre{font-family:"Source Code Pro", ui-monospace, monospace}
     color: var(--ink-soft);
   }
   footer a { color: var(--ink); }
+
+/* Zeilenumbrüche und Filter auf kleinen Bildschirmen */
+h1, h2, h3, .card h3 { text-wrap: balance; }
+p { text-wrap: pretty; }
+.row { position: relative; padding-left: 6rem; }
+.row-label { position: absolute; left: 0; top: .5rem; min-width: 0; margin: 0; }
+@media (max-width: 640px) {
+  header { padding-left: 1.1rem; padding-right: 1.1rem; }
+  header h1 { font-size: clamp(1.6rem, 7.5vw, 2.2rem); }
+  .row { padding-left: 0; }
+  .row-label { position: static; flex-basis: 100%; margin-bottom: .1rem; }
+  .chip { padding: .3rem .75rem; font-size: .88rem; }
+  .search { font-size: .95rem; }
+}
 </style>
 </head>
 <body>
