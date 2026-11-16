@@ -22,6 +22,19 @@ code,kbd,samp,pre{font-family:"Source Code Pro", ui-monospace, monospace}
     --bg:#f6f5f1; --panel:#ffffff; --text:#1f2933; --muted:#5f6b7a;
     --line:#d9dde3; --accent:#2563eb; --accent-soft:#dbe7fd;
     --k:#e8590c; --k-soft:#fde8dc; --theory:#1e3a8a;
+    --btn:#f3f5f8; --btn-hover:#e8ecf2; --formula:#f7f9fc; --bar:#93b8f7; --on-accent:#ffffff;
+  }
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){color-scheme:dark;
+    --bg:#0f1418; --panel:#171e24; --text:#e5e9ee; --muted:#9aa6b2;
+    --line:#2c3640; --accent:#6ea0f5; --accent-soft:#1d2a40;
+    --k:#f08a4b; --k-soft:#3a2416; --theory:#a5b4fc;
+    --btn:#212a33; --btn-hover:#2a3540; --formula:#1c242c; --bar:#3b5f99; --on-accent:#0f1418;
+  }}
+  :root[data-theme="dark"]{color-scheme:dark;
+    --bg:#0f1418; --panel:#171e24; --text:#e5e9ee; --muted:#9aa6b2;
+    --line:#2c3640; --accent:#6ea0f5; --accent-soft:#1d2a40;
+    --k:#f08a4b; --k-soft:#3a2416; --theory:#a5b4fc;
+    --btn:#212a33; --btn-hover:#2a3540; --formula:#1c242c; --bar:#3b5f99; --on-accent:#0f1418;
   }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%}
@@ -38,6 +51,7 @@ code,kbd,samp,pre{font-family:"Source Code Pro", ui-monospace, monospace}
   header .links{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:6px;font-size:.92rem}
   header .links a{color:var(--accent);font-weight:600;text-decoration:none}
   header .links a:hover{text-decoration:underline}
+  header .links .themebtn{order:9;margin-left:auto;padding:4px 12px;font-size:.88rem}
   main{
     display:grid; grid-template-columns:minmax(0,1fr) 380px;
     gap:16px; padding:8px 16px 16px; min-height:0;
@@ -64,17 +78,17 @@ code,kbd,samp,pre{font-family:"Source Code Pro", ui-monospace, monospace}
   .buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   button{
     font:inherit;font-size:.95rem;padding:8px 10px;border-radius:9px;cursor:pointer;
-    border:1px solid var(--line);background:#f3f5f8;color:var(--text);
+    border:1px solid var(--line);background:var(--btn);color:var(--text);
   }
-  button:hover{background:#e8ecf2}
-  button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  button:hover{background:var(--btn-hover)}
+  button.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
   button.primary:hover{background:#1d4fd0}
-  button.kbtn{background:var(--k);color:#fff;border-color:var(--k);grid-column:1/-1}
+  button.kbtn{background:var(--k);color:var(--on-accent);border-color:var(--k);grid-column:1/-1}
   button.kbtn:hover{background:#cf4f0a}
   .check{display:flex;align-items:center;gap:8px;margin-top:10px;cursor:pointer}
   .check input{width:18px;height:18px;accent-color:var(--accent)}
   .formula{
-    background:#f7f9fc;border:1px solid var(--line);border-radius:10px;
+    background:var(--formula);border:1px solid var(--line);border-radius:10px;
     padding:10px 8px;margin:6px 0;overflow-x:auto;text-align:center;font-size:.95rem
   }
   .hiddenNote{background:#f7f9fc;border:1px dashed var(--line);border-radius:10px;padding:10px 12px;color:var(--muted);font-size:.92rem}
@@ -101,7 +115,7 @@ code,kbd,samp,pre{font-family:"Source Code Pro", ui-monospace, monospace}
 <header>
   <h1>Galton-Brett: Bernoulli-Kette und Binomialverteilung</h1>
   <p>An jedem Nagel wird die Kugel mit Wahrscheinlichkeit p nach rechts und mit 1&minus;p nach links abgelenkt. Sie landet in Fach k, wenn sie genau k-mal nach rechts fällt.</p>
-  <p class="links"><a href="../">‹ Zur Übersicht</a><a href="arbeitsblaetter/galton-bernoulli.pdf" target="_blank" rel="noopener">Arbeitsblatt „Vom Galton-Brett zur Formel von Bernoulli“ (PDF)</a><a href="galton-brett.html">Zurück zu Simulation 1: Binomialkoeffizient</a></p>
+  <p class="links"><button type="button" id="themeBtn" class="themebtn">Dunkel</button><a href="../">‹ Zur Übersicht</a><a href="arbeitsblaetter/galton-bernoulli.pdf" target="_blank" rel="noopener">Arbeitsblatt „Vom Galton-Brett zur Formel von Bernoulli“ (PDF)</a><a href="galton-brett.html">Zurück zu Simulation 1: Binomialkoeffizient</a></p>
 </header>
 <main>
   <div class="stage" id="stage"><canvas id="board"></canvas></div>
@@ -157,7 +171,7 @@ code,kbd,samp,pre{font-family:"Source Code Pro", ui-monospace, monospace}
       <tr><td>theoretische Wahrscheinlichkeit</td><td id="stTheo">0</td></tr>
     </table>
     <div class="legend">
-      <span><i class="sw" style="background:#93b8f7"></i>relative Häufigkeit</span>
+      <span><i class="sw" style="background:var(--bar)"></i>relative Häufigkeit</span>
       <span><i class="sw" style="background:var(--theory);border-radius:50%"></i>theoretische Wahrscheinlichkeit</span>
     </div>
   </aside>
@@ -169,10 +183,21 @@ code,kbd,samp,pre{font-family:"Source Code Pro", ui-monospace, monospace}
   const cvs = $('board'), ctx = cvs.getContext('2d');
   let cw = 0, ch = 0, dpr = 1;
 
-  const COL = {
+  const COL = {};
+  /* Farben für helles und dunkles Design; gewählt wird nach dem aktuellen Farbschema */
+  const COL_LIGHT = {
     peg:'#475569', ball:'#2563eb', ballEdge:'#1e40af', k:'#e8590c', kSoft:'rgba(232,89,12,0.10)',
-    bar:'#93b8f7', barK:'#f4a26f', theory:'#1e3a8a', line:'#cfd5dd', text:'#1f2933', muted:'#6b7684'
+    bar:'#93b8f7', barK:'#f4a26f', theory:'#1e3a8a', line:'#cfd5dd', text:'#1f2933', muted:'#6b7684',
+    funnel:'#e5e9ef', badge:'#eef3fb', badgeLine:'#9fb2cc', theoryLine:'rgba(30,58,138,0.55)', pLab:'#0f766e'
   };
+  const COL_DARK = {
+    peg:'#94a3b8', ball:'#60a5fa', ballEdge:'#bfdbfe', k:'#f08a4b', kSoft:'rgba(240,138,75,0.16)',
+    bar:'#3b5f99', barK:'#b4673a', theory:'#a5b4fc', line:'#334155', text:'#e5e9ee', muted:'#9aa6b2',
+    funnel:'#283241', badge:'#1e293b', badgeLine:'#475569', theoryLine:'rgba(165,180,252,0.7)', pLab:'#5eead4'
+  };
+  function setCols(){const r=document.documentElement,t=r.getAttribute('data-theme');const d=t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches;Object.assign(COL,d?COL_DARK:COL_LIGHT);}
+  setCols();
+  document.addEventListener('themechange',setCols);
 
   const S = {
     n: 6, k: 3, p: 0.5, speed: 3, showF: false,
@@ -356,7 +381,7 @@ code,kbd,samp,pre{font-family:"Source Code Pro", ui-monospace, monospace}
         const txt = String(binom(r, j));
         ctx.font = `600 ${g.fs}px "Source Sans 3",system-ui,sans-serif`;
         const w = Math.max(ctx.measureText(txt).width + g.fs * 0.6, g.fs * 1.35), h = g.fs * 1.35;
-        ctx.fillStyle = '#eef3fb'; ctx.strokeStyle = '#9fb2cc'; ctx.lineWidth = 1;
+        ctx.fillStyle = COL.badge; ctx.strokeStyle = COL.badgeLine; ctx.lineWidth = 1;
         roundRect(x - w / 2, y - h / 2, w, h, h / 2); ctx.fill(); ctx.stroke();
         ctx.fillStyle = COL.theory; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         ctx.fillText(txt, x, y + 1);
@@ -391,7 +416,7 @@ code,kbd,samp,pre{font-family:"Source Code Pro", ui-monospace, monospace}
     // Theorie
     const pts = [];
     for (let i = 0; i <= n; i++) pts.push([g.bx(i), g.binsBottom - prob(n, i) / hs.maxV * hs.histH]);
-    ctx.strokeStyle = 'rgba(30,58,138,0.55)'; ctx.lineWidth = 2; ctx.setLineDash([6, 5]);
+    ctx.strokeStyle = COL.theoryLine; ctx.lineWidth = 2; ctx.setLineDash([6, 5]);
     ctx.beginPath(); pts.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.stroke();
     ctx.setLineDash([]);
     pts.forEach(([x, y], i) => {
@@ -427,7 +452,7 @@ code,kbd,samp,pre{font-family:"Source Code Pro", ui-monospace, monospace}
     const f = Math.max(12, Math.min(g.dx * 0.26, 18));
     ctx.font = `600 ${f}px "Source Sans 3",system-ui,sans-serif`;
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#0f766e';
+    ctx.fillStyle = COL.pLab;
     ctx.textAlign = 'left';
     ctx.fillText(`p = ${fmt(S.p, 2)}  ↘`, x + g.dx * 0.45, y - g.dy * 0.35);
     ctx.textAlign = 'right';
@@ -454,7 +479,7 @@ code,kbd,samp,pre{font-family:"Source Code Pro", ui-monospace, monospace}
     ctx.clearRect(0, 0, cw, ch);
     const g = geo(), hs = histScale(g);
     // Einfülltrichter
-    ctx.fillStyle = '#e5e9ef';
+    ctx.fillStyle = COL.funnel;
     ctx.beginPath();
     ctx.moveTo(g.px(0, 0) - g.dx * 0.5, g.startY - g.dy * 0.35);
     ctx.lineTo(g.px(0, 0) + g.dx * 0.5, g.startY - g.dy * 0.35);
@@ -578,6 +603,15 @@ code,kbd,samp,pre{font-family:"Source Code Pro", ui-monospace, monospace}
   window.addEventListener('load', renderFormulas);
   requestAnimationFrame(loop);
 })();
+</script>
+<script>/* Farbschema: folgt der Systemeinstellung, eine Umschaltung wird gemerkt */
+(function(){var root=document.documentElement,KEY='galton-theme',mq=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null,btn=document.getElementById('themeBtn');
+function isDark(){var t=root.getAttribute('data-theme');return t?t==='dark':!!(mq&&mq.matches);}
+function label(){if(!btn)return;var d=isDark();btn.textContent=d?'Hell':'Dunkel';btn.setAttribute('aria-pressed',String(d));btn.title=d?'Zum hellen Design wechseln':'Zum dunklen Design wechseln';}
+function changed(){label();try{document.dispatchEvent(new Event('themechange'));}catch(e){}}
+try{var s=localStorage.getItem(KEY);if(s==='light'||s==='dark')root.setAttribute('data-theme',s);}catch(e){}
+if(btn)btn.addEventListener('click',function(){var n=isDark()?'light':'dark';root.setAttribute('data-theme',n);try{localStorage.setItem(KEY,n);}catch(e){}changed();});
+if(mq&&mq.addEventListener)mq.addEventListener('change',changed);label();})();
 </script>
 </body>
 </html>

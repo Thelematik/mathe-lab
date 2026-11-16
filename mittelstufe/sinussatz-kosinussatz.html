@@ -27,14 +27,25 @@ window.MathJax = {
   :root{
     --ink:#1f2937; --muted:#6b7280; --bg:#f8fafc; --card:#ffffff; --line:#e5e7eb;
     --blue:#1d4ed8; --orange:#c2410c; --green:#15803d; --violet:#7c3aed;
+    --gray:#9ca3af; --btn:#ffffff; --on-ink:#ffffff; --note:#fff7ed; --box:#eff6ff; --violet-soft:#f5f3ff; --violet-ink:#5b21b6;
+  }
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){color-scheme:dark;
+    --ink:#e5e7eb; --muted:#9ca3af; --bg:#0f141b; --card:#171d26; --line:#2b3442;
+    --blue:#7aa2f7; --orange:#f0965a; --green:#5cc58a; --violet:#b49cf5;
+    --gray:#6b7280; --btn:#1f2631; --on-ink:#0f141b; --note:#33241a; --box:#17233a; --violet-soft:#251f3a; --violet-ink:#cbb8fa;
+  }}
+  :root[data-theme="dark"]{color-scheme:dark;
+    --ink:#e5e7eb; --muted:#9ca3af; --bg:#0f141b; --card:#171d26; --line:#2b3442;
+    --blue:#7aa2f7; --orange:#f0965a; --green:#5cc58a; --violet:#b49cf5;
+    --gray:#6b7280; --btn:#1f2631; --on-ink:#0f141b; --note:#33241a; --box:#17233a; --violet-soft:#251f3a; --violet-ink:#cbb8fa;
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:"Source Sans 3", system-ui, sans-serif;background:var(--bg);color:var(--ink);font-size:20px}
   header{display:flex;align-items:center;gap:16px;padding:14px 22px;background:var(--card);border-bottom:1px solid var(--line);flex-wrap:wrap}
   header h1{font-size:23px;margin:0 12px 0 0}
   .tabs{display:flex;gap:6px}
-  .tabs button,.presets button,.nav button{font:inherit;font-size:18px;border:1px solid var(--line);background:#fff;padding:8px 16px;border-radius:10px;cursor:pointer;color:var(--ink)}
-  .tabs button.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .tabs button,.presets button,.nav button,.themebtn{font:inherit;font-size:18px;border:1px solid var(--line);background:var(--btn);padding:8px 16px;border-radius:10px;cursor:pointer;color:var(--ink)}
+  .tabs button.active{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
   .presets{display:flex;gap:6px;margin-left:auto;align-items:center;flex-wrap:wrap}
   .presets span{color:var(--muted);font-size:17px;margin-right:4px}
   main{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(360px,1fr);gap:18px;padding:18px 22px}
@@ -52,10 +63,10 @@ window.MathJax = {
   #title{font-size:26px;margin:4px 0 12px}
   #text{line-height:1.5;flex:1}
   #text p{margin:0 0 12px}
-  .note{background:#fff7ed;border-left:4px solid var(--orange);padding:10px 14px;border-radius:6px;margin:10px 0;font-size:18px}
-  .box{background:#eff6ff;border:2px solid var(--blue);padding:8px 14px;border-radius:10px;margin:10px 0}
+  .note{background:var(--note);border-left:4px solid var(--orange);padding:10px 14px;border-radius:6px;margin:10px 0;font-size:18px}
+  .box{background:var(--box);border:2px solid var(--blue);padding:8px 14px;border-radius:10px;margin:10px 0}
   .nav{display:flex;gap:10px;margin-top:14px;align-items:center}
-  .nav button.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+  .nav button.primary{background:var(--blue);color:var(--on-ink);border-color:var(--blue)}
   .nav button:disabled{opacity:.4;cursor:default}
   .dots{display:flex;gap:6px;margin-left:auto}
   .dots i{width:10px;height:10px;border-radius:50%;background:var(--line);display:block}
@@ -83,6 +94,7 @@ window.MathJax = {
     <button data-p="alpha">α stumpf</button>
     <button data-p="beta">β stumpf</button>
   </div>
+  <button class="themebtn" id="themeBtn" type="button">Dunkel</button>
 </header>
 <main>
   <section class="card" id="stage">
@@ -114,7 +126,10 @@ window.MathJax = {
 <script>
 const S = 60; // Pixel pro cm
 const W = 800, H = 560;
-const COL = { ink:'#1f2937', gray:'#9ca3af', blue:'#1d4ed8', orange:'#c2410c', green:'#15803d', violet:'#7c3aed' };
+/* Farben kommen aus den CSS-Variablen, damit sie zum hellen oder dunklen Design passen */
+const COL = { ink:'#1f2937', gray:'#9ca3af', blue:'#1d4ed8', orange:'#c2410c', green:'#15803d', violet:'#7c3aed', card:'#ffffff' };
+function readCols(){const c=getComputedStyle(document.documentElement);for(const k of Object.keys(COL)){const v=c.getPropertyValue('--'+k).trim();if(v)COL[k]=v;}}
+readCols();
 const PRESETS = {
   spitz: { A:{x:170,y:440}, B:{x:640,y:440}, C:{x:420,y:130} },
   alpha: { A:{x:300,y:440}, B:{x:700,y:440}, C:{x:150,y:200} },
@@ -183,7 +198,7 @@ const STEPS = {
     { t:'Ergebnis: der Kosinussatz', cfg:{side:{a:'violet',b:'violet',c:'violet'},ang:{al:'violet'}},
       h:d=>`<p>Jetzt ersetzen wir $x$ durch $b\\cdot\\cos\\alpha$:</p><div class="box">$$a^2 = b^2 + c^2 - 2bc\\cdot\\cos\\alpha$$</div><p>Ebenso (mit einer anderen Höhe) erhält man:</p>$$b^2 = a^2 + c^2 - 2ac\\cdot\\cos\\beta$$$$c^2 = a^2 + b^2 - 2ab\\cdot\\cos\\gamma$$` },
     { t:'Spezialfall: Satz des Pythagoras', cfg:{side:{a:'violet'},ang:{al:'violet'}},
-      h:d=>`<p>Ist $\\alpha = 90^\\circ$, so gilt $\\cos 90^\\circ = 0$ und der Kosinussatz wird zu</p>$$a^2 = b^2 + c^2.$$<p>Der Satz des Pythagoras ist also ein Spezialfall des Kosinussatzes. Der Term $-2bc\\cdot\\cos\\alpha$ wirkt wie ein Korrekturterm: Für $\\alpha < 90^\\circ$ ist $a^2$ kleiner als $b^2+c^2$, für $\\alpha > 90^\\circ$ größer.</p><p><button id="make90" style="font:inherit;font-size:18px;padding:8px 14px;border-radius:10px;border:1px solid #7c3aed;background:#f5f3ff;color:#5b21b6;cursor:pointer">α auf 90° setzen</button></p>` }
+      h:d=>`<p>Ist $\\alpha = 90^\\circ$, so gilt $\\cos 90^\\circ = 0$ und der Kosinussatz wird zu</p>$$a^2 = b^2 + c^2.$$<p>Der Satz des Pythagoras ist also ein Spezialfall des Kosinussatzes. Der Term $-2bc\\cdot\\cos\\alpha$ wirkt wie ein Korrekturterm: Für $\\alpha < 90^\\circ$ ist $a^2$ kleiner als $b^2+c^2$, für $\\alpha > 90^\\circ$ größer.</p><p><button id="make90" style="font:inherit;font-size:18px;padding:8px 14px;border-radius:10px;border:1px solid var(--violet);background:var(--violet-soft);color:var(--violet-ink);cursor:pointer">α auf 90° setzen</button></p>` }
   ]
 };
 
@@ -280,7 +295,7 @@ function draw(){
   ['A','B','C'].forEach(k=>{
     const p=P[k], o=add(p,mul(unit(sub(p,cen)),30));
     h+=`<circle cx="${p.x}" cy="${p.y}" r="22" fill="transparent" class="handle" data-k="${k}"/>`;
-    h+=`<circle cx="${p.x}" cy="${p.y}" r="8" fill="#fff" stroke="${COL.ink}" stroke-width="3" class="handle" data-k="${k}"/>`;
+    h+=`<circle cx="${p.x}" cy="${p.y}" r="8" fill="${COL.card}" stroke="${COL.ink}" stroke-width="3" class="handle" data-k="${k}"/>`;
     h+=text(o,k,COL.ink,28,'font-style="normal" font-weight="bold" pointer-events="none"');
   });
   document.getElementById('handles').innerHTML=h;
@@ -312,7 +327,7 @@ function updateLive(d){
     s=`<div><b>a / sin α</b> = ${fmt(d.a/Math.sin(d.al*r))}</div><div><b>b / sin β</b> = ${fmt(d.b/Math.sin(d.be*r))}</div><div><b>c / sin γ</b> = ${fmt(d.c/Math.sin(d.ga*r))}</div><div class="ok">✓ Alle drei Quotienten stimmen überein.</div>`;
   } else {
     const rhs=d.b*d.b+d.c*d.c-2*d.b*d.c*Math.cos(d.al*r);
-    s=`<div><b>a²</b> = ${fmt(d.a*d.a)}</div><div><b>b² + c² − 2bc · cos α</b> = ${fmt(rhs)}</div><div><b>b² + c²</b> = ${fmt(d.b*d.b+d.c*d.c)} <span style="color:#6b7280">(nur bei α = 90° gleich a²)</span></div><div class="ok">✓ Der Kosinussatz stimmt.</div>`;
+    s=`<div><b>a²</b> = ${fmt(d.a*d.a)}</div><div><b>b² + c² − 2bc · cos α</b> = ${fmt(rhs)}</div><div><b>b² + c²</b> = ${fmt(d.b*d.b+d.c*d.c)} <span style="color:var(--muted)">(nur bei α = 90° gleich a²)</span></div><div class="ok">✓ Der Kosinussatz stimmt.</div>`;
   }
   document.getElementById('check').innerHTML=s;
 }
@@ -351,6 +366,16 @@ function make90(){
 
 draw();
 window.addEventListener('load',()=>{lastKey='';draw();});
+document.addEventListener('themechange',()=>{readCols();lastKey='';draw();});
+</script>
+<script>/* Farbschema: folgt der Systemeinstellung, eine Umschaltung wird gemerkt */
+(function(){var root=document.documentElement,KEY='sk-theme',mq=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null,btn=document.getElementById('themeBtn');
+function isDark(){var t=root.getAttribute('data-theme');return t?t==='dark':!!(mq&&mq.matches);}
+function label(){if(!btn)return;var d=isDark();btn.textContent=d?'Hell':'Dunkel';btn.setAttribute('aria-pressed',String(d));btn.title=d?'Zum hellen Design wechseln':'Zum dunklen Design wechseln';}
+function changed(){label();try{document.dispatchEvent(new Event('themechange'));}catch(e){}}
+try{var s=localStorage.getItem(KEY);if(s==='light'||s==='dark')root.setAttribute('data-theme',s);}catch(e){}
+if(btn)btn.addEventListener('click',function(){var n=isDark()?'light':'dark';root.setAttribute('data-theme',n);try{localStorage.setItem(KEY,n);}catch(e){}changed();});
+if(mq&&mq.addEventListener)mq.addEventListener('change',changed);label();})();
 </script>
 </body>
 </html>

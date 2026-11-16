@@ -623,7 +623,9 @@ function init(){
   const fb=document.getElementById('full');
   if(!document.documentElement.requestFullscreen)fb.hidden=true;
   fb.onclick=()=>{try{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen().catch(()=>{})}catch(_){}};
-  document.addEventListener('fullscreenchange',()=>fb.textContent=document.fullscreenElement?'Vollbild beenden':'Vollbild');
+  document.addEventListener('fullscreenchange',()=>{fb.textContent=document.fullscreenElement?'Vollbild beenden':'Vollbild';
+    /* Im Vollbild (Beamer) immer hell, danach wieder gemerkte Wahl oder Systemeinstellung */
+    if(document.fullscreenElement)setTheme('light');else{let s=null;try{s=localStorage.getItem('tw-theme')}catch(_){}setTheme(s==='dark'||s==='light'?s:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))}});
 }
 if(typeof window!=='undefined')init();
 </script>

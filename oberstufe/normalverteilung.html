@@ -562,11 +562,15 @@ document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
 ['c2hp','c2wp','c2sym','c2cmp'].forEach(id=>$('#'+id).addEventListener('change',()=>update('t2')));
 ['t3type','t3a','t3b'].forEach(id=>$('#'+id).addEventListener('input',()=>update('t3')));
 $('#t3type').addEventListener('change',()=>update('t3'));
-$('#btnPresent').addEventListener('click',e=>{const on=root.classList.toggle('present');e.currentTarget.setAttribute('aria-pressed',String(on));update();});
+const TKEY='nv-theme';
+const savedTheme=()=>{try{const s=localStorage.getItem(TKEY);return s==='light'||s==='dark'?s:null;}catch(e){return null;}};
+/* Im Präsentationsmodus immer hell, sonst Systemeinstellung oder gemerkte Wahl */
+const applyTheme=()=>{const s=root.classList.contains('present')?'light':savedTheme();if(s)root.setAttribute('data-theme',s);else root.removeAttribute('data-theme');};
+$('#btnPresent').addEventListener('click',e=>{const on=root.classList.toggle('present');e.currentTarget.setAttribute('aria-pressed',String(on));applyTheme();themeLabel();update();});
 const mq=matchMedia('(prefers-color-scheme: dark)');
 function isDark(){const t=root.getAttribute('data-theme');return t?t==='dark':mq.matches;}
 function themeLabel(){$('#btnTheme').textContent=isDark()?'Hell':'Dunkel';}
-$('#btnTheme').addEventListener('click',()=>{root.setAttribute('data-theme',isDark()?'light':'dark');themeLabel();update();});
+$('#btnTheme').addEventListener('click',()=>{const n=isDark()?'light':'dark';root.setAttribute('data-theme',n);try{localStorage.setItem(TKEY,n);}catch(e){}themeLabel();update();});
 mq.addEventListener('change',()=>{themeLabel();update();});
 $('#btnReset').addEventListener('click',()=>{
   ['t1mu','t2mu','t3mu','t4mu'].forEach(id=>setVal(id,0));['t1sg','t2sg','t3sg','t4sg'].forEach(id=>setVal(id,1));
@@ -578,7 +582,7 @@ $('#btnReset').addEventListener('click',()=>{
 });
 const ro=new ResizeObserver(()=>update());document.querySelectorAll('canvas').forEach(c=>ro.observe(c));
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>update());
-themeLabel();setP5();reset5();update();
+applyTheme();themeLabel();setP5();reset5();update();
 })();
 </script>
 

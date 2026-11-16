@@ -116,6 +116,36 @@ td.ok{color:var(--good);font-weight:600} td.no{color:var(--muted)}
 .present .explain,.present .task{display:none!important}
 .present .stage canvas.main{height:clamp(320px,64vh,700px)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.setup .params{margin-top:4px}
+.setup .params > summary{font-size:.9rem;color:var(--muted);font-weight:600}
+.lead{font-size:1.02rem;margin:0 0 10px;max-width:65ch}
+.story{font-size:1.02rem;margin:0;max-width:65ch}
+.rulebox{margin-top:10px;padding:10px 12px;border-left:4px solid var(--curve);background:color-mix(in srgb,var(--curve) 8%,transparent);border-radius:0 8px 8px 0}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.btn.small{padding:5px 10px;font-size:.85rem}
+.big{font:600 1.5rem var(--font-mono);font-variant-numeric:tabular-nums;margin:4px 0}
+.simline{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+.simres{margin:10px 0 0;font-size:1rem}
+.steps{display:flex;flex-direction:column;gap:14px}
+.step{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--sheet)}
+.step h3{font-size:1.1rem;margin:0 0 8px;display:flex;gap:10px;align-items:baseline}
+.step h3 .no{font:600 .8rem var(--font-mono);color:var(--reject)}
+.step textarea{font:400 .98rem var(--font-body);width:100%;min-height:3.2em;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:6px;padding:6px 8px;resize:vertical}
+.step .row{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.step .row select{width:auto}
+.step .row input[type=text]{width:7rem}
+.step .hrow{display:grid;grid-template-columns:3.4rem 8rem 7rem;gap:8px;align-items:center;margin:6px 0}
+.step .hrow b{font-family:var(--font-display);font-weight:500;font-size:1.1rem}
+.step .hrow select{width:auto}
+.model{margin-top:10px;padding:10px 12px;border-radius:8px;background:color-mix(in srgb,var(--good) 9%,transparent);border:1px solid color-mix(in srgb,var(--good) 35%,transparent)}
+.model p{margin:0 0 .4em;max-width:65ch}.model p:last-child{margin:0}
+.fb{list-style:none;padding:0;margin:10px 0 0;display:grid;gap:6px}
+.fb li{display:flex;gap:8px;align-items:baseline}
+.fb .st{font:600 .8rem var(--font-body);padding:1px 8px;border-radius:999px;border:1px solid currentColor;flex:0 0 auto}
+.fb .ok{color:var(--good)} .fb .no{color:var(--reject)}
+.steptools{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+#kv3 dd{white-space:normal}
+.task ol{margin:0;padding-left:1.2em}.task li{margin-bottom:.5em;max-width:65ch}
 </style>
 
 <div class="wrap">
@@ -131,138 +161,254 @@ td.ok{color:var(--good);font-weight:600} td.no{color:var(--muted)}
     </div>
   </header>
 
-  <section class="setup" aria-label="Testaufbau">
+  <nav class="tabs" role="tablist" aria-label="Themen">
+    <button class="tab" role="tab" data-tab="t1" aria-selected="true"><span class="no">1</span>Einführendes Beispiel</button>
+    <button class="tab" role="tab" data-tab="t2" aria-selected="false"><span class="no">2</span>Hypothesen aufstellen</button>
+    <button class="tab" role="tab" data-tab="t3" aria-selected="false"><span class="no">3</span>Fehler 1. und 2. Art</button>
+    <button class="tab" role="tab" data-tab="t4" aria-selected="false"><span class="no">4</span>Entscheidungsregel zu α</button>
+    <button class="tab" role="tab" data-tab="t5" aria-selected="false"><span class="no">5</span>Operationscharakteristik und Güte</button>
+  </nav>
+
+  <section class="setup" id="setup" aria-label="Testaufbau" hidden>
     <div>
       <h3>Sachzusammenhang</h3>
       <p class="ctx" id="ctxText"></p>
       <div class="hyp" id="hypText"></div>
     </div>
-    <div class="fields">
-      <label class="field" style="grid-column:1/-1">Situation<select id="ctx"></select></label>
-      <label class="field">Art des Tests<select id="type"><option value="R">rechtsseitig</option><option value="L">linksseitig</option><option value="Z">zweiseitig</option></select></label>
-      <label class="field">p₀ (auch als Bruch)<input type="text" id="p0" inputmode="decimal" value="0,6"></label>
-      <label class="field">Stichprobenumfang n<input type="number" id="n" min="1" max="2000" step="1" value="100"></label>
-      <label class="field">Signifikanzniveau α<select id="alpha"><option value="0.1">10 %</option><option value="0.05" selected>5 %</option><option value="0.025">2,5 %</option><option value="0.01">1 %</option></select></label>
+    <div>
+      <label class="field">Situation<select id="ctx"></select></label>
+      <details class="params" id="params"><summary>Werte selbst ändern</summary>
+        <div class="fields" style="margin-top:8px">
+          <label class="field">Art des Tests<select id="type"><option value="R">rechtsseitig</option><option value="L">linksseitig</option><option value="Z">zweiseitig</option></select></label>
+          <label class="field">p₀ (auch als Bruch)<input type="text" id="p0" inputmode="decimal" value="0,6"></label>
+          <label class="field">Stichprobenumfang n<input type="number" id="n" min="1" max="2000" step="1" value="100"></label>
+        </div>
+      </details>
     </div>
   </section>
 
-  <nav class="tabs" role="tablist" aria-label="Themen">
-    <button class="tab" role="tab" data-tab="t1" aria-selected="true"><span class="no">1</span>Entscheidungsregel</button>
-    <button class="tab" role="tab" data-tab="t2" aria-selected="false"><span class="no">2</span>Fehler 1. und 2. Art</button>
-    <button class="tab" role="tab" data-tab="t3" aria-selected="false"><span class="no">3</span>Operationscharakteristik und Güte</button>
-  </nav>
-
   <main>
+  <!-- Reiter 1: Einführendes Beispiel -->
   <section class="panel" id="t1" role="tabpanel">
     <div class="stage">
       <p class="cap" id="cap1"></p>
-      <canvas id="c1" class="main" aria-label="Histogramm unter der Nullhypothese mit Verwerfungsbereich"></canvas>
-      <div class="legend"><span><i style="background:var(--reject)"></i>Verwerfungsbereich V</span><span><i style="background:var(--keep)"></i>Annahmebereich A</span><span id="leg1k" hidden><i class="ln" style="background:var(--ink)"></i>Stichprobenergebnis</span></div>
+      <canvas id="c1" class="main" aria-label="Verteilung der Anzahl geheilter Patienten"></canvas>
+      <div class="legend"><span><i style="background:var(--curve)"></i>X ≥ k: Medikament gilt als besser</span><span><i style="background:var(--keep)"></i>X &lt; k: Medikament gilt nicht als besser</span><span id="leg1s" hidden><i class="ln" style="background:var(--ink)"></i>letzte simulierte Studie</span></div>
+      <div class="simline">
+        <button class="btn primary" id="sim1">1 Studie simulieren</button>
+        <button class="btn" id="sim100">100 Studien simulieren</button>
+        <button class="btn" id="simReset">Simulation löschen</button>
+      </div>
+      <p class="simres" id="simres"></p>
     </div>
     <aside class="side">
       <div class="card">
-        <div class="row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h3 style="margin:0">Entscheidungsregel</h3><button class="btn primary" id="show1">Lösung verdecken</button></div>
-        <div id="res1" style="margin-top:8px"></div>
-      </div>
-      <div class="card" id="probeCard">
-        <h3>Systematisches Probieren</h3>
-        <div id="probe"></div>
-        <p class="notation">Kumulierte Wahrscheinlichkeiten P(X ≤ k) liefert der WTR. In der Lösung mathematisch notieren, z. B. P(X ≥ k) = 1 − P(X ≤ k − 1).</p>
+        <h3>Die Studie</h3>
+        <p class="story">Ein bewährtes Medikament heilt 60 % der Patienten. Ein Hersteller hat ein neues Medikament entwickelt und behauptet, es wirke besser. In einer Studie wird es an 100 Patienten getestet.</p>
+        <div class="rulebox"><b>Vorab festgelegte Entscheidungsregel:</b> Werden mindestens <span id="k1t">68</span> Patienten geheilt, gilt das neue Medikament als besser.</div>
+        <div class="slider" style="margin-top:12px"><label for="k1" class="sym">k</label><input type="range" id="k1r" min="55" max="80" step="1" value="68"><input type="number" id="k1" min="1" max="100" step="1" value="68" aria-label="Grenze k"></div>
       </div>
       <div class="card">
-        <h3>Stichprobe auswerten</h3>
-        <label class="field">beobachtete Anzahl k<input type="number" id="kobs" min="0" step="1" value="68"></label>
-        <div id="dec" style="margin-top:10px"></div>
+        <h3>Wie gut wirkt das neue Medikament wirklich?</h3>
+        <p class="notation" style="margin:0 0 4px">Die wahre Heilungswahrscheinlichkeit p ist unbekannt. Probieren Sie verschiedene Werte aus.</p>
+        <div class="slider"><label for="pr1" class="sym">p</label><input type="range" id="pr1" min="0.45" max="0.85" step="0.01" value="0.6"><input type="number" id="pn1" min="0.45" max="0.85" step="0.01" value="0.6" aria-label="p exakt eingeben"></div>
+        <div class="chips"><button class="btn small" data-p="0.6">p = 0,6: nicht besser</button><button class="btn small" data-p="0.7">p = 0,7: besser</button></div>
+        <div id="acc1" style="margin-top:10px"></div>
       </div>
-      <details class="card explain" open><summary>Erklärung</summary><div class="body">
-        <p><b>Nullhypothese H₀</b> ist die Annahme, die man nur bei deutlichen Gegenbelegen aufgibt. Die <b>Alternative H₁</b> ist meist das, was man nachweisen möchte. Gerechnet wird immer mit p = p₀, dem Grenzfall von H₀.</p>
-        <p>Der <b>Verwerfungsbereich V</b> wird so gewählt, dass P(X ∈ V) ≤ α gilt und V möglichst groß ist. Fällt das Stichprobenergebnis in V, wird H₀ verworfen, sonst beibehalten.</p>
-        <p><b>Rechtsseitig</b> (H₁: p &gt; p₀): V = {k; …; n}, kleinstes k mit P(X ≥ k) ≤ α.<br><b>Linksseitig</b> (H₁: p &lt; p₀): V = {0; …; k}, größtes k mit P(X ≤ k) ≤ α.<br><b>Zweiseitig</b> (H₁: p ≠ p₀): je α/2 auf beiden Seiten.</p>
-        <p>Als Startwert für das Probieren helfen die Sigma-Regeln, z. B. liegt bei einseitigem Test mit α = 5 % die Grenze ungefähr bei μ + 1,64σ.</p>
-        <p>Wird H₀ beibehalten, ist H₀ damit nicht bewiesen. Die Stichprobe spricht nur nicht deutlich genug dagegen.</p>
+      <details class="card explain" open><summary>Worum geht es?</summary><div class="body">
+        <p>Ob das neue Medikament besser wirkt, kann man nicht sicher wissen. Man kennt nur das Ergebnis einer Stichprobe, und das hängt vom Zufall ab. Auch ein besseres Medikament kann in einer Studie schlecht abschneiden, und ein gleich gutes Medikament kann zufällig gut abschneiden.</p>
+        <p>Ein <b>Hypothesentest</b> ist eine Entscheidungsregel, die vorab festlegt, bei welchen Stichprobenergebnissen man sich wofür entscheidet. Dabei sind zwei Fehlentscheidungen möglich:</p>
+        <p>Das Medikament ist <b>nicht besser</b>, gilt aber als besser. Das heißt später <b>Fehler 1. Art</b>.<br>Das Medikament ist <b>besser</b>, das wird aber nicht erkannt. Das heißt später <b>Fehler 2. Art</b>.</p>
+        <p>Die Wahrscheinlichkeiten beider Fehler hängen von der Grenze k ab. Die folgenden Reiter führen das schrittweise aus.</p>
       </div></details>
-      <details class="card task"><summary><span class="tag">Aufgabe für dich</span></summary><div class="body">
-        <p><b>Ermitteln</b> Sie die Entscheidungsregel zuerst selbst durch systematisches Probieren mit dem WTR und <b>vergleichen</b> Sie dann mit der Lösung.</p>
-        <p>Verdoppeln Sie n. <b>Beschreiben</b> Sie, wie sich der Verwerfungsbereich und die tatsächliche Irrtumswahrscheinlichkeit verändern.</p>
-        <p><b>Begründen</b> Sie, warum die tatsächliche Irrtumswahrscheinlichkeit P(X ∈ V) meist kleiner als α ist.</p>
-      </div></details>
+      <details class="card task"><summary><span class="tag">Aufgabe für dich</span></summary><div class="body"><ol>
+        <li>Stellen Sie p = 0,6 ein und simulieren Sie 100 Studien. <b>Ermitteln</b> Sie, wie oft das Medikament zu Unrecht als besser gilt, und <b>vergleichen</b> Sie mit der berechneten Wahrscheinlichkeit.</li>
+        <li>Stellen Sie p = 0,7 ein. <b>Beschreiben</b> Sie, welche Fehlentscheidung jetzt möglich ist und wie wahrscheinlich sie ist.</li>
+        <li>Der Hersteller schlägt vor, die Grenze auf k = 64 zu senken. <b>Beurteilen</b> Sie den Vorschlag aus Sicht des Herstellers und aus Sicht der Patienten.</li>
+      </ol></div></details>
     </aside>
   </section>
 
+  <!-- Reiter 2: Hypothesen aufstellen -->
   <section class="panel" id="t2" role="tabpanel" hidden>
+    <div class="steps">
+      <div class="step">
+        <h3>Aufgabe</h3>
+        <label class="field">Aufgabe auswählen<select id="task2"></select></label>
+        <p class="story" id="task2Text" style="margin-top:10px"></p>
+      </div>
+      <div class="step">
+        <h3><span class="no">1</span>Zufallsgröße X</h3>
+        <textarea id="a2X" placeholder="X: Anzahl der …"></textarea>
+        <div class="steptools"><button class="btn small" data-sol="X">Lösung zeigen</button></div>
+        <div class="model" id="m2X" hidden></div>
+      </div>
+      <div class="step">
+        <h3><span class="no">2</span>Trefferwahrscheinlichkeit p</h3>
+        <textarea id="a2p" placeholder="p: Wahrscheinlichkeit dafür, dass …"></textarea>
+        <div class="steptools"><button class="btn small" data-sol="p">Lösung zeigen</button></div>
+        <div class="model" id="m2p" hidden></div>
+      </div>
+      <div class="step">
+        <h3><span class="no">3</span>Prüfung auf Binomialverteilung</h3>
+        <p class="notation" style="margin:0 0 4px">Kreuzen Sie an, welche Bedingungen hier erfüllt sind, und begründen Sie mündlich oder im Heft.</p>
+        <label class="toggle"><input type="checkbox" class="b2" value="zwei">Jede Durchführung hat genau zwei mögliche Ausgänge (Treffer oder Niete).</label>
+        <label class="toggle"><input type="checkbox" class="b2" value="konst">Die Trefferwahrscheinlichkeit p ist bei jeder Durchführung gleich, d. h. die Durchführungen sind unabhängig voneinander.</label>
+        <div class="steptools"><button class="btn small" data-sol="B">Lösung zeigen</button></div>
+        <div class="model" id="m2B" hidden></div>
+      </div>
+      <div class="step">
+        <h3><span class="no">4</span>Hypothesen und Art des Tests</h3>
+        <div class="hrow"><b>H₀:</b><select id="a2h0"><option value="">wählen</option><option value="le">p ≤</option><option value="ge">p ≥</option><option value="eq">p =</option></select><input type="text" id="a2p0a" inputmode="decimal" placeholder="Wert"></div>
+        <div class="hrow"><b>H₁:</b><select id="a2h1"><option value="">wählen</option><option value="gt">p &gt;</option><option value="lt">p &lt;</option><option value="ne">p ≠</option></select><input type="text" id="a2p0b" inputmode="decimal" placeholder="Wert"></div>
+        <div class="row" style="margin-top:6px"><label class="field" style="grid-auto-flow:column;align-items:center;gap:10px">Art des Tests<select id="a2type"><option value="">wählen</option><option value="R">rechtsseitig</option><option value="L">linksseitig</option><option value="Z">zweiseitig</option></select></label></div>
+        <div class="steptools"><button class="btn primary small" id="check2">Prüfen</button><button class="btn small" data-sol="H">Lösung zeigen</button></div>
+        <ul class="fb" id="fb2"></ul>
+        <div class="model" id="m2H" hidden></div>
+      </div>
+      <div class="steptools"><button class="btn" id="all2">Alle Lösungen zeigen</button><button class="btn" id="clear2">Eingaben löschen</button></div>
+    </div>
+    <aside class="side">
+      <details class="card explain" open><summary>So gehen Sie vor</summary><div class="body">
+        <p><b>1. Zufallsgröße X</b> ist immer eine Anzahl in der Stichprobe: „X: Anzahl der … in der Stichprobe“.</p>
+        <p><b>2. Trefferwahrscheinlichkeit p</b> bezieht sich auf <i>eine</i> Durchführung: „p: Wahrscheinlichkeit dafür, dass ein … “.</p>
+        <p><b>3. Binomialverteilung:</b> Jede Durchführung hat genau zwei mögliche Ausgänge, und die Trefferwahrscheinlichkeit p bleibt konstant. Das ist gleichbedeutend damit, dass die Durchführungen unabhängig voneinander sind. Dann ist X binomialverteilt mit den Parametern n und p.</p>
+        <p><b>4. Hypothesen:</b> Die Alternativhypothese H₁ ist in der Regel die Aussage, die statistisch „bewiesen“ werden soll: der Verdacht, die neue Theorie oder die Veränderung. Die Nullhypothese H₀ ist die Gegenhypothese, also der Status quo oder die skeptisch gesehene Aussage. Sie wird mit Gleichheitszeichen geschrieben: H₀: p = p₀. Bei einseitigen Tests ist das gleichwertig zu p ≤ p₀ bzw. p ≥ p₀, denn gerechnet wird immer mit p = p₀.</p>
+      </div></details>
+      <details class="card explain" open><summary>Woran erkennt man die Art des Tests?</summary><div class="body">
+        <p><b>Rechtsseitig</b>, H₁: p &gt; p₀. Signalwörter: besser, häufiger, gestiegen, mehr als.</p>
+        <p><b>Linksseitig</b>, H₁: p &lt; p₀. Signalwörter: schlechter, seltener, gesunken, weniger als.</p>
+        <p><b>Zweiseitig</b>, H₁: p ≠ p₀. Signalwörter: stimmt die Angabe noch, weicht ab, ist fair.</p>
+        <p>Die Testart richtet sich nach H₁: Große Werte von X sprechen beim rechtsseitigen Test gegen H₀, kleine Werte beim linksseitigen, beim zweiseitigen Test beide.</p>
+      </div></details>
+      <details class="card task"><summary><span class="tag">Aufgabe für dich</span></summary><div class="body"><ol>
+        <li><b>Bearbeiten</b> Sie die Schritte 1 bis 4 zuerst selbst und <b>vergleichen</b> Sie dann mit der Lösung.</li>
+        <li><b>Begründen</b> Sie in Schritt 4, warum die zu zeigende Behauptung als H₁ und nicht als H₀ gewählt wird.</li>
+        <li>Bearbeiten Sie mindestens je eine Aufgabe mit rechtsseitigem, linksseitigem und zweiseitigem Test.</li>
+      </ol></div></details>
+    </aside>
+  </section>
+
+  <!-- Reiter 3: Fehler 1. und 2. Art bei gegebenem k -->
+  <section class="panel" id="t3" role="tabpanel" hidden>
     <div class="stage">
-      <p class="cap" id="cap2a"></p>
-      <canvas id="c2a" class="half" aria-label="Histogramm unter H0 mit Fehler 1. Art"></canvas>
-      <p class="cap" id="cap2b"></p>
-      <canvas id="c2b" class="half" aria-label="Histogramm unter wahrem p mit Fehler 2. Art"></canvas>
+      <p class="cap" id="cap3a"></p>
+      <canvas id="c3a" class="half" aria-label="Histogramm unter H0 mit Fehler 1. Art"></canvas>
+      <p class="cap" id="cap3b"></p>
+      <canvas id="c3b" class="half" aria-label="Histogramm unter wahrem p mit Fehler 2. Art"></canvas>
       <div class="legend"><span><i style="background:var(--reject)"></i>Fehler 1. Art: H₀ wahr, aber verworfen</span><span><i style="background:var(--beta)"></i>Fehler 2. Art: H₁ wahr, aber H₀ beibehalten</span></div>
     </div>
     <aside class="side">
       <div class="card">
-        <h3>Entscheidungsregel</h3>
-        <label class="toggle"><input type="radio" name="rule2" id="ruleA" checked>aus dem Signifikanzniveau α bestimmen</label>
-        <label class="toggle"><input type="radio" name="rule2" id="ruleK">Grenze k selbst festlegen</label>
-        <div class="fields" id="kbox" hidden style="margin-top:6px">
-          <label class="field" id="kLwrap"><span id="kLlab">H₀ verwerfen für X ≤</span><input type="number" id="kL2" min="0" step="1"></label>
-          <label class="field" id="kRwrap"><span id="kRlab">H₀ verwerfen für X ≥</span><input type="number" id="kR2" min="0" step="1"></label>
+        <h3>Vorgegebene Entscheidungsregel</h3>
+        <div class="rulebox" id="rule3"></div>
+        <div class="fields" style="margin-top:10px">
+          <label class="field" id="kLwrap"><span id="kLlab"></span><input type="number" id="kL" min="0" step="1"></label>
+          <label class="field" id="kRwrap"><span id="kRlab"></span><input type="number" id="kR" min="0" step="1"></label>
         </div>
         <div id="kinfo"></div>
+        <div class="steptools"><button class="btn small" id="kRestore">Vorgabe wiederherstellen</button></div>
       </div>
       <div class="card">
         <h3>Wahre Trefferwahrscheinlichkeit</h3>
         <div class="slider"><label for="p1r" class="sym">p₁</label><input type="range" id="p1r" min="0.01" max="0.99" step="0.01" value="0.7"><input type="number" id="p1n" min="0.01" max="0.99" step="0.01" value="0.7" aria-label="p₁ exakt eingeben"></div>
         <div id="p1warn"></div>
       </div>
-      <div class="card">
-        <table class="four" id="four"></table>
-      </div>
-      <div class="card"><dl class="kv" id="kv2"></dl></div>
+      <div class="card"><table class="four" id="four"></table></div>
+      <div class="card"><dl class="kv" id="kv3"></dl></div>
       <details class="card explain" open><summary>Erklärung</summary><div class="body">
-        <p><b>Fehler 1. Art:</b> H₀ ist wahr, wird aber verworfen. Seine Wahrscheinlichkeit ist P(X ∈ V) unter p₀ und höchstens α.</p>
-        <p><b>Fehler 2. Art:</b> H₁ ist wahr, H₀ wird aber beibehalten. Seine Wahrscheinlichkeit β hängt vom wahren Wert p₁ ab: β = P(X ∈ A) unter p₁. Je näher p₁ an p₀ liegt, desto größer ist β.</p>
-        <p>Wird α kleiner gewählt, wird der Annahmebereich größer und β wächst. Beide Fehler lassen sich bei festem n nicht gleichzeitig verkleinern. Erst ein größeres n verringert beide.</p>
-        <p>Legt man die Grenze k selbst fest, ergeben sich beide Fehlerwahrscheinlichkeiten direkt aus der Entscheidungsregel. Verschiebt man k so, dass der Verwerfungsbereich größer wird, steigt der Fehler 1. Art und der Fehler 2. Art sinkt. Umgekehrt gilt das Gegenteil.</p>
+        <p><b>Fehler 1. Art:</b> H₀ ist wahr, wird aber verworfen. Seine Wahrscheinlichkeit ist P(X ∈ V), berechnet mit p = p₀.</p>
+        <p><b>Fehler 2. Art:</b> H₁ ist wahr, H₀ wird aber beibehalten. Seine Wahrscheinlichkeit β = P(X ∈ A) wird mit einem wahren Wert p₁ aus H₁ berechnet. Je näher p₁ an p₀ liegt, desto größer ist β.</p>
+        <p>Wird k so verschoben, dass der Verwerfungsbereich V größer wird, steigt der Fehler 1. Art und der Fehler 2. Art sinkt. Umgekehrt gilt das Gegenteil. Bei festem n lassen sich nicht beide Fehler zugleich verkleinern.</p>
       </div></details>
-      <details class="card task"><summary><span class="tag">Aufgabe für dich</span></summary><div class="body">
-        <p><b>Berechnen</b> Sie die Wahrscheinlichkeit für den Fehler 2. Art für den eingestellten Wert p₁ mit dem WTR.</p>
-        <p><b>Untersuchen</b> Sie, wie groß n mindestens sein muss, damit β unter 10 % liegt. <b>Deuten</b> Sie das Ergebnis im Sachzusammenhang.</p>
-        <p>Legen Sie die Grenze k selbst fest. <b>Berechnen</b> Sie für diese Entscheidungsregel die Wahrscheinlichkeiten beider Fehler mit dem WTR und <b>beschreiben</b> Sie, wie sie sich ändern, wenn k um 1 vergrößert wird.</p>
-      </div></details>
+      <details class="card task"><summary><span class="tag">Aufgabe für dich</span></summary><div class="body"><ol>
+        <li><b>Geben</b> Sie Verwerfungsbereich und Annahmebereich der vorgegebenen Regel <b>an</b>.</li>
+        <li><b>Berechnen</b> Sie die Wahrscheinlichkeit für den Fehler 1. Art und für den Fehler 2. Art bei p₁ mit dem WTR und kontrollieren Sie hier.</li>
+        <li>Vergrößern Sie k um 1. <b>Beschreiben</b> Sie, wie sich beide Fehlerwahrscheinlichkeiten ändern, und <b>erläutern</b> Sie, wer im Sachzusammenhang welchen Fehler eher vermeiden möchte.</li>
+      </ol></div></details>
     </aside>
   </section>
 
-  <section class="panel" id="t3" role="tabpanel" hidden>
+  <!-- Reiter 4: Entscheidungsregel zu vorgegebenem alpha -->
+  <section class="panel" id="t4" role="tabpanel" hidden>
     <div class="stage">
-      <p class="cap" id="cap3"></p>
-      <canvas id="c3" class="main" aria-label="Operationscharakteristik"></canvas>
-      <div class="legend"><span><i class="ln" style="background:var(--curve)"></i>Stichprobenumfang n</span><span id="leg3b" hidden><i class="ln" style="background:var(--beta)"></i>Vergleich n₂</span><span><i class="ln" style="background:var(--reject)"></i>p₀</span></div>
+      <p class="cap" id="cap4"></p>
+      <canvas id="c4" class="main" aria-label="Histogramm unter der Nullhypothese mit Verwerfungsbereich"></canvas>
+      <div class="legend"><span><i style="background:var(--reject)"></i>Verwerfungsbereich V</span><span><i style="background:var(--keep)"></i>Annahmebereich A</span><span id="leg4k" hidden><i class="ln" style="background:var(--ink)"></i>Stichprobenergebnis</span></div>
     </div>
     <aside class="side">
+      <div class="card">
+        <label class="field">Signifikanzniveau α<select id="alpha"><option value="0.1">10 %</option><option value="0.05" selected>5 %</option><option value="0.025">2,5 %</option><option value="0.01">1 %</option></select></label>
+      </div>
+      <div class="card">
+        <div class="row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h3 style="margin:0">Entscheidungsregel</h3><button class="btn primary" id="show4">Lösung zeigen</button></div>
+        <div id="res4" style="margin-top:8px"></div>
+      </div>
+      <div class="card">
+        <h3>Systematisches Probieren</h3>
+        <div id="probe"></div>
+        <p class="notation">Kumulierte Wahrscheinlichkeiten liefert der WTR: P(X ≤ k) = <span style="white-space:nowrap">F(n; p; k)</span>. In der Lösung notieren, z. B. P(X ≥ k) = 1 − P(X ≤ k − 1) = 1 − <span style="white-space:nowrap">F(n; p; k − 1)</span>.</p>
+      </div>
+      <div class="card">
+        <h3>Stichprobe auswerten</h3>
+        <label class="field">beobachtete Anzahl<input type="number" id="kobs" min="0" step="1" value="68"></label>
+        <div id="dec" style="margin-top:10px"></div>
+      </div>
+      <details class="card explain" open><summary>Erklärung</summary><div class="body">
+        <p>Bisher war die Grenze k vorgegeben. Meist gibt man stattdessen das <b>Signifikanzniveau α</b> vor: Die Wahrscheinlichkeit für den Fehler 1. Art soll höchstens α betragen.</p>
+        <p>Der <b>Verwerfungsbereich V</b> wird so gewählt, dass P(X ∈ V) ≤ α gilt und V möglichst groß ist. Gerechnet wird mit p = p₀.</p>
+        <p><b>Rechtsseitig:</b> V = {k; …; n}, kleinstes k mit P(X ≥ k) ≤ α.<br><b>Linksseitig:</b> V = {0; …; k}, größtes k mit P(X ≤ k) ≤ α.<br><b>Zweiseitig:</b> je α/2 auf beiden Seiten.</p>
+        <p>Als Startwert helfen die Sigma-Regeln, z. B. liegt bei einem einseitigen Test mit α = 5 % die Grenze ungefähr bei μ + 1,64σ.</p>
+        <p>Wird H₀ beibehalten, ist H₀ damit nicht bewiesen. Die Stichprobe spricht nur nicht deutlich genug dagegen.</p>
+      </div></details>
+      <details class="card task"><summary><span class="tag">Aufgabe für dich</span></summary><div class="body"><ol>
+        <li><b>Ermitteln</b> Sie die Entscheidungsregel durch systematisches Probieren mit dem WTR und <b>vergleichen</b> Sie dann mit der Lösung.</li>
+        <li><b>Vergleichen</b> Sie die Regel mit der Vorgabe aus Reiter 3. <b>Prüfen</b> Sie, ob die Vorgabe das Signifikanzniveau einhält.</li>
+        <li><b>Begründen</b> Sie, warum die tatsächliche Irrtumswahrscheinlichkeit P(X ∈ V) meist kleiner als α ist.</li>
+      </ol></div></details>
+    </aside>
+  </section>
+
+  <!-- Reiter 5: OC und Güte -->
+  <section class="panel" id="t5" role="tabpanel" hidden>
+    <div class="stage">
+      <p class="cap" id="cap5"></p>
+      <canvas id="c5" class="main" aria-label="Operationscharakteristik"></canvas>
+      <div class="legend"><span><i class="ln" style="background:var(--curve)"></i>Stichprobenumfang n</span><span id="leg5b" hidden><i class="ln" style="background:var(--beta)"></i>Vergleich n₂</span><span><i class="ln" style="background:var(--reject)"></i>p₀</span></div>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>Entscheidungsregel</h3>
+        <label class="toggle"><input type="radio" name="src5" id="src5k" checked>vorgegebene Grenze aus Reiter 3</label>
+        <label class="toggle"><input type="radio" name="src5" id="src5a">Regel zum Signifikanzniveau α aus Reiter 4</label>
+      </div>
       <div class="card">
         <h3>Darstellung</h3>
         <label class="toggle"><input type="radio" name="oc" id="ocO" checked>Operationscharakteristik: P(H₀ wird beibehalten)</label>
         <label class="toggle"><input type="radio" name="oc" id="ocG">Gütefunktion: P(H₀ wird verworfen)</label>
         <label class="toggle"><input type="checkbox" id="cmp">zweiten Stichprobenumfang vergleichen</label>
         <div class="slider" id="n2box" hidden><label for="n2r" class="sym">n₂</label><input type="range" id="n2r" min="10" max="1000" step="10" value="400"><input type="number" id="n2n" min="1" max="2000" step="1" value="400" aria-label="n₂ exakt eingeben"></div>
+        <p class="notation" id="cmpNote" hidden>Für den Vergleich wird bei beiden Stichprobenumfängen die Regel zum Signifikanzniveau α verwendet.</p>
       </div>
-      <div class="card"><dl class="kv" id="kv3"></dl></div>
+      <div class="card"><dl class="kv" id="kv5"></dl></div>
       <details class="card explain" open><summary>Erklärung</summary><div class="body">
         <p>Die <b>Operationscharakteristik</b> ordnet jedem möglichen wahren Wert p die Wahrscheinlichkeit zu, dass H₀ beibehalten wird. Für Werte p aus H₁ ist das genau die Wahrscheinlichkeit β des Fehlers 2. Art.</p>
-        <p>Die <b>Gütefunktion</b> ist 1 minus die Operationscharakteristik. Sie gibt an, wie gut der Test eine falsche Nullhypothese erkennt. An der Stelle p₀ hat sie den Wert der tatsächlichen Irrtumswahrscheinlichkeit.</p>
+        <p>Die <b>Gütefunktion</b> ist 1 minus die Operationscharakteristik. Sie gibt an, wie gut der Test eine falsche Nullhypothese erkennt. An der Stelle p₀ hat sie den Wert der Wahrscheinlichkeit für den Fehler 1. Art.</p>
         <p>Ein idealer Test hätte eine Stufe bei p₀. Mit wachsendem n wird die Kurve steiler und nähert sich dieser Stufe an.</p>
       </div></details>
-      <details class="card task"><summary><span class="tag">Aufgabe für dich</span></summary><div class="body">
-        <p><b>Lesen</b> Sie aus dem Graphen ab, für welche wahren Werte p der Test H₀ mit mindestens 90 % Wahrscheinlichkeit verwirft.</p>
-        <p>Vergleichen Sie zwei Stichprobenumfänge. <b>Erläutern</b> Sie den Unterschied der Kurven und <b>beurteilen</b> Sie, welcher Umfang für den Sachzusammenhang sinnvoll ist.</p>
-      </div></details>
+      <details class="card task"><summary><span class="tag">Aufgabe für dich</span></summary><div class="body"><ol>
+        <li><b>Lesen</b> Sie aus dem Graphen <b>ab</b>, für welche wahren Werte p der Test H₀ mit mindestens 90 % Wahrscheinlichkeit verwirft.</li>
+        <li><b>Erläutern</b> Sie den Zusammenhang zwischen dem Punkt bei p₁ und der Wahrscheinlichkeit β aus Reiter 3.</li>
+        <li>Vergleichen Sie zwei Stichprobenumfänge. <b>Erläutern</b> Sie den Unterschied der Kurven und <b>beurteilen</b> Sie, welcher Umfang im Sachzusammenhang sinnvoll ist.</li>
+      </ol></div></details>
     </aside>
   </section>
   </main>
 </div>
-
 <script>
 (function(){
 const $=s=>document.querySelector(s);
+const $$=s=>document.querySelectorAll(s);
 const root=document.documentElement;
 const C=n=>getComputedStyle(root).getPropertyValue(n).trim();
 const fmt=(x,d=2)=>(Math.abs(x)<1e-12?0:x).toLocaleString('de-DE',{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -297,85 +443,270 @@ function plot(cv,xr,yr,o={}){
   return {ctx,X,Y,w,h,pad,xr,yr};
 }
 function clip(P){const c=P.ctx;c.save();c.beginPath();c.rect(P.pad.l,P.pad.t-2,P.w-P.pad.l-P.pad.r,P.h-P.pad.t-P.pad.b+2);c.clip();}
-function label(P,text,px,py,color,o={}){const c=P.ctx;c.save();c.font=`600 ${P.w<500?11:13}px "Source Code Pro",ui-monospace,monospace`;const w=c.measureText(text).width;let x=Math.max(P.pad.l+2,Math.min(P.w-P.pad.r-w-4,px-w/2));let y=Math.max(P.pad.t,Math.min(P.h-P.pad.b-20,py));c.globalAlpha=.9;c.fillStyle=C('--sheet');c.fillRect(x-4,y-1,w+8,19);c.globalAlpha=1;c.fillStyle=color||C('--ink');c.textBaseline='top';c.textAlign='left';c.fillText(text,x,y+1);c.restore();}
+function label(P,text,px,py,color){const c=P.ctx;c.save();c.font=`600 ${P.w<500?11:13}px "Source Code Pro",ui-monospace,monospace`;const w=c.measureText(text).width;let x=Math.max(P.pad.l+2,Math.min(P.w-P.pad.r-w-4,px-w/2));let y=Math.max(P.pad.t,Math.min(P.h-P.pad.b-20,py));c.globalAlpha=.9;c.fillStyle=C('--sheet');c.fillRect(x-4,y-1,w+8,19);c.globalAlpha=1;c.fillStyle=color||C('--ink');c.textBaseline='top';c.textAlign='left';c.fillText(text,x,y+1);c.restore();}
 function vline(P,x,color,dash=[5,4],lw=1.6){if(x<P.xr[0]||x>P.xr[1])return;const c=P.ctx;c.save();c.strokeStyle=color;c.lineWidth=lw;c.setLineDash(dash);c.beginPath();c.moveTo(P.X(x),P.Y(P.yr[0]));c.lineTo(P.X(x),P.pad.t);c.stroke();c.restore();}
 function dot(P,x,y,color){const c=P.ctx;c.save();c.fillStyle=color;c.strokeStyle=C('--sheet');c.lineWidth=2;c.beginPath();c.arc(P.X(x),P.Y(y),5.5,0,7);c.fill();c.stroke();c.restore();}
 function bars(P,D,colorOf){const c=P.ctx;clip(P);const k0=Math.max(0,Math.floor(P.xr[0])),k1=Math.min(D.n,Math.ceil(P.xr[1]));for(let k=k0;k<=k1;k++){const L=P.X(k-.5),R=P.X(k+.5),T=P.Y(D.f[k]),b=P.Y(0);const [col,a]=colorOf(k);c.globalAlpha=a;c.fillStyle=col;c.fillRect(L,T,R-L,b-T);if(R-L>5){c.globalAlpha=1;c.strokeStyle=col;c.lineWidth=1;c.strokeRect(L+.5,T+.5,R-L-1,b-T);}}c.globalAlpha=1;c.restore();}
+function clearCv(id){const c=$(id);c.getContext('2d').clearRect(0,0,c.width,c.height);}
 
-/* Sachzusammenhänge */
+/* Sachzusammenhänge für die Reiter 3 bis 5 (mit vorgegebener Entscheidungsregel) */
 const CTX=[
- {id:'med',name:'Neues Medikament',type:'R',p0:'0,6',n:100,alpha:'0.05',p1:.7,k:68,
+ {id:'med',name:'Neues Medikament',type:'R',p0:'0,6',n:100,p1:.7,k:68,rule:{kR:68},
   text:n=>`Ein bisher verwendetes Medikament heilt 60 % der Patienten. Ein Hersteller behauptet, sein neues Medikament wirke besser. Es wird an ${n} Patienten getestet.`,
-  X:'Anzahl der geheilten Patienten',rej:'Man geht davon aus, dass das neue Medikament besser wirkt.',keep:'Eine bessere Wirkung lässt sich mit dieser Stichprobe nicht nachweisen.'},
- {id:'partei',name:'Wahlumfrage',type:'L',p0:'0,3',n:500,alpha:'0.05',p1:.25,k:131,
+  ruleText:'Werden mindestens 68 Patienten geheilt, geht man davon aus, dass das neue Medikament besser wirkt.',
+  X:'Anzahl der geheilten Patienten in der Stichprobe',pT:'Wahrscheinlichkeit dafür, dass das neue Medikament einen Patienten heilt',
+  bern:'Ja, da jeder Patient entweder geheilt wird oder nicht, die Patienten unabhängig voneinander behandelt werden und die Heilungswahrscheinlichkeit p als konstant angenommen werden kann.',
+  rej:'Man geht davon aus, dass das neue Medikament besser wirkt.',keep:'Eine bessere Wirkung lässt sich mit dieser Stichprobe nicht nachweisen.'},
+ {id:'partei',name:'Wahlumfrage',type:'L',p0:'0,3',n:500,p1:.25,k:131,rule:{kL:135},
   text:n=>`Eine Partei erreichte bei der letzten Wahl 30 %. Ein Meinungsforschungsinstitut vermutet, dass der Anteil gesunken ist, und befragt ${n} zufällig ausgewählte Wahlberechtigte.`,
-  X:'Anzahl der Befragten, die die Partei wählen würden',rej:'Man geht davon aus, dass der Stimmenanteil der Partei gesunken ist.',keep:'Ein Rückgang des Stimmenanteils lässt sich nicht nachweisen.'},
- {id:'wuerfel',name:'Würfel',type:'Z',p0:'1/6',n:300,alpha:'0.05',p1:.22,k:64,
+  ruleText:'Würden höchstens 135 der Befragten die Partei wählen, geht das Institut von einem Rückgang aus.',
+  X:'Anzahl der Befragten in der Stichprobe, die die Partei wählen würden',pT:'Wahrscheinlichkeit dafür, dass ein zufällig ausgewählter Wahlberechtigter die Partei wählen würde',
+  bern:'Ja, da jeder Befragte die Partei entweder wählen würde oder nicht, die Befragten zufällig und unabhängig ausgewählt werden und der Anteil p bei der großen Zahl von Wahlberechtigten als konstant angenommen werden kann.',
+  rej:'Man geht davon aus, dass der Stimmenanteil der Partei gesunken ist.',keep:'Ein Rückgang des Stimmenanteils lässt sich nicht nachweisen.'},
+ {id:'wuerfel',name:'Würfel',type:'Z',p0:'1/6',n:300,p1:.22,k:64,rule:{kL:37,kR:63},
   text:n=>`Es soll geprüft werden, ob ein Würfel die Sechs mit der Wahrscheinlichkeit 1/6 zeigt. Er wird ${n}-mal geworfen.`,
-  X:'Anzahl der geworfenen Sechsen',rej:'Man geht davon aus, dass der Würfel die Sechs nicht mit der Wahrscheinlichkeit 1/6 zeigt.',keep:'Gegen die Annahme eines fairen Würfels spricht die Stichprobe nicht.'},
- {id:'ausschuss',name:'Qualitätskontrolle',type:'R',p0:'0,05',n:200,alpha:'0.01',p1:.1,k:17,
-  text:n=>`Ein Lieferant garantiert, dass höchstens 5 % seiner Bauteile defekt sind. Der Abnehmer prüft ${n} Bauteile einer Lieferung. Er will den Lieferanten höchstens mit einer Wahrscheinlichkeit von 1 % zu Unrecht beschuldigen.`,
-  X:'Anzahl der defekten Bauteile',rej:'Man geht davon aus, dass der Anteil defekter Bauteile über 5 % liegt, und reklamiert die Lieferung.',keep:'Die Garantie des Lieferanten kann nicht widerlegt werden.'},
- {id:'muenze',name:'Münze',type:'Z',p0:'0,5',n:100,alpha:'0.05',p1:.6,k:61,
+  ruleText:'Fallen höchstens 37 oder mindestens 63 Sechsen, geht man davon aus, dass der Würfel nicht fair ist.',
+  X:'Anzahl der geworfenen Sechsen',pT:'Wahrscheinlichkeit dafür, dass der Würfel bei einem Wurf eine Sechs zeigt',
+  bern:'Ja, da jeder Wurf entweder eine Sechs ergibt oder nicht, die Würfe unabhängig voneinander sind und die Wahrscheinlichkeit p bei jedem Wurf gleich ist.',
+  rej:'Man geht davon aus, dass der Würfel die Sechs nicht mit der Wahrscheinlichkeit 1/6 zeigt.',keep:'Gegen die Annahme eines fairen Würfels spricht die Stichprobe nicht.'},
+ {id:'ausschuss',name:'Qualitätskontrolle',type:'R',p0:'0,05',n:200,p1:.1,k:17,rule:{kR:16},
+  text:n=>`Ein Lieferant garantiert, dass höchstens 5 % seiner Bauteile defekt sind. Der Abnehmer vermutet, dass der Anteil höher ist, und prüft ${n} Bauteile einer Lieferung.`,
+  ruleText:'Sind mindestens 16 Bauteile defekt, reklamiert der Abnehmer die Lieferung.',
+  X:'Anzahl der defekten Bauteile in der Stichprobe',pT:'Wahrscheinlichkeit dafür, dass ein Bauteil defekt ist',
+  bern:'Ja, da jedes Bauteil entweder defekt ist oder nicht, die Bauteile unabhängig voneinander gefertigt werden und der Ausschussanteil p als konstant angenommen werden kann.',
+  rej:'Man geht davon aus, dass der Anteil defekter Bauteile über 5 % liegt, und reklamiert die Lieferung.',keep:'Die Garantie des Lieferanten kann nicht widerlegt werden.'},
+ {id:'muenze',name:'Münze',type:'Z',p0:'0,5',n:100,p1:.6,k:61,rule:{kL:39,kR:61},
   text:n=>`Eine Münze soll auf Fairness geprüft werden. Sie wird ${n}-mal geworfen.`,
-  X:'Anzahl der Würfe mit „Zahl“',rej:'Man geht davon aus, dass die Münze nicht fair ist.',keep:'Gegen die Fairness der Münze spricht die Stichprobe nicht.'},
- {id:'eigen',name:'Eigene Eingabe',X:'Anzahl der Treffer',rej:'H₀ wird verworfen.',keep:'H₀ wird beibehalten.'}
+  ruleText:'Fällt höchstens 39-mal oder mindestens 61-mal „Zahl“, geht man davon aus, dass die Münze nicht fair ist.',
+  X:'Anzahl der Würfe, bei denen die Münze „Zahl“ zeigt',pT:'Wahrscheinlichkeit dafür, dass die Münze bei einem Wurf „Zahl“ zeigt',
+  bern:'Ja, da jeder Wurf entweder „Zahl“ oder „Kopf“ ergibt, die Würfe unabhängig voneinander sind und die Wahrscheinlichkeit p konstant bleibt.',
+  rej:'Man geht davon aus, dass die Münze nicht fair ist.',keep:'Gegen die Fairness der Münze spricht die Stichprobe nicht.'},
+ {id:'eigen',name:'Eigene Eingabe',X:'Anzahl der Treffer',pT:'Trefferwahrscheinlichkeit bei einer Durchführung',bern:'Die Bedingungen müssen im Sachzusammenhang geprüft werden.',rej:'H₀ wird verworfen.',keep:'H₀ wird beibehalten.'}
 ];
+
+/* Übungsaufgaben für Reiter 2 */
+const TASKS=[
+ {type:'R',p0:'0,70',text:'Ein Pharmaunternehmen behauptet, dass ein neues Medikament bei mehr als 70 % der Patienten die Symptome lindert. Bisher half das Standardmedikament genau 70 % der Betroffenen. Zur Überprüfung wird eine Stichprobe von 150 Patienten untersucht.',
+  X:'Anzahl der Patienten in der Stichprobe, bei denen das neue Medikament die Symptome lindert.',pT:'Wahrscheinlichkeit dafür, dass das neue Medikament bei einem Patienten die Symptome lindert.',
+  bern:'Ja, da es für jeden Patienten zwei Ausgänge gibt (Linderung / keine Linderung), die Patienten unabhängig voneinander behandelt werden und die Erfolgswahrscheinlichkeit p als konstant angenommen werden kann.',
+  why:'Das Unternehmen möchte nachweisen, dass das neue Medikament bei mehr als 70 % der Patienten hilft, also p > 0,70.'},
+ {type:'L',p0:'0,15',text:'Ein Online-Händler hatte bisher eine Retourenquote von 15 %. Nach einer Umstellung des Verpackungsdesigns vermutet der Logistikleiter, dass die Retourenquote gesunken ist. Es werden 500 Bestellungen ausgewertet.',
+  X:'Anzahl der retournierten Bestellungen in der Stichprobe.',pT:'Wahrscheinlichkeit dafür, dass eine Bestellung retourniert wird.',
+  bern:'Ja, da jede Bestellung entweder retourniert wird oder nicht, die Bestellungen als unabhängig gelten und die Basis-Retourenquote p konstant bleibt.',
+  why:'Der Logistikleiter vermutet, dass die Retourenquote gesunken ist, also p < 0,15.'},
+ {type:'Z',p0:'0,25',text:'Ein Süßwarenhersteller füllt Bonbontüten so ab, dass der Anteil an Erdbeerbonbons laut Rezeptur exakt 25 % betragen sollte. Die Qualitätskontrolle vermutet eine Abweichung durch eine neue Abfüllanlage. 200 Tüten werden stichprobenartig geprüft.',
+  X:'Anzahl der Erdbeerbonbons in den geprüften Tüten.',pT:'Wahrscheinlichkeit dafür, dass ein zufällig gezogenes Bonbon die Sorte Erdbeere hat.',
+  bern:'Ja, da ein Bonbon entweder Erdbeere ist oder nicht, die Ziehungen unabhängig sind (große Gesamtmenge) und die Rezepturwahrscheinlichkeit p konstant ist.',
+  why:'Die Qualitätskontrolle vermutet eine Abweichung, ohne Richtung, also p ≠ 0,25.'},
+ {type:'R',p0:'0,88',text:'Bei der Produktion von Mikrochips lag der Anteil fehlerfreier Chips bisher bei 88 %. Durch eine Optimierung der Reinraumfilter erhofft sich der Produktionsleiter eine Steigerung der Gutquote. Eine Stichprobe von 400 Chips wird getestet.',
+  X:'Anzahl der fehlerfreien Chips in der Stichprobe.',pT:'Wahrscheinlichkeit dafür, dass ein produzierter Mikrochip fehlerfrei ist.',
+  bern:'Ja, da jeder Chip entweder fehlerfrei oder fehlerhaft ist, die Chips unabhängig produziert werden und die Wahrscheinlichkeit p konstant bleibt.',
+  why:'Der Produktionsleiter erhofft sich eine Steigerung der Gutquote, also p > 0,88.'},
+ {type:'L',p0:'0,45',text:'Die Durchfallquote bei einer schweren universitären Klausur betrug in den letzten Jahren im Schnitt 45 %. Ein Professor setzt ein neues Online-Tutorium ein und vermutet, dass sich die Durchfallquote dadurch verringert hat. Er analysiert die Ergebnisse von 120 Studierenden.',
+  X:'Anzahl der Studierenden in der Stichprobe, die die Klausur nicht bestanden haben.',pT:'Wahrscheinlichkeit dafür, dass ein Studierender die Klausur nicht besteht.',
+  bern:'Ja, da ein Studierender entweder besteht oder durchfällt, die Leistungen unter Verwendung des Tutoriums als unabhängig betrachtet werden können und das grundlegende Niveau p konstant ist.',
+  why:'Der Professor vermutet, dass die Durchfallquote gesunken ist, also p < 0,45.'},
+ {type:'Z',p0:'0,90',text:'Ein Saatguthersteller gibt auf der Verpackung an, dass die Keimungsrate der Samen bei genau 90 % liegt. Ein Verbraucherschutzverein vermutet, dass dieser Wert ungenau ist und eine Veränderung vorliegt. Es werden 300 Samen unter Standardbedingungen eingepflanzt.',
+  X:'Anzahl der gekeimten Samen in der Stichprobe.',pT:'Wahrscheinlichkeit dafür, dass ein gepflanzter Same keimt.',
+  bern:'Ja, da jeder Same entweder keimt oder nicht, die Samen unabhängig voneinander wachsen und die theoretische Keimungsrate p konstant ist.',
+  why:'Der Verbraucherschutzverein vermutet eine Veränderung, ohne Richtung, also p ≠ 0,90.'},
+ {type:'R',p0:'0,40',text:'Ein Streaming-Dienst weiß, dass 40 % der Nutzer ein kostenloses Probeabo in ein kostenpflichtiges Abo umwandeln. Durch ein neues Empfehlungssystem soll diese Konversionsrate gesteigert werden. Die Daten von 600 Testnutzern werden ausgewertet.',
+  X:'Anzahl der Testnutzer, die ein kostenpflichtiges Abo abschließen.',pT:'Wahrscheinlichkeit dafür, dass ein Testnutzer das Abo umwandelt.',
+  bern:'Ja, da jeder Nutzer konvertiert oder nicht, die Entscheidungen unabhängig getroffen werden und die Konversionswahrscheinlichkeit p konstant bleibt.',
+  why:'Nachgewiesen werden soll eine Steigerung der Konversionsrate, also p > 0,40.'},
+ {type:'L',p0:'0,65',text:'In einer Großstadt betrug der Anteil der Haushalte ohne Auto bisher konstant 35 %. Nach dem Ausbau des ÖPNV-Netzes vermutet die Stadtverwaltung, dass der Anteil der Haushalte mit Auto gesunken ist (bzw. der Anteil ohne Auto gestiegen ist). Getestet wird die Vermutung, dass der Anteil der Haushalte MIT Auto (bisher 65 %) gesunken ist, anhand von 800 befragten Haushalten.',
+  X:'Anzahl der Haushalte in der Stichprobe, die ein Auto besitzen.',pT:'Wahrscheinlichkeit dafür, dass ein zufällig ausgewählter Haushalt ein Auto besitzt.',
+  bern:'Ja, da ein Haushalt entweder ein Auto besitzt oder nicht, die Haushalte unabhängig ausgewählt werden und die Grundwahrscheinlichkeit p konstant ist.',
+  why:'Die Stadtverwaltung vermutet, dass der Anteil der Haushalte mit Auto gesunken ist, also p < 0,65.'},
+ {type:'Z',p0:'0,50',text:'Beim Werfen einer Münze soll geprüft werden, ob diese fair ist, der Anteil an \'Kopf\' also exakt 50 % beträgt. Ein Zauberkünstler vermutet, dass die Münze manipuliert wurde und eine Abweichung vorliegt. Die Münze wird 1000-mal geworfen.',
+  X:'Anzahl der Würfe, bei denen die Münze „Kopf“ zeigt.',pT:'Wahrscheinlichkeit dafür, dass die Münze bei einem Wurf „Kopf“ zeigt.',
+  bern:'Ja, da jeder Wurf entweder „Kopf“ oder „Zahl“ ergibt, die Würfe unabhängig voneinander stattfinden und die ideale Wahrscheinlichkeit p konstant bleibt.',
+  why:'Der Zauberkünstler vermutet eine Abweichung, ohne Richtung, also p ≠ 0,50.'},
+ {type:'R',p0:'0,75',text:'Eine Fluggesellschaft verzeichnet auf einer bestimmten Route üblicherweise eine Auslastung von 75 % pro Flug. Nach einer Marketingkampagne wird vermutet, dass die Buchungswahrscheinlichkeit pro Sitzplatz gestiegen ist. Es werden die Daten von 12 Flügen (insgesamt 1800 Sitzplätze) analysiert.',
+  X:'Anzahl der gebuchten Sitzplätze in der Stichprobe.',pT:'Wahrscheinlichkeit dafür, dass ein angebotener Sitzplatz gebucht wird.',
+  bern:'Ja, unter der Annahme, dass die Buchungen der einzelnen Plätze näherungsweise unabhängig voneinander erfolgen und die Buchungswahrscheinlichkeit p konstant ist.',
+  why:'Vermutet wird, dass die Buchungswahrscheinlichkeit gestiegen ist, also p > 0,75.'},
+ {type:'L',p0:'0,20',text:'Ein Callcenter hat eine Erfolgsquote von 20 % bei Kaltakquise-Anrufen. Nach einer Änderung des Telefon-Leitfadens befürchten einige Mitarbeiter, dass die Erfolgsquote gesunken ist. Der Teamleiter lässt eine Stichprobe von 250 Anrufen auswerten.',
+  X:'Anzahl der erfolgreichen Telefonate in der Stichprobe.',pT:'Wahrscheinlichkeit dafür, dass ein Kaltakquise-Anruf erfolgreich ist.',
+  bern:'Ja, da jeder Anruf entweder erfolgreich ist oder nicht, die Telefonate unabhängig voneinander geführt werden und die Erfolgswahrscheinlichkeit p konstant bleibt.',
+  why:'Die Mitarbeiter befürchten, dass die Erfolgsquote gesunken ist, also p < 0,20.'},
+ {type:'Z',p0:'0,60',text:'Ein Energieversorger weiß aus den Vorjahren, dass genau 60 % der Kunden ihre Stromrechnung per Lastschrift bezahlen. Aufgrund von Änderungen im Online-Portal wird vermutet, dass sich dieser Anteil verändert hat. Es werden 400 Kundenkonten zufällig überprüft.',
+  X:'Anzahl der Kunden in der Stichprobe, die per Lastschrift bezahlen.',pT:'Wahrscheinlichkeit dafür, dass ein Kunde per Lastschrift bezahlt.',
+  bern:'Ja, da jeder Kunde entweder per Lastschrift zahlt oder nicht, die Kunden unabhängig voneinander wählen und der Anteil p im Modell konstant bleibt.',
+  why:'Vermutet wird eine Veränderung, ohne Richtung, also p ≠ 0,60.'}
+];
+const TNAME={R:'rechtsseitigen Test',L:'linksseitigen Test',Z:'zweiseitigen Test'};
+
 $('#ctx').innerHTML=CTX.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
 const ctxOf=()=>CTX.find(c=>c.id===$('#ctx').value);
-function loadCtx(id){const c=CTX.find(x=>x.id===id);if(!c||id==='eigen')return;$('#ctx').value=id;$('#type').value=c.type;$('#p0').value=c.p0;$('#n').value=c.n;$('#alpha').value=c.alpha;setP1(c.p1);$('#kobs').value=c.k;}
+let p1=.7;
+function setP1(v){p1=v;$('#p1r').value=v;$('#p1n').value=v;}
+function loadCtx(id){const c=CTX.find(x=>x.id===id);if(!c||id==='eigen')return;$('#ctx').value=id;$('#type').value=c.type;$('#p0').value=c.p0;$('#n').value=c.n;setP1(c.p1);$('#kobs').value=c.k;ruleKey='';}
 
 /* Kernrechnung */
-function test(n,p0,type,alpha){
+function mk(n,p0,type,kL,kR,alpha){
   const D=dist(n,p0),mu=n*p0,s=Math.sqrt(n*p0*(1-p0));
-  let kL=null,kR=null;
-  if(type==='R'||type==='Z'){const a=type==='Z'?alpha/2:alpha;for(let k=0;k<=n+1;k++){if(Pge(D,k)<=a+1e-12){kR=k;break;}}if(kR>n)kR=null;}
-  if(type==='L'||type==='Z'){const a=type==='Z'?alpha/2:alpha;for(let k=n;k>=-1;k--){if(Ple(D,k)<=a+1e-12){kL=k;break;}}if(kL<0)kL=null;}
   const inV=k=>(kL!==null&&k<=kL)||(kR!==null&&k>=kR);
   const aL=kL===null?0:kL+1,aR=kR===null?n:kR-1;
   const err1=(kL===null?0:Ple(D,kL))+(kR===null?0:Pge(D,kR));
   return{D,mu,s,kL,kR,inV,aL,aR,err1,n,p0,type,alpha};
 }
+function test(n,p0,type,alpha){
+  const D=dist(n,p0);let kL=null,kR=null;const a=type==='Z'?alpha/2:alpha;
+  if(type==='R'||type==='Z'){for(let k=0;k<=n+1;k++){if(Pge(D,k)<=a+1e-12){kR=k;break;}}if(kR>n)kR=null;}
+  if(type==='L'||type==='Z'){for(let k=n;k>=-1;k--){if(Ple(D,k)<=a+1e-12){kL=k;break;}}if(kL<0)kL=null;}
+  return mk(n,p0,type,kL,kR,alpha);
+}
 const keepProb=(n,p,T)=>Pin(dist(n,p),T.aL,T.aR);
-/* Entscheidungsregel mit selbst gewählter Grenze */
-function withK(T,kL,kR){
-  const n=T.n,D=T.D;
-  const inV=k=>(kL!==null&&k<=kL)||(kR!==null&&k>=kR);
-  const aL=kL===null?0:kL+1,aR=kR===null?n:kR-1;
-  const err1=(kL===null?0:Ple(D,kL))+(kR===null?0:Pge(D,kR));
-  return Object.assign({},T,{kL,kR,inV,aL,aR,err1,own:true});
+function params(){const n=Math.round(+$('#n').value),p0=parseNum($('#p0').value),type=$('#type').value;if(!(n>=1&&n<=2000)||!(p0>0&&p0<1))return null;return{n,p0,type};}
+const alpha=()=>+$('#alpha').value;
+const Ta=P=>test(P.n,P.p0,P.type,alpha());
+
+/* vorgegebene Regel (Reiter 3 und 5) */
+let ruleKey='',ruleGiven=false;
+function initRule(P){
+  const c=ctxOf();
+  const match=c.rule&&c.type===P.type&&c.n===P.n&&Math.abs(parseNum(c.p0)-P.p0)<1e-9;
+  let kL,kR;
+  if(match){kL=c.rule.kL??null;kR=c.rule.kR??null;}
+  else{const T=test(P.n,P.p0,P.type,.05),m=Math.round(T.mu),s=Math.max(1,Math.round(1.64*T.s));kL=T.kL!==null?T.kL:Math.max(0,m-s);kR=T.kR!==null?T.kR:Math.min(P.n,m+s);}
+  if(kL!==null)$('#kL').value=kL;if(kR!==null)$('#kR').value=kR;
+  ruleGiven=!!match;
+}
+function Tk(P){
+  const key=$('#ctx').value+'|'+P.type+'|'+P.n+'|'+P.p0;
+  if(key!==ruleKey){initRule(P);ruleKey=key;}
+  const L=P.type!=='R',R=P.type!=='L';
+  const kL=L?Math.round(+$('#kL').value):null,kR=R?Math.round(+$('#kR').value):null;
+  const bad=(L&&!($('#kL').value!==''&&kL>=0&&kL<=P.n))||(R&&!($('#kR').value!==''&&kR>=0&&kR<=P.n))||(L&&R&&kL>=kR-1);
+  if(bad)return{bad:`Bitte ganze Zahlen von 0 bis ${P.n} eingeben${L&&R?', dabei k₁ deutlich kleiner als k₂':''}.`};
+  return mk(P.n,P.p0,P.type,kL,kR,null);
 }
 
-let show1=true;
-function state(){
-  const n=Math.round(+$('#n').value),p0=parseNum($('#p0').value),type=$('#type').value,alpha=+$('#alpha').value;
-  if(!(n>=1&&n<=2000)||!(p0>0&&p0<1))return null;
-  return test(n,p0,type,alpha);
-}
 const p0Str=()=>String($('#p0').value).trim().replace('.',',');
-function hypHTML(type){const p=p0Str();return type==='R'?`<span><b>H₀:</b> p ≤ ${p}</span><span><b>H₁:</b> p &gt; ${p}</span>`:type==='L'?`<span><b>H₀:</b> p ≥ ${p}</span><span><b>H₁:</b> p &lt; ${p}</span>`:`<span><b>H₀:</b> p = ${p}</span><span><b>H₁:</b> p ≠ ${p}</span>`;}
-function setText(T){
+function hypHTML(type){const p=p0Str();return type==='R'?`<span><b>H₀:</b> p = ${p}</span><span><b>H₁:</b> p &gt; ${p}</span>`:type==='L'?`<span><b>H₀:</b> p = ${p}</span><span><b>H₁:</b> p &lt; ${p}</span>`:`<span><b>H₀:</b> p = ${p}</span><span><b>H₁:</b> p ≠ ${p}</span>`;}
+function setText(P){
   const c=ctxOf();const n=Math.round(+$('#n').value);
-  $('#ctxText').textContent=c.text?c.text(n):'Eigene Eingabe: Wählen Sie Testart, p₀, n und α.';
-  $('#hypText').innerHTML=(T?hypHTML(T.type):'')+`<span>X: ${c.X}, unter H₀ B(${n}; ${p0Str()})-verteilt</span>`;
+  $('#ctxText').textContent=c.text?c.text(n):'Eigene Eingabe: Wählen Sie unter „Werte selbst ändern“ Testart, p₀ und n.';
+  $('#hypText').innerHTML=(P?hypHTML(P.type):'')+`<span>X: ${c.X}, unter H₀ B(${n};\u00A0${p0Str()})-verteilt</span>`;
+  if(c.id==='eigen')$('#params').open=true;
 }
 const VText=T=>{const parts=[];if(T.kL!==null)parts.push(T.kL===0?'{0}':`{0; …; ${T.kL}}`);if(T.kR!==null)parts.push(T.kR===T.n?`{${T.n}}`:`{${T.kR}; …; ${T.n}}`);return parts.length?parts.join(' ∪ '):'∅';};
 const AText=T=>T.aL>T.aR?'∅':`{${T.aL}; …; ${T.aR}}`;
-function ruleText(T,c){
-  if(!T.own&&T.kL===null&&T.kR===null)return `<p class="err">Bei n = ${T.n} gibt es keinen Verwerfungsbereich, der das Signifikanzniveau einhält. Der Stichprobenumfang ist zu klein.</p>`;
-  let cond=T.type==='R'?`mindestens ${T.kR}`:T.type==='L'?`höchstens ${T.kL}`:(T.kL!==null&&T.kR!==null?`höchstens ${T.kL} oder mindestens ${T.kR}`:T.kL!==null?`höchstens ${T.kL}`:`mindestens ${T.kR}`);
+function ruleText(T){
+  if(T.kL===null&&T.kR===null)return `<p class="err">Bei n = ${T.n} gibt es keinen Verwerfungsbereich, der das Signifikanzniveau einhält. Der Stichprobenumfang ist zu klein.</p>`;
+  const cond=(T.kL!==null&&T.kR!==null)?`höchstens ${T.kL} oder mindestens ${T.kR}`:T.kL!==null?`höchstens ${T.kL}`:`mindestens ${T.kR}`;
   return `<p class="rule">Nimmt X einen Wert von ${cond} an, wird H₀ verworfen. Andernfalls wird H₀ beibehalten.</p>`;
 }
+const F=(n,p,k)=>`F(${n};\u00A0${p};\u00A0${k})`;
+const pS=p=>typeof p==='string'?p:fmtT(p,3);
 
-/* Reiter 1 */
+/* Reiter 1: Einführendes Beispiel */
+const N1=100,P01=.6;let pT=.6,sims=[];
+function k1(){const k=Math.round(+$('#k1').value);return k>=1&&k<=N1?k:null;}
+function setPT(v){pT=v;$('#pr1').value=v;$('#pn1').value=v;sims=[];}
+function simulate(m){for(let j=0;j<m;j++){let x=0;for(let i=0;i<N1;i++)if(Math.random()<pT)x++;sims.push(x);}update();}
+function r1(){
+  const k=k1();
+  if(k===null){$('#acc1').innerHTML='<p class="err">Bitte für k eine ganze Zahl von 1 bis 100 eingeben.</p>';return;}
+  $('#k1t').textContent=k;
+  const D=dist(N1,pT),pa=Pge(D,k),pn=1-pa,ps=fmtT(pT,2);
+  $('#cap1').textContent=`X: Anzahl der geheilten Patienten, X ~ B(100;\u00A0${ps})`;
+  const better=pT>P01+1e-9;
+  $('#acc1').innerHTML=`<p style="margin:0">Wahrscheinlichkeit, dass das Medikament als besser gilt:</p><p class="big">P(X ≥ ${k}) ≈ ${pct(pa,1)}</p>`+
+   (better?`<p class="rule" style="margin-top:6px">Bei p = ${ps} wirkt das neue Medikament <b>tatsächlich besser</b>. Werden aber höchstens ${k-1} Patienten geheilt, wird das nicht erkannt. Diese Fehlentscheidung hat die Wahrscheinlichkeit P(X ≤ ${k-1}) = ${F(100,ps,k-1)} ≈ ${pct(pn,1)}.</p>`
+   :`<p class="rule" style="margin-top:6px">Bei p = ${ps} wirkt das neue Medikament <b>nicht besser</b> als das alte. Gilt es trotzdem als besser, ist das eine Fehlentscheidung. Sie hat die Wahrscheinlichkeit P(X ≥ ${k}) = 1 − ${F(100,ps,k-1)} ≈ ${pct(pa,1)}.</p>`);
+  const last=sims.length?sims[sims.length-1]:null;
+  $('#leg1s').hidden=last===null;
+  if(last===null)$('#simres').innerHTML='Simulieren Sie Studien mit der eingestellten Heilungswahrscheinlichkeit p.';
+  else{const m=sims.filter(x=>x>=k).length;
+    $('#simres').innerHTML=`Letzte Studie: <b>${last} Geheilte</b>, das Medikament gilt ${last>=k?'als besser':'nicht als besser'}.<br>Bisher ${sims.length} ${sims.length===1?'Studie':'Studien'}, davon ${m} als besser eingestuft (relative Häufigkeit ${pct(m/sims.length,1)}). ${better?`Übersehen wurde die bessere Wirkung ${sims.length-m}-mal.`:`Zu Unrecht als besser eingestuft: ${m}-mal.`}`;}
+  const P=plot($('#c1'),[29.5,95.5],[0,.13],{minX:1});if(!P)return;
+  bars(P,D,x=>x>=k?[C('--curve'),.75]:[C('--keep'),.35]);
+  vline(P,k-.5,C('--curve'));label(P,`ab ${k}: „besser“`,P.X(k-.5)+55,P.pad.t+4,C('--curve'));
+  if(last!==null){vline(P,last,C('--ink'),[],2);label(P,`Studie: ${last}`,P.X(last),P.pad.t+52,C('--ink'));}
+}
+
+/* Reiter 2: Hypothesen aufstellen */
+let sol2={},fb2=false;
+function taskOf(){const v=$('#task2').value;if(v==='ctx'){const c=ctxOf(),P=params();const n=P?P.n:'n';return{type:P?P.type:'R',p0:p0Str(),text:c.text?c.text(n):'Eigene Eingabe ohne Sachzusammenhang.',X:c.X+'.',pT:c.pT+'.',bern:c.bern,why:c.id==='eigen'?'':null};}return TASKS[+v];}
+const H0={R:'le',L:'ge',Z:'eq'},H1={R:'gt',L:'lt',Z:'ne'},OP={le:'≤',ge:'≥',eq:'=',gt:'&gt;',lt:'&lt;',ne:'≠'};
+function whyText(t){if(t.why)return t.why;const c=ctxOf();if(c.id==='eigen')return 'Die Behauptung, die nachgewiesen werden soll, wird zu H₁.';const m={med:'Der Hersteller möchte nachweisen, dass das neue Medikament besser wirkt, also p > 0,6.',partei:'Das Institut vermutet einen Rückgang und möchte ihn nachweisen, also p < 0,3.',wuerfel:'Geprüft wird, ob die Wahrscheinlichkeit von 1/6 abweicht, egal in welche Richtung, also p ≠ 1/6.',ausschuss:'Der Abnehmer möchte nachweisen, dass mehr als 5 % der Bauteile defekt sind, also p > 0,05.',muenze:'Eine unfaire Münze kann „Zahl“ häufiger oder seltener zeigen, also p ≠ 0,5.'};return m[c.id]||'';}
+function r2(){
+  const t=taskOf();
+  $('#task2Text').textContent=t.text;
+  $('#m2X').innerHTML=`<p><b>X:</b> ${t.X}</p>`;
+  $('#m2p').innerHTML=`<p><b>p:</b> ${t.pT}</p>`;
+  $('#m2B').innerHTML=`<p>${t.bern}</p><p>Beide Bedingungen sind erfüllt. X ist binomialverteilt.</p>`;
+  $('#m2H').innerHTML=`<p><b>H₀:</b> p = ${t.p0}&nbsp;&nbsp;&nbsp;<b>H₁:</b> p ${OP[H1[t.type]]} ${t.p0}</p><p>${whyText(t)} Diese Behauptung wird zu H₁. H₀ ist die Gegenhypothese und wird mit Gleichheitszeichen geschrieben.</p><p>Es handelt sich um einen <b>${TNAME[t.type]}</b>.</p>`;
+  ['X','p','B','H'].forEach(s=>{$('#m2'+s).hidden=!sol2[s];const b=document.querySelector(`[data-sol="${s}"]`);b.textContent=sol2[s]?'Lösung verdecken':'Lösung zeigen';});
+  $('#all2').textContent=['X','p','B','H'].every(s=>sol2[s])?'Alle Lösungen verdecken':'Alle Lösungen zeigen';
+  if(!fb2){$('#fb2').innerHTML='';return;}
+  const p0=parseNum(t.p0),items=[];
+  const add=(ok,txt,hint)=>items.push(`<li><span class="st ${ok?'ok':'no'}">${ok?'richtig':'noch nicht'}</span><span>${txt}${ok?'':'<br><span class="notation" style="margin:0">'+hint+'</span>'}</span></li>`);
+  const pP=v=>{v=String(v).trim();return v.includes('%')?parseNum(v.replace('%',''))/100:parseNum(v);};
+  const pa=pP($('#a2p0a').value),pb=pP($('#a2p0b').value);
+  add($('#a2h1').value===H1[t.type],'Relation in H₁','H₁ ist die Behauptung, die nachgewiesen werden soll. Achten Sie auf Signalwörter wie „besser“, „gesunken“ oder „stimmt die Angabe“.');
+  const h0v=$('#a2h0').value,h0ok=h0v==='eq'||(t.type!=='Z'&&h0v===H0[t.type]);
+  add(h0ok,'Relation in H₀'+(h0ok&&h0v!=='eq'?` (gleichwertig zu H₀: p = ${t.p0})`:''),'H₀ ist die Gegenhypothese zu H₁ und wird mit Gleichheitszeichen geschrieben: p = p₀.');
+  add(Math.abs(pa-p0)<1e-9&&Math.abs(pb-p0)<1e-9,'Wert p₀ in beiden Hypothesen','p₀ ist der bisherige oder behauptete Anteil aus dem Text. In H₀ und H₁ steht derselbe Wert.');
+  add($('#a2type').value===t.type,'Art des Tests','Die Testart ergibt sich aus H₁: p &gt; p₀ rechtsseitig, p &lt; p₀ linksseitig, p ≠ p₀ zweiseitig.');
+  const bs=[...$$('.b2')].every(b=>b.checked);
+  add(bs,'Bedingungen der Binomialverteilung (Schritt 3)','Prüfen Sie Schritt 3 noch einmal. Im Modell sind hier beide Bedingungen erfüllt.');
+  $('#fb2').innerHTML=items.join('');
+}
+function clear2(){$$('#t2 textarea').forEach(e=>e.value='');$$('.b2').forEach(b=>b.checked=false);['#a2h0','#a2h1','#a2type'].forEach(s=>$(s).value='');$('#a2p0a').value='';$('#a2p0b').value='';sol2={};fb2=false;}
+function fillTasks(){const c=ctxOf();$('#task2').innerHTML=`<option value="ctx">Aktuelle Situation: ${c.name}</option>`+TASKS.map((t,i)=>`<option value="${i}">Aufgabe ${i+1}</option>`).join('');}
+
+/* Reiter 3: Fehler 1. und 2. Art bei gegebener Regel */
+function r3(P){
+  const T=Tk(P),c=ctxOf();
+  const L=P.type!=='R',R=P.type!=='L';
+  $('#kLwrap').hidden=!L;$('#kRwrap').hidden=!R;
+  $('#kLlab').textContent=P.type==='Z'?'H₀ verwerfen für X ≤ k₁ mit k₁ =':'H₀ verwerfen für X ≤ k mit k =';
+  $('#kRlab').textContent=P.type==='Z'?'H₀ verwerfen für X ≥ k₂ mit k₂ =':'H₀ verwerfen für X ≥ k mit k =';
+  $('#kL').max=P.n;$('#kR').max=P.n;
+  const cur=T.bad?null:T;
+  const isGiven=ruleGiven&&cur&&(c.rule.kL??null)===cur.kL&&(c.rule.kR??null)===cur.kR;
+  $('#rule3').innerHTML=isGiven?c.ruleText:(cur?`Eigene Grenze: ${ruleText(cur).replace(/<\/?p[^>]*>/g,'')}`:'Eigene Grenze');
+  if(T.bad){$('#kinfo').innerHTML=`<p class="err" style="margin:8px 0 0">${T.bad}</p>`;$('#four').innerHTML='';$('#kv3').innerHTML='';$('#cap3a').textContent='';$('#cap3b').textContent='';clearCv('#c3a');clearCv('#c3b');return;}
+  $('#kinfo').innerHTML='';
+  const inH1=T.type==='R'?p1>T.p0:T.type==='L'?p1<T.p0:Math.abs(p1-T.p0)>1e-9;
+  const D1=dist(T.n,p1),beta=Pin(D1,T.aL,T.aR);
+  $('#p1warn').innerHTML=inH1?'':`<p class="err" style="margin:0">p₁ = ${fmtT(p1,3)} liegt nicht in H₁. Dann kann ein Fehler 2. Art nicht auftreten.</p>`;
+  $('#cap3a').textContent=`H₀ wahr: X ~ B(${T.n};\u00A0${p0Str()})`;
+  $('#cap3b').textContent=`wahrer Wert p₁ = ${fmtT(p1,3)}: X ~ B(${T.n};\u00A0${fmtT(p1,3)})`;
+  $('#four').innerHTML=`<tr><th></th><th>H₀ ist wahr</th><th>H₁ ist wahr</th></tr>
+   <tr><td class="rowh">H₀ wird beibehalten</td><td class="r">richtige Entscheidung</td><td class="e2">Fehler 2. Art<br>β ≈ ${inH1?fmt(beta,4):'–'}</td></tr>
+   <tr><td class="rowh">H₀ wird verworfen</td><td class="e1">Fehler 1. Art<br>≈ ${fmt(T.err1,4)}</td><td class="r">richtige Entscheidung${inH1?`<br>${fmt(1-beta,4)}`:''}</td></tr>`;
+  const ps=p0Str(),q=fmtT(p1,3);
+  const e1=T.kL!==null&&T.kR!==null?`P(X ≤ ${T.kL}) + 1 − P(X ≤ ${T.kR-1}) = ${F(T.n,ps,T.kL)} + 1 − ${F(T.n,ps,T.kR-1)}`:T.kR!==null?`P(X ≥ ${T.kR}) = 1 − P(X ≤ ${T.kR-1}) = 1 − ${F(T.n,ps,T.kR-1)}`:`P(X ≤ ${T.kL}) = ${F(T.n,ps,T.kL)}`;
+  const e2=T.aL===0?`P(X ≤ ${T.aR}) = ${F(T.n,q,T.aR)}`:T.aR===T.n?`1 − P(X ≤ ${T.aL-1}) = 1 − ${F(T.n,q,T.aL-1)}`:`P(X ≤ ${T.aR}) − P(X ≤ ${T.aL-1}) = ${F(T.n,q,T.aR)} − ${F(T.n,q,T.aL-1)}`;
+  $('#kv3').innerHTML=`<dt>Verwerfungsbereich</dt><dd>V = ${VText(T)}</dd><dt>Annahmebereich</dt><dd>A = ${AText(T)}</dd><dt>Fehler 1. Art, mit p₀ = ${ps}</dt><dd>${e1}</dd><dd>≈ ${fmt(T.err1,4)}</dd><dt>Fehler 2. Art, mit p₁ = ${q}</dt>`+(inH1?`<dd>β = ${e2}</dd><dd>≈ ${fmt(beta,4)}</dd>`:'<dd>nicht definiert</dd>');
+  const s1=Math.sqrt(T.n*p1*(1-p1)),lo=Math.min(T.mu-4.5*T.s,T.n*p1-4.5*s1),hi=Math.max(T.mu+4.5*T.s,T.n*p1+4.5*s1);
+  let x0=Math.max(-0.5,lo),x1=Math.min(T.n+0.5,hi);if(x1-x0<8){x1=Math.min(T.n+0.5,x0+8);x0=Math.max(-0.5,x1-8);}
+  let fm=0;for(let k=Math.max(0,Math.floor(x0));k<=Math.min(T.n,Math.ceil(x1));k++)fm=Math.max(fm,T.D.f[k],D1.f[k]);
+  const yr=[0,fm*1.22];
+  const PA=plot($('#c3a'),[x0,x1],yr,{minX:1});if(!PA)return;
+  bars(PA,T.D,k=>T.inV(k)?[C('--reject'),.75]:[C('--keep'),.3]);
+  if(T.kR!==null)vline(PA,T.kR-.5,C('--reject'));if(T.kL!==null)vline(PA,T.kL+.5,C('--reject'));
+  label(PA,`Fehler 1. Art ≈ ${pct(T.err1,1)}`,PA.X(T.kR!==null?Math.min(T.kR+2,x1):Math.max((T.kL??0)-2,x0)),PA.pad.t+4,C('--reject'));
+  const PB=plot($('#c3b'),[x0,x1],yr,{minX:1});
+  bars(PB,D1,k=>!T.inV(k)&&inH1?[C('--beta'),.75]:[C('--keep'),.3]);
+  if(T.kR!==null)vline(PB,T.kR-.5,C('--reject'));if(T.kL!==null)vline(PB,T.kL+.5,C('--reject'));
+  if(inH1){const xb=T.type==='L'?Math.max(T.aL,x0)+6:T.type==='R'?Math.min(T.aR,x1)-6:T.n*p1;label(PB,`Fehler 2. Art β ≈ ${pct(beta,1)}`,PB.X(xb),PB.pad.t+4,C('--warn'));}
+}
+
+/* Reiter 4: Entscheidungsregel zu alpha */
 const SIG1={0.1:1.28,0.05:1.64,0.025:1.96,0.01:2.33},SIG2={0.1:1.64,0.05:1.96,0.025:2.24,0.01:2.58};
 const SIGOK={1.64:1,1.96:1,2.58:1};
+let show4=false;
 function probeTable(T,side){
-  const D=T.D,a=T.type==='Z'?T.alpha/2:T.alpha,A=fmtT(a,4).replace('.',',');
+  const D=T.D,a=T.type==='Z'?T.alpha/2:T.alpha,A=fmtT(a,4);
   const c=(T.type==='Z'?SIG2:SIG1)[T.alpha],ok=SIGOK[c];
   const start=side==='R'?T.mu+c*T.s:T.mu-c*T.s;
   const kc=side==='R'?T.kR:T.kL;
-  let center=kc!==null?kc:Math.round(start);
+  const center=kc!==null?kc:Math.round(start);
   const ks=[];for(let k=center-3;k<=center+3;k++)if(k>=0&&k<=T.n)ks.push(k);
   const hint=ok?`Startwert mit der ${fmtT(c)}σ-Regel: μ ${side==='R'?'+':'−'} ${fmtT(c)}σ ≈ ${fmt(T.mu,2)} ${side==='R'?'+':'−'} ${fmtT(c)} · ${fmt(T.s,3)} ≈ ${fmt(start,1)}`:`Startwert ungefähr μ ${side==='R'?'+':'−'} ${fmtT(c)}σ ≈ ${fmt(start,1)}`;
   const head=side==='R'?`<tr><th>k</th><th>P(X ≤ k − 1)</th><th>P(X ≥ k)</th><th>≤ ${A}?</th></tr>`:`<tr><th>k</th><th>P(X ≤ k)</th><th>≤ ${A}?</th></tr>`;
@@ -383,131 +714,113 @@ function probeTable(T,side){
   const what=side==='R'?`kleinstes k mit P(X ≥ k) ≤ ${A}`:`größtes k mit P(X ≤ k) ≤ ${A}`;
   return `<p style="margin:0 0 6px"><b>${T.type==='Z'?(side==='R'?'Rechte Seite: ':'Linke Seite: '):''}</b>${what}</p><p class="notation" style="margin:0 0 6px">${hint}</p><div class="tablebox"><table>${head}${rows}</table></div>`;
 }
-function r1(T){
-  const c=ctxOf();
-  $('#cap1').textContent=`Verteilung von X unter H₀: B(${T.n}; ${p0Str()}), μ = ${fmtT(T.mu,3)}, σ ≈ ${fmt(T.s,3)}`;
-  $('#show1').textContent=show1?'Lösung verdecken':'Lösung zeigen';
-  if(show1){
-    $('#res1').innerHTML=`<dl class="kv"><dt>Verwerfungsbereich</dt><dd>V = ${VText(T)}</dd><dt>Annahmebereich</dt><dd>A = ${AText(T)}</dd><dt>tatsächliche Irrtumswahrscheinlichkeit</dt><dd>P(X ∈ V) ≈ ${fmt(T.err1,4)} ≤ ${fmtT(T.alpha,3)}</dd></dl>`+ruleText(T,c);
+function r4(P){
+  const T=Ta(P),c=ctxOf();
+  $('#cap4').textContent=`Verteilung von X unter H₀: B(${T.n};\u00A0${p0Str()}), μ = ${fmtT(T.mu,3)}, σ ≈ ${fmt(T.s,3)}`;
+  $('#show4').textContent=show4?'Lösung verdecken':'Lösung zeigen';
+  if(show4){
+    let cmp='';const G=Tk(P);
+    if(!G.bad){const same=G.kL===T.kL&&G.kR===T.kR;cmp=`<p class="notation">Vergleich mit Reiter 3: Die dortige Regel mit V = ${VText(G)} hat einen Fehler 1. Art von etwa ${pct(G.err1,2)}${same?' und stimmt mit dieser Regel überein.':G.err1<=T.alpha+1e-12?' und hält das Signifikanzniveau ein, ist aber nicht der größtmögliche Verwerfungsbereich.':' und hält das Signifikanzniveau nicht ein.'}</p>`;}
+    $('#res4').innerHTML=`<dl class="kv"><dt>Verwerfungsbereich</dt><dd>V = ${VText(T)}</dd><dt>Annahmebereich</dt><dd>A = ${AText(T)}</dd><dt>tatsächliche Irrtumswahrscheinlichkeit</dt><dd>P(X ∈ V) ≈ ${fmt(T.err1,4)} ≤ ${fmtT(T.alpha,3)}</dd></dl>`+ruleText(T)+cmp;
     $('#probe').innerHTML=T.type==='Z'?probeTable(T,'L')+'<div style="height:12px"></div>'+probeTable(T,'R'):probeTable(T,T.type);
-  }else{$('#res1').innerHTML='<p class="covered">Lösung verdeckt. Ermitteln Sie die Entscheidungsregel zuerst selbst.</p>';$('#probe').innerHTML='<p class="covered">Wertetabelle verdeckt.</p>';}
+  }else{$('#res4').innerHTML='<p class="covered">Lösung verdeckt. Ermitteln Sie die Entscheidungsregel zuerst selbst.</p>';$('#probe').innerHTML='<p class="covered">Wertetabelle verdeckt.</p>';}
   const ko=Math.round(+$('#kobs').value);$('#kobs').max=T.n;
-  const okK=isFinite(ko)&&ko>=0&&ko<=T.n;
-  $('#leg1k').hidden=!okK;
+  const okK=$('#kobs').value!==''&&ko>=0&&ko<=T.n;
+  $('#leg4k').hidden=!okK;
   if(!okK)$('#dec').innerHTML=`<p class="err">Bitte eine ganze Zahl von 0 bis ${T.n} eingeben.</p>`;
-  else if(!show1)$('#dec').innerHTML='<p class="covered">Entscheidung verdeckt.</p>';
-  else{const r=T.inV(ko);$('#dec').innerHTML=`<p style="margin:0"><span class="state ${r?'no':'ok'}">${r?'H₀ wird verworfen':'H₀ wird beibehalten'}</span></p><p class="rule">k = ${ko} liegt ${r?'im Verwerfungsbereich':'im Annahmebereich'}. ${r?c.rej:c.keep}</p>`;}
+  else if(!show4)$('#dec').innerHTML='<p class="covered">Entscheidung verdeckt.</p>';
+  else{const r=T.inV(ko);$('#dec').innerHTML=`<p style="margin:0"><span class="state ${r?'no':'ok'}">${r?'H₀ wird verworfen':'H₀ wird beibehalten'}</span></p><p class="rule">${ko} liegt ${r?'im Verwerfungsbereich':'im Annahmebereich'}. ${r?c.rej:c.keep}</p>`;}
   const h=Math.max(4.5*T.s,6);let x0=Math.max(-0.5,T.mu-h),x1=Math.min(T.n+0.5,T.mu+h);if(x1-x0<8){x1=Math.min(T.n+0.5,x0+8);x0=Math.max(-0.5,x1-8);}
   let fm=0;for(let k=Math.max(0,Math.floor(x0));k<=Math.min(T.n,Math.ceil(x1));k++)fm=Math.max(fm,T.D.f[k]);
-  const P=plot($('#c1'),[x0,x1],[0,fm*1.22],{minX:1});if(!P)return;
-  bars(P,T.D,k=>T.inV(k)&&show1?[C('--reject'),.75]:[C('--keep'),.35]);
-  if(show1){if(T.kR!==null&&T.kR>=x0){vline(P,T.kR-.5,C('--reject'));label(P,`V ab ${T.kR}`,P.X(T.kR-.5)+40,P.pad.t+4,C('--reject'));}
-    if(T.kL!==null&&T.kL<=x1){vline(P,T.kL+.5,C('--reject'));label(P,`V bis ${T.kL}`,P.X(T.kL+.5)-40,P.pad.t+4,C('--reject'));}}
-  if(okK&&ko>=x0&&ko<=x1){vline(P,ko,C('--ink'),[],2);label(P,`k = ${ko}`,P.X(ko),P.pad.t+52,C('--ink'));}
+  const PL=plot($('#c4'),[x0,x1],[0,fm*1.22],{minX:1});if(!PL)return;
+  bars(PL,T.D,k=>T.inV(k)&&show4?[C('--reject'),.75]:[C('--keep'),.35]);
+  if(show4){if(T.kR!==null&&T.kR>=x0){vline(PL,T.kR-.5,C('--reject'));label(PL,`V ab ${T.kR}`,PL.X(T.kR-.5)+40,PL.pad.t+4,C('--reject'));}
+    if(T.kL!==null&&T.kL<=x1){vline(PL,T.kL+.5,C('--reject'));label(PL,`V bis ${T.kL}`,PL.X(T.kL+.5)-40,PL.pad.t+4,C('--reject'));}}
+  if(okK&&ko>=x0&&ko<=x1){vline(PL,ko,C('--ink'),[],2);label(PL,`Stichprobe: ${ko}`,PL.X(ko),PL.pad.t+52,C('--ink'));}
 }
 
-/* Reiter 2 */
-let p1=.7;
-function setP1(v){p1=v;$('#p1r').value=v;$('#p1n').value=v;}
-let ruleKey='';
-function fillK(T){
-  const mu=Math.round(T.mu),s=Math.max(1,Math.round(1.64*T.s));
-  $('#kL2').value=T.kL!==null?T.kL:Math.max(0,mu-s);
-  $('#kR2').value=T.kR!==null?T.kR:Math.min(T.n,mu+s);
-}
-function ownRule(T){
-  const own=$('#ruleK').checked;$('#kbox').hidden=!own;
-  if(!own){$('#kinfo').innerHTML='';ruleKey='';return T;}
-  const key=T.type+'|'+T.n+'|'+T.p0;if(key!==ruleKey||$('#kL2').value===''||$('#kR2').value===''){fillK(T);ruleKey=key;}
-  const L=T.type!=='R',Rt=T.type!=='L';
-  $('#kLwrap').hidden=!L;$('#kRwrap').hidden=!Rt;
-  $('#kLlab').textContent=T.type==='Z'?'H₀ verwerfen für X ≤ k₁ mit k₁ =':'H₀ verwerfen für X ≤ k mit k =';
-  $('#kRlab').textContent=T.type==='Z'?'H₀ verwerfen für X ≥ k₂ mit k₂ =':'H₀ verwerfen für X ≥ k mit k =';
-  $('#kL2').max=T.n;$('#kR2').max=T.n;
-  const kL=L?Math.round(+$('#kL2').value):null,kR=Rt?Math.round(+$('#kR2').value):null;
-  const bad=(L&&!(kL>=0&&kL<=T.n))||(Rt&&!(kR>=0&&kR<=T.n))||(L&&Rt&&kL>=kR-1);
-  if(bad){$('#kinfo').innerHTML=`<p class="err" style="margin:8px 0 0">Bitte ganze Zahlen von 0 bis ${T.n} eingeben${L&&Rt?', dabei k₁ deutlich kleiner als k₂':''}.</p>`;return null;}
-  const U=withK(T,kL,kR);
-  const ok=U.err1<=T.alpha+1e-12;
-  $('#kinfo').innerHTML=ruleText(U)+`<p class="notation">Vergleich mit α = ${fmtT(T.alpha*100,1)} %: Der Fehler 1. Art ist ${ok?'höchstens':'größer als'} α. ${ok?'Das Signifikanzniveau wird eingehalten.':'Das Signifikanzniveau wird nicht eingehalten.'}</p>`;
-  return U;
-}
-function r2(T0){
-  const T=ownRule(T0);
-  if(!T){document.querySelectorAll('#four,#kv2').forEach(e=>e.innerHTML='');$('#cap2a').textContent='';$('#cap2b').textContent='';['#c2a','#c2b'].forEach(id=>{const c=$(id);c.getContext('2d').clearRect(0,0,c.width,c.height);});return;}
-  const inH1=T.type==='R'?p1>T.p0:T.type==='L'?p1<T.p0:Math.abs(p1-T.p0)>1e-9;
-  const D1=dist(T.n,p1),beta=Pin(D1,T.aL,T.aR);
-  $('#p1warn').innerHTML=inH1?'':`<p class="err" style="margin:0">p₁ = ${fmtT(p1,3)} liegt nicht in H₁. Dann ist H₀ wahr und ein Fehler 2. Art kann nicht auftreten.</p>`;
-  $('#cap2a').textContent=`H₀ wahr: X ~ B(${T.n}; ${p0Str()})`;
-  $('#cap2b').textContent=`wahrer Wert p₁ = ${fmtT(p1,3)}: X ~ B(${T.n}; ${fmtT(p1,3)})`;
-  $('#four').innerHTML=`<tr><th></th><th>H₀ ist wahr</th><th>H₁ ist wahr</th></tr>
-   <tr><td class="rowh">H₀ wird beibehalten</td><td class="r">richtige Entscheidung</td><td class="e2">Fehler 2. Art<br>β ≈ ${inH1?fmt(beta,4):'–'}</td></tr>
-   <tr><td class="rowh">H₀ wird verworfen</td><td class="e1">Fehler 1. Art<br>≈ ${fmt(T.err1,4)}</td><td class="r">richtige Entscheidung${inH1?`<br>${fmt(1-beta,4)}`:''}</td></tr>`;
-  $('#kv2').innerHTML=`<dt>Verwerfungsbereich</dt><dd>V = ${VText(T)}</dd><dt>Fehler 1. Art</dt><dd>P<sub>p₀</sub>(X ∈ V) ≈ ${fmt(T.err1,4)}</dd><dt>Fehler 2. Art</dt><dd>${inH1?`P<sub>p₁</sub>(${T.aL} ≤ X ≤ ${T.aR}) ≈ ${fmt(beta,4)}`:'nicht definiert'}</dd>`+(inH1?`<dt>Ansatz für den WTR</dt><dd>${T.aL===0?`P(X ≤ ${T.aR})`:T.aR===T.n?`1 − P(X ≤ ${T.aL-1})`:`P(X ≤ ${T.aR}) − P(X ≤ ${T.aL-1})`}</dd>`:'');
-  const s1=Math.sqrt(T.n*p1*(1-p1)),lo=Math.min(T.mu-4.5*T.s,T.n*p1-4.5*s1),hi=Math.max(T.mu+4.5*T.s,T.n*p1+4.5*s1);
-  let x0=Math.max(-0.5,lo),x1=Math.min(T.n+0.5,hi);if(x1-x0<8){x1=Math.min(T.n+0.5,x0+8);x0=Math.max(-0.5,x1-8);}
-  let fm=0;for(let k=Math.max(0,Math.floor(x0));k<=Math.min(T.n,Math.ceil(x1));k++)fm=Math.max(fm,T.D.f[k],D1.f[k]);
-  const yr=[0,fm*1.22];
-  const PA=plot($('#c2a'),[x0,x1],yr,{minX:1});if(!PA)return;
-  bars(PA,T.D,k=>T.inV(k)?[C('--reject'),.75]:[C('--keep'),.3]);
-  if(T.kR!==null)vline(PA,T.kR-.5,C('--reject'));if(T.kL!==null)vline(PA,T.kL+.5,C('--reject'));
-  label(PA,`Fehler 1. Art ≈ ${pct(T.err1,1)}`,PA.X(T.kR!==null?Math.min(T.kR+2,x1):Math.max((T.kL??0)-2,x0)),PA.pad.t+4,C('--reject'));
-  const PB=plot($('#c2b'),[x0,x1],yr,{minX:1});
-  bars(PB,D1,k=>!T.inV(k)&&inH1?[C('--beta'),.75]:[C('--keep'),.3]);
-  if(T.kR!==null)vline(PB,T.kR-.5,C('--reject'));if(T.kL!==null)vline(PB,T.kL+.5,C('--reject'));
-  if(inH1){const xb=T.type==='L'?Math.max(T.aL,x0)+6:T.type==='R'?Math.min(T.aR,x1)-6:T.n*p1;label(PB,`Fehler 2. Art β ≈ ${pct(beta,1)}`,PB.X(xb),PB.pad.t+4,C('--warn'));}
-}
-
-/* Reiter 3 */
-function ocCurve(n,T0){const T=test(n,T0.p0,T0.type,T0.alpha);const pts=[];for(let i=0;i<=200;i++){const p=i/200;pts.push([p,Pin(dist(n,Math.min(Math.max(p,1e-9),1-1e-9)),T.aL,T.aR)]);}return{T,pts};}
-function r3(T){
+/* Reiter 5: OC und Güte */
+function ocPts(n,T){const pts=[];for(let i=0;i<=200;i++){const p=i/200;pts.push([p,Pin(dist(n,Math.min(Math.max(p,1e-9),1-1e-9)),T.aL,T.aR)]);}return pts;}
+function r5(P){
+  const useK=$('#src5k').checked;
+  const T=useK?Tk(P):Ta(P);
   const guete=$('#ocG').checked,cmp=$('#cmp').checked,n2=Math.round(+$('#n2n').value);
-  $('#n2box').hidden=!cmp;$('#leg3b').hidden=!cmp;
-  $('#cap3').textContent=guete?'Gütefunktion: Wahrscheinlichkeit, dass H₀ verworfen wird':'Operationscharakteristik: Wahrscheinlichkeit, dass H₀ beibehalten wird';
+  $('#n2box').hidden=!cmp;$('#leg5b').hidden=!cmp;$('#cmpNote').hidden=!(cmp&&useK);
+  $('#cap5').textContent=guete?'Gütefunktion: Wahrscheinlichkeit, dass H₀ verworfen wird':'Operationscharakteristik: Wahrscheinlichkeit, dass H₀ beibehalten wird';
+  if(T.bad){$('#kv5').innerHTML=`<p class="err" style="margin:0">Die Regel in Reiter 3 ist ungültig. ${T.bad}</p>`;clearCv('#c5');return;}
   const tr=v=>guete?1-v:v;
-  const A=ocCurve(T.n,T);let B=null;if(cmp&&n2>=1&&n2<=2000)B=ocCurve(n2,T);
-  const P=plot($('#c3'),[0,1],[0,1.05],{xStep:.1,yTicks:5});if(!P)return;
-  vline(P,T.p0,C('--reject'),[6,4],1.8);label(P,`p₀ = ${p0Str()}`,P.X(T.p0),P.pad.t+2,C('--reject'));
-  const draw=(pts,col)=>{const c=P.ctx;clip(P);c.strokeStyle=col;c.lineWidth=3;c.lineJoin='round';c.beginPath();pts.forEach(([p,v],i)=>{const x=P.X(p),y=P.Y(tr(v));i?c.lineTo(x,y):c.moveTo(x,y);});c.stroke();c.restore();};
-  if(B)draw(B.pts,C('--beta'));
-  draw(A.pts,C('--curve'));
-  const b1=keepProb(T.n,p1,T);
-  dot(P,p1,tr(b1),C('--curve'));label(P,`p = ${fmtT(p1,3)}: ${fmt(tr(b1),3)}`,P.X(p1),P.Y(tr(b1))+10,C('--ink'));
-  dot(P,T.p0,tr(1-T.err1),C('--reject'));
-  let rows=`<dt>Stichprobenumfang n</dt><dd>${T.n}, A = ${AText(T)}</dd><dt>${guete?'Güte':'OC-Wert'} an p₀</dt><dd>${fmt(tr(1-T.err1),4)}</dd><dt>${guete?'Güte':'OC-Wert'} an p₁ = ${fmtT(p1,3)}</dt><dd>${fmt(tr(b1),4)}</dd>`;
-  if(B){const b2=keepProb(n2,p1,B.T);rows+=`<dt>Vergleich n₂ = ${n2}</dt><dd>A = ${AText(B.T)}</dd><dt>${guete?'Güte':'OC-Wert'} an p₁ bei n₂</dt><dd>${fmt(tr(b2),4)}</dd>`;}
-  rows+=`<dt>p₁ ändern</dt><dd>in Reiter 2</dd>`;
-  $('#kv3').innerHTML=rows;
+  const A=useK&&cmp?Ta(P):T;
+  let B=null;if(cmp&&n2>=1&&n2<=2000)B=test(n2,P.p0,P.type,alpha());
+  const PL=plot($('#c5'),[0,1],[0,1.05],{xStep:.1,yTicks:5});if(!PL)return;
+  vline(PL,T.p0,C('--reject'),[6,4],1.8);label(PL,`p₀ = ${p0Str()}`,PL.X(T.p0),PL.pad.t+2,C('--reject'));
+  const draw=(pts,col)=>{const c=PL.ctx;clip(PL);c.strokeStyle=col;c.lineWidth=3;c.lineJoin='round';c.beginPath();pts.forEach(([p,v],i)=>{const x=PL.X(p),y=PL.Y(tr(v));i?c.lineTo(x,y):c.moveTo(x,y);});c.stroke();c.restore();};
+  if(B)draw(ocPts(n2,B),C('--beta'));
+  draw(ocPts(A.n,A),C('--curve'));
+  const b1=keepProb(A.n,p1,A);
+  dot(PL,p1,tr(b1),C('--curve'));label(PL,`p = ${fmtT(p1,3)}: ${fmt(tr(b1),3)}`,PL.X(p1),PL.Y(tr(b1))+10,C('--ink'));
+  dot(PL,A.p0,tr(1-A.err1),C('--reject'));
+  let rows=`<dt>Regel</dt><dd>V = ${VText(A)}</dd><dt>Stichprobenumfang n</dt><dd>${A.n}, A = ${AText(A)}</dd><dt>${guete?'Güte':'OC-Wert'} an p₀</dt><dd>${fmt(tr(1-A.err1),4)}</dd><dt>${guete?'Güte':'OC-Wert'} an p₁ = ${fmtT(p1,3)}</dt><dd>${fmt(tr(b1),4)}</dd>`;
+  if(B){const b2=keepProb(n2,p1,B);rows+=`<dt>Vergleich n₂ = ${n2}</dt><dd>V = ${VText(B)}</dd><dt>${guete?'Güte':'OC-Wert'} an p₁ bei n₂</dt><dd>${fmt(tr(b2),4)}</dd>`;}
+  rows+=`<dt>p₁ ändern</dt><dd>in Reiter 3</dd>`;
+  $('#kv5').innerHTML=rows;
 }
 
 /* Steuerung */
-const R={t1:r1,t2:r2,t3:r3};let active='t1',raf=0;
-function update(){cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{const T=state();setText(T);if(!T){document.querySelectorAll('#res1,#probe,#dec,#kv2,#kv3').forEach(e=>e.innerHTML='<p class="err">Bitte n von 1 bis 2000 und p₀ zwischen 0 und 1 eingeben.</p>');return;}R[active](T);});}
-document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{active=b.dataset.tab;document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',String(x===b)));document.querySelectorAll('.panel').forEach(p=>p.hidden=p.id!==active);update();}));
-$('#ctx').addEventListener('change',()=>{loadCtx($('#ctx').value);show1=false;update();});
-['type','p0'].forEach(id=>$('#'+id).addEventListener('input',()=>{$('#ctx').value='eigen';update();}));
-$('#type').addEventListener('change',()=>{$('#ctx').value='eigen';update();});
-['n','kobs'].forEach(id=>$('#'+id).addEventListener('input',update));
+const R={t3:r3,t4:r4,t5:r5};let active='t1',raf=0;
+function update(){cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{
+  $('#setup').hidden=active==='t1'||active==='t2';
+  if(active==='t1'){r1();return;}
+  if(active==='t2'){r2();return;}
+  const P=params();setText(P);
+  if(!P){$$('#kv3,#res4,#probe,#dec,#kv5').forEach(e=>e.innerHTML='<p class="err">Bitte n von 1 bis 2000 und p₀ zwischen 0 und 1 eingeben.</p>');return;}
+  R[active](P);});}
+$$('.tab').forEach(b=>b.addEventListener('click',()=>{active=b.dataset.tab;$$('.tab').forEach(x=>x.setAttribute('aria-selected',String(x===b)));$$('.panel').forEach(p=>p.hidden=p.id!==active);update();}));
+/* Reiter 1 */
+$('#k1r').addEventListener('input',()=>{$('#k1').value=$('#k1r').value;update();});
+$('#k1').addEventListener('input',()=>{$('#k1r').value=$('#k1').value;update();});
+$('#pr1').addEventListener('input',()=>{setPT(+$('#pr1').value);update();});
+$('#pn1').addEventListener('input',()=>{const v=parseNum($('#pn1').value);if(v>0&&v<1){pT=v;$('#pr1').value=v;sims=[];update();}});
+$$('[data-p]').forEach(b=>b.addEventListener('click',()=>{setPT(+b.dataset.p);update();}));
+$('#sim1').addEventListener('click',()=>simulate(1));
+$('#sim100').addEventListener('click',()=>simulate(100));
+$('#simReset').addEventListener('click',()=>{sims=[];update();});
+/* Reiter 2 */
+$('#task2').addEventListener('change',()=>{clear2();update();});
+$$('[data-sol]').forEach(b=>b.addEventListener('click',()=>{const s=b.dataset.sol;sol2[s]=!sol2[s];update();}));
+$('#all2').addEventListener('click',()=>{const all=['X','p','B','H'].every(s=>sol2[s]);['X','p','B','H'].forEach(s=>sol2[s]=!all);update();});
+$('#check2').addEventListener('click',()=>{fb2=true;update();});
+$('#clear2').addEventListener('click',()=>{clear2();update();});
+['#a2h0','#a2h1','#a2type'].forEach(s=>$(s).addEventListener('change',()=>{if(fb2)update();}));
+['#a2p0a','#a2p0b'].forEach(s=>$(s).addEventListener('input',()=>{if(fb2)update();}));
+$$('.b2').forEach(b=>b.addEventListener('change',()=>{if(fb2)update();}));
+/* Reiter 3 bis 5 */
+$('#ctx').addEventListener('change',()=>{loadCtx($('#ctx').value);ruleKey='';show4=false;fillTasks();update();});
+['type','p0'].forEach(id=>$('#'+id).addEventListener('input',()=>{$('#ctx').value='eigen';fillTasks();update();}));
+$('#type').addEventListener('change',()=>{$('#ctx').value='eigen';fillTasks();update();});
+$('#n').addEventListener('input',()=>{$('#ctx').value='eigen';fillTasks();update();});
+$('#kobs').addEventListener('input',update);
 $('#alpha').addEventListener('change',update);
-$('#show1').addEventListener('click',()=>{show1=!show1;update();});
+$('#show4').addEventListener('click',()=>{show4=!show4;update();});
+['kL','kR'].forEach(id=>$('#'+id).addEventListener('input',update));
+$('#kRestore').addEventListener('click',()=>{ruleKey='';update();});
 $('#p1r').addEventListener('input',()=>{p1=+$('#p1r').value;$('#p1n').value=p1;update();});
 $('#p1n').addEventListener('input',()=>{const v=parseNum($('#p1n').value);if(v>0&&v<1){p1=v;$('#p1r').value=v;update();}});
-['ruleA','ruleK'].forEach(id=>$('#'+id).addEventListener('change',update));
-['kL2','kR2'].forEach(id=>$('#'+id).addEventListener('input',update));
-['ocO','ocG','cmp'].forEach(id=>$('#'+id).addEventListener('change',update));
+['src5k','src5a','ocO','ocG','cmp'].forEach(id=>$('#'+id).addEventListener('change',update));
 $('#n2r').addEventListener('input',()=>{$('#n2n').value=$('#n2r').value;update();});
 $('#n2n').addEventListener('input',()=>{$('#n2r').value=$('#n2n').value;update();});
-$('#btnPresent').addEventListener('click',e=>{const on=root.classList.toggle('present');e.currentTarget.setAttribute('aria-pressed',String(on));update();});
+const TKEY='ht-theme';
+const savedTheme=()=>{try{const s=localStorage.getItem(TKEY);return s==='light'||s==='dark'?s:null;}catch(e){return null;}};
+/* Im Präsentationsmodus immer hell, sonst Systemeinstellung oder gemerkte Wahl */
+const applyTheme=()=>{const s=root.classList.contains('present')?'light':savedTheme();if(s)root.setAttribute('data-theme',s);else root.removeAttribute('data-theme');};
+$('#btnPresent').addEventListener('click',e=>{const on=root.classList.toggle('present');e.currentTarget.setAttribute('aria-pressed',String(on));applyTheme();themeLabel();update();});
 const mq=matchMedia('(prefers-color-scheme: dark)');
 const isDark=()=>{const t=root.getAttribute('data-theme');return t?t==='dark':mq.matches;};
 const themeLabel=()=>{$('#btnTheme').textContent=isDark()?'Hell':'Dunkel';};
-$('#btnTheme').addEventListener('click',()=>{root.setAttribute('data-theme',isDark()?'light':'dark');themeLabel();update();});
+$('#btnTheme').addEventListener('click',()=>{const n=isDark()?'light':'dark';root.setAttribute('data-theme',n);try{localStorage.setItem(TKEY,n);}catch(e){}themeLabel();update();});
 mq.addEventListener('change',()=>{themeLabel();update();});
-$('#btnReset').addEventListener('click',()=>{loadCtx('med');show1=true;$('#ruleA').checked=true;ruleKey='';$('#ocO').checked=true;$('#cmp').checked=false;$('#n2n').value=400;$('#n2r').value=400;update();});
+$('#btnReset').addEventListener('click',()=>{loadCtx('med');show4=false;$('#alpha').value='0.05';$('#k1').value=68;$('#k1r').value=68;setPT(.6);fillTasks();clear2();$('#src5k').checked=true;$('#ocO').checked=true;$('#cmp').checked=false;$('#n2n').value=400;$('#n2r').value=400;update();});
 new ResizeObserver(()=>update()).observe(document.querySelector('main'));
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(update);
-themeLabel();loadCtx('med');update();
+applyTheme();themeLabel();loadCtx('med');fillTasks();update();
 })();
 </script>
-
-</body></html>

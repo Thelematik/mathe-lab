@@ -105,6 +105,7 @@ kbd{font-family:var(--f-mono);border:1px solid var(--line);border-radius:4px;pad
       <h1 id="stTitle">Ähnliche Dreiecke</h1>
     </div>
     <nav class="steps" id="steps" aria-label="Stufen"></nav>
+    <button class="ghostbtn" id="themeBtn" type="button">Dunkel</button>
     <button class="ghostbtn" id="fs" type="button">Vollbild</button>
   </header>
 
@@ -490,6 +491,10 @@ svg.addEventListener('pointermove',e=>{if(drag)dragTo(e);});
 /* Tastatur und Vollbild */
 function fullscreen(){const d=document;try{if(d.fullscreenElement)d.exitFullscreen();else d.documentElement.requestFullscreen().catch(()=>{});}catch(_){}}
 $('fs').onclick=fullscreen;
+/* Im Vollbild (Beamer) immer hell, danach wieder gemerkte Wahl oder Systemeinstellung */
+document.addEventListener('fullscreenchange',()=>{const r=document.documentElement;let s=null;try{s=localStorage.getItem('trig-theme')}catch(_){}
+  if(document.fullscreenElement)r.setAttribute('data-theme','light');else if(s==='dark'||s==='light')r.setAttribute('data-theme',s);else r.removeAttribute('data-theme');
+  const b=$('themeBtn');if(b){const d=r.getAttribute('data-theme')?r.getAttribute('data-theme')==='dark':matchMedia('(prefers-color-scheme: dark)').matches;b.textContent=d?'Hell':'Dunkel';}});
 document.addEventListener('keydown',e=>{
   const tag=(e.target.type||'');
   if(tag==='range')return;
@@ -502,4 +507,13 @@ document.addEventListener('keydown',e=>{
 render();
 </script>
 
+<script>/* Farbschema: folgt der Systemeinstellung, eine Umschaltung wird gemerkt */
+(function(){var root=document.documentElement,KEY='trig-theme',mq=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null,btn=document.getElementById('themeBtn');
+function isDark(){var t=root.getAttribute('data-theme');return t?t==='dark':!!(mq&&mq.matches);}
+function label(){if(!btn)return;var d=isDark();btn.textContent=d?'Hell':'Dunkel';btn.setAttribute('aria-pressed',String(d));btn.title=d?'Zum hellen Design wechseln':'Zum dunklen Design wechseln';}
+function changed(){label();try{document.dispatchEvent(new Event('themechange'));}catch(e){}}
+try{var s=localStorage.getItem(KEY);if(s==='light'||s==='dark')root.setAttribute('data-theme',s);}catch(e){}
+if(btn)btn.addEventListener('click',function(){var n=isDark()?'light':'dark';root.setAttribute('data-theme',n);try{localStorage.setItem(KEY,n);}catch(e){}changed();});
+if(mq&&mq.addEventListener)mq.addEventListener('change',changed);label();})();
+</script>
 </body></html>
