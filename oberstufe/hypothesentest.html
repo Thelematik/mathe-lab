@@ -199,6 +199,16 @@ td.ok{color:var(--good);font-weight:600} td.no{color:var(--muted)}
     </div>
     <aside class="side">
       <div class="card">
+        <h3>Entscheidungsregel</h3>
+        <label class="toggle"><input type="radio" name="rule2" id="ruleA" checked>aus dem Signifikanzniveau α bestimmen</label>
+        <label class="toggle"><input type="radio" name="rule2" id="ruleK">Grenze k selbst festlegen</label>
+        <div class="fields" id="kbox" hidden style="margin-top:6px">
+          <label class="field" id="kLwrap"><span id="kLlab">H₀ verwerfen für X ≤</span><input type="number" id="kL2" min="0" step="1"></label>
+          <label class="field" id="kRwrap"><span id="kRlab">H₀ verwerfen für X ≥</span><input type="number" id="kR2" min="0" step="1"></label>
+        </div>
+        <div id="kinfo"></div>
+      </div>
+      <div class="card">
         <h3>Wahre Trefferwahrscheinlichkeit</h3>
         <div class="slider"><label for="p1r" class="sym">p₁</label><input type="range" id="p1r" min="0.01" max="0.99" step="0.01" value="0.7"><input type="number" id="p1n" min="0.001" max="0.999" step="any" value="0.7" aria-label="p₁ exakt eingeben"></div>
         <div id="p1warn"></div>
@@ -211,10 +221,12 @@ td.ok{color:var(--good);font-weight:600} td.no{color:var(--muted)}
         <p><b>Fehler 1. Art:</b> H₀ ist wahr, wird aber verworfen. Seine Wahrscheinlichkeit ist P(X ∈ V) unter p₀ und höchstens α.</p>
         <p><b>Fehler 2. Art:</b> H₁ ist wahr, H₀ wird aber beibehalten. Seine Wahrscheinlichkeit β hängt vom wahren Wert p₁ ab: β = P(X ∈ A) unter p₁. Je näher p₁ an p₀ liegt, desto größer ist β.</p>
         <p>Wird α kleiner gewählt, wird der Annahmebereich größer und β wächst. Beide Fehler lassen sich bei festem n nicht gleichzeitig verkleinern. Erst ein größeres n verringert beide.</p>
+        <p>Legt man die Grenze k selbst fest, ergeben sich beide Fehlerwahrscheinlichkeiten direkt aus der Entscheidungsregel. Verschiebt man k so, dass der Verwerfungsbereich größer wird, steigt der Fehler 1. Art und der Fehler 2. Art sinkt. Umgekehrt gilt das Gegenteil.</p>
       </div></details>
       <details class="card task"><summary><span class="tag">Aufgabe für dich</span></summary><div class="body">
         <p><b>Berechnen</b> Sie die Wahrscheinlichkeit für den Fehler 2. Art für den eingestellten Wert p₁ mit dem WTR.</p>
         <p><b>Untersuchen</b> Sie, wie groß n mindestens sein muss, damit β unter 10 % liegt. <b>Deuten</b> Sie das Ergebnis im Sachzusammenhang.</p>
+        <p>Legen Sie die Grenze k selbst fest. <b>Berechnen</b> Sie für diese Entscheidungsregel die Wahrscheinlichkeiten beider Fehler mit dem WTR und <b>beschreiben</b> Sie, wie sie sich ändern, wenn k um 1 vergrößert wird.</p>
       </div></details>
     </aside>
   </section>
@@ -325,6 +337,14 @@ function test(n,p0,type,alpha){
   return{D,mu,s,kL,kR,inV,aL,aR,err1,n,p0,type,alpha};
 }
 const keepProb=(n,p,T)=>Pin(dist(n,p),T.aL,T.aR);
+/* Entscheidungsregel mit selbst gewählter Grenze */
+function withK(T,kL,kR){
+  const n=T.n,D=T.D;
+  const inV=k=>(kL!==null&&k<=kL)||(kR!==null&&k>=kR);
+  const aL=kL===null?0:kL+1,aR=kR===null?n:kR-1;
+  const err1=(kL===null?0:Ple(D,kL))+(kR===null?0:Pge(D,kR));
+  return Object.assign({},T,{kL,kR,inV,aL,aR,err1,own:true});
+}
 
 let show1=true;
 function state(){
@@ -342,7 +362,7 @@ function setText(T){
 const VText=T=>{const parts=[];if(T.kL!==null)parts.push(T.kL===0?'{0}':`{0; …; ${T.kL}}`);if(T.kR!==null)parts.push(T.kR===T.n?`{${T.n}}`:`{${T.kR}; …; ${T.n}}`);return parts.length?parts.join(' ∪ '):'∅';};
 const AText=T=>T.aL>T.aR?'∅':`{${T.aL}; …; ${T.aR}}`;
 function ruleText(T,c){
-  if(T.kL===null&&T.kR===null)return `<p class="err">Bei n = ${T.n} gibt es keinen Verwerfungsbereich, der das Signifikanzniveau einhält. Der Stichprobenumfang ist zu klein.</p>`;
+  if(!T.own&&T.kL===null&&T.kR===null)return `<p class="err">Bei n = ${T.n} gibt es keinen Verwerfungsbereich, der das Signifikanzniveau einhält. Der Stichprobenumfang ist zu klein.</p>`;
   let cond=T.type==='R'?`mindestens ${T.kR}`:T.type==='L'?`höchstens ${T.kL}`:(T.kL!==null&&T.kR!==null?`höchstens ${T.kL} oder mindestens ${T.kR}`:T.kL!==null?`höchstens ${T.kL}`:`mindestens ${T.kR}`);
   return `<p class="rule">Nimmt X einen Wert von ${cond} an, wird H₀ verworfen. Andernfalls wird H₀ beibehalten.</p>`;
 }
@@ -389,7 +409,32 @@ function r1(T){
 /* Reiter 2 */
 let p1=.7;
 function setP1(v){p1=v;$('#p1r').value=v;$('#p1n').value=v;}
-function r2(T){
+let ruleKey='';
+function fillK(T){
+  const mu=Math.round(T.mu),s=Math.max(1,Math.round(1.64*T.s));
+  $('#kL2').value=T.kL!==null?T.kL:Math.max(0,mu-s);
+  $('#kR2').value=T.kR!==null?T.kR:Math.min(T.n,mu+s);
+}
+function ownRule(T){
+  const own=$('#ruleK').checked;$('#kbox').hidden=!own;
+  if(!own){$('#kinfo').innerHTML='';ruleKey='';return T;}
+  const key=T.type+'|'+T.n+'|'+T.p0;if(key!==ruleKey||$('#kL2').value===''||$('#kR2').value===''){fillK(T);ruleKey=key;}
+  const L=T.type!=='R',Rt=T.type!=='L';
+  $('#kLwrap').hidden=!L;$('#kRwrap').hidden=!Rt;
+  $('#kLlab').textContent=T.type==='Z'?'H₀ verwerfen für X ≤ k₁ mit k₁ =':'H₀ verwerfen für X ≤ k mit k =';
+  $('#kRlab').textContent=T.type==='Z'?'H₀ verwerfen für X ≥ k₂ mit k₂ =':'H₀ verwerfen für X ≥ k mit k =';
+  $('#kL2').max=T.n;$('#kR2').max=T.n;
+  const kL=L?Math.round(+$('#kL2').value):null,kR=Rt?Math.round(+$('#kR2').value):null;
+  const bad=(L&&!(kL>=0&&kL<=T.n))||(Rt&&!(kR>=0&&kR<=T.n))||(L&&Rt&&kL>=kR-1);
+  if(bad){$('#kinfo').innerHTML=`<p class="err" style="margin:8px 0 0">Bitte ganze Zahlen von 0 bis ${T.n} eingeben${L&&Rt?', dabei k₁ deutlich kleiner als k₂':''}.</p>`;return null;}
+  const U=withK(T,kL,kR);
+  const ok=U.err1<=T.alpha+1e-12;
+  $('#kinfo').innerHTML=ruleText(U)+`<p class="notation">Vergleich mit α = ${fmtT(T.alpha*100,1)} %: Der Fehler 1. Art ist ${ok?'höchstens':'größer als'} α. ${ok?'Das Signifikanzniveau wird eingehalten.':'Das Signifikanzniveau wird nicht eingehalten.'}</p>`;
+  return U;
+}
+function r2(T0){
+  const T=ownRule(T0);
+  if(!T){document.querySelectorAll('#four,#kv2').forEach(e=>e.innerHTML='');$('#cap2a').textContent='';$('#cap2b').textContent='';['#c2a','#c2b'].forEach(id=>{const c=$(id);c.getContext('2d').clearRect(0,0,c.width,c.height);});return;}
   const inH1=T.type==='R'?p1>T.p0:T.type==='L'?p1<T.p0:Math.abs(p1-T.p0)>1e-9;
   const D1=dist(T.n,p1),beta=Pin(D1,T.aL,T.aR);
   $('#p1warn').innerHTML=inH1?'':`<p class="err" style="margin:0">p₁ = ${fmtT(p1,3)} liegt nicht in H₁. Dann ist H₀ wahr und ein Fehler 2. Art kann nicht auftreten.</p>`;
@@ -447,6 +492,8 @@ $('#alpha').addEventListener('change',update);
 $('#show1').addEventListener('click',()=>{show1=!show1;update();});
 $('#p1r').addEventListener('input',()=>{p1=+$('#p1r').value;$('#p1n').value=p1;update();});
 $('#p1n').addEventListener('input',()=>{const v=parseNum($('#p1n').value);if(v>0&&v<1){p1=v;$('#p1r').value=v;update();}});
+['ruleA','ruleK'].forEach(id=>$('#'+id).addEventListener('change',update));
+['kL2','kR2'].forEach(id=>$('#'+id).addEventListener('input',update));
 ['ocO','ocG','cmp'].forEach(id=>$('#'+id).addEventListener('change',update));
 $('#n2r').addEventListener('input',()=>{$('#n2n').value=$('#n2r').value;update();});
 $('#n2n').addEventListener('input',()=>{$('#n2r').value=$('#n2n').value;update();});
@@ -456,7 +503,7 @@ const isDark=()=>{const t=root.getAttribute('data-theme');return t?t==='dark':mq
 const themeLabel=()=>{$('#btnTheme').textContent=isDark()?'Hell':'Dunkel';};
 $('#btnTheme').addEventListener('click',()=>{root.setAttribute('data-theme',isDark()?'light':'dark');themeLabel();update();});
 mq.addEventListener('change',()=>{themeLabel();update();});
-$('#btnReset').addEventListener('click',()=>{loadCtx('med');show1=true;$('#ocO').checked=true;$('#cmp').checked=false;$('#n2n').value=400;$('#n2r').value=400;update();});
+$('#btnReset').addEventListener('click',()=>{loadCtx('med');show1=true;$('#ruleA').checked=true;ruleKey='';$('#ocO').checked=true;$('#cmp').checked=false;$('#n2n').value=400;$('#n2r').value=400;update();});
 new ResizeObserver(()=>update()).observe(document.querySelector('main'));
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(update);
 themeLabel();loadCtx('med');update();
