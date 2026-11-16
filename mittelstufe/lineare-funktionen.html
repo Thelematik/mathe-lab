@@ -1,0 +1,612 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:17px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Lineare Funktionen erkunden</title>
+<link rel="stylesheet" href="../assets/fonts/fonts.css">
+<style id="typo-basis">
+/* Platz für die Scrollleiste immer freihalten, damit nichts springt, wenn die Seite länger wird */
+html{scrollbar-gutter:stable}
+/* Einheitliche Schriften: Text Source Sans 3, Überschriften Source Serif 4, Zahlen Source Code Pro */
+html{font-size:19px}
+body{font-family:"Source Sans 3", system-ui, sans-serif}
+h1,h2,h3{font-family:"Source Serif 4", Georgia, serif}
+button,input,select,textarea{font-family:inherit}
+code,kbd,samp,pre{font-family:"Source Code Pro", ui-monospace, monospace}
+</style>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: Kopfzeile, Reiter, darunter Zeichenfläche links und Steuerung mit Erklärung rechts; schmal einspaltig */
+:root{
+  --paper:#edf1f4; --sheet:#ffffff; --ink:#13212c; --muted:#556776; --line:#d2dce4; --grid:#e3e9ee; --axis:#7a8b99;
+  --curve:#0e6584; --reject:#b03f74; --keep:#7a8b99; --beta:#dc8f1e; --good:#2c7a4b; --warn:#a4570f; --on-curve:#ffffff;
+  --font-display:"Source Serif 4","Iowan Old Style",Georgia,serif;
+  --font-body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --font-mono:"Source Code Pro",ui-monospace,"SFMono-Regular",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0e151b; --sheet:#152029; --ink:#e4ecf1; --muted:#93a5b3; --line:#283844; --grid:#1f2c36; --axis:#6d8292;
+    --curve:#5ec4e2; --reject:#ec8fbb; --keep:#6d8292; --beta:#f1b155; --good:#6cc596; --warn:#f0a35a; --on-curve:#0b1a22; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0e151b; --sheet:#152029; --ink:#e4ecf1; --muted:#93a5b3; --line:#283844; --grid:#1f2c36; --axis:#6d8292;
+  --curve:#5ec4e2; --reject:#ec8fbb; --keep:#6d8292; --beta:#f1b155; --good:#6cc596; --warn:#f0a35a; --on-curve:#0b1a22; color-scheme:dark;
+}
+[hidden]{display:none!important}
+body{background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:20.5px;line-height:1.5}
+.wrap{max-width:1380px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:22px 48px}
+h1,h2,h3{font-family:var(--font-display);font-weight:500;text-wrap:balance;margin:0}
+.top{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;margin-bottom:16px}
+.eyebrow{margin:0 0 4px;font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h1{font-size:clamp(1.8rem,3.4vw,2.6rem);line-height:1.1}
+h1 em{color:var(--reject)}
+.tools{display:flex;flex-wrap:wrap;gap:8px}
+.btn{font:600 .92rem var(--font-body);border:1px solid var(--line);background:var(--sheet);color:var(--ink);border-radius:8px;padding:8px 14px;cursor:pointer}
+.btn:hover{border-color:var(--axis)}
+.btn[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.btn.primary{background:var(--curve);border-color:var(--curve);color:var(--on-curve)}
+:focus-visible{outline:2px solid var(--curve);outline-offset:2px}
+.setup{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:16px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.4fr);gap:18px}
+@media (max-width:920px){.setup{grid-template-columns:minmax(0,1fr)}}
+.setup h3{font-size:1.15rem;margin-bottom:8px}
+.ctx{margin:0;max-width:65ch;font-size:1.02rem}
+.hyp{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:10px;font-size:1.05rem}
+.hyp b{font-family:var(--font-display);font-weight:500;font-size:1.15rem}
+.tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);margin-bottom:18px;scrollbar-width:thin}
+.tab{flex:0 0 auto;display:flex;gap:8px;align-items:baseline;font:600 .98rem var(--font-body);background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:10px 14px 9px;cursor:pointer}
+.tab .no{font:600 .78rem var(--font-mono);color:var(--axis)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--reject)}
+.tab[aria-selected="true"] .no{color:var(--reject)}
+.panel{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:920px){.panel{grid-template-columns:minmax(0,1fr)}}
+.stage,.card{background:var(--sheet);border:1px solid var(--line);border-radius:10px}
+.stage{padding:14px;min-width:0}
+.stage canvas{display:block;width:100%;height:clamp(280px,50vh,520px)}
+.stage canvas.half{height:clamp(200px,30vh,300px)}
+.stage canvas.half + .cap{margin-top:12px}
+.cap{font:600 .9rem var(--font-body);color:var(--muted);margin:0 0 4px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.88rem;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:6px}
+.legend i.ln{height:3px;width:22px;vertical-align:middle}
+.side{display:flex;flex-direction:column;gap:14px;min-width:0}
+.card{padding:14px 16px}
+.card h3{font-size:1.15rem;margin-bottom:10px}
+.slider{display:grid;grid-template-columns:2.6rem minmax(0,1fr) 5.6rem;gap:10px;align-items:center;margin:8px 0}
+.slider .sym{font:italic 500 1.3rem var(--font-display)}
+input,select,textarea{box-sizing:border-box}
+input[type=range]{accent-color:var(--curve);width:100%;min-width:0}
+input[type=number],input[type=text],select{font:500 .95rem var(--font-mono);border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:6px;padding:6px 8px;width:100%;min-width:0}
+select{font-family:var(--font-body)}
+.field{display:grid;gap:4px;font-size:.9rem;color:var(--muted)}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.toggle{display:flex;gap:10px;align-items:center;padding:6px 0;cursor:pointer}
+.toggle input{width:18px;height:18px;accent-color:var(--curve)}
+.state{display:inline-flex;align-items:center;gap:6px;font:600 .85rem var(--font-body);padding:3px 10px;border-radius:999px;border:1px solid currentColor}
+.state.ok{color:var(--good)} .state.no{color:var(--reject)}
+.kv{display:grid;grid-template-columns:minmax(0,1fr);gap:2px;font-size:.95rem;margin:0}
+.kv dt:not(:first-child){margin-top:8px}
+.kv dd{white-space:nowrap;overflow-x:auto}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.result{font:600 1.4rem var(--font-mono);font-variant-numeric:tabular-nums;margin:2px 0;overflow-wrap:anywhere}
+.result small{display:block;font:400 .9rem var(--font-body);color:var(--muted)}
+.rule{font-size:1.02rem;margin:8px 0 0;max-width:65ch}
+.covered{color:var(--muted);font-style:italic;margin:0}
+.err{color:var(--warn);font-weight:600}
+details > summary{cursor:pointer;font-weight:700;list-style:none;display:flex;align-items:center;gap:8px}
+details > summary::-webkit-details-marker{display:none}
+details > summary::before{content:"";width:8px;height:8px;border-right:2px solid var(--axis);border-bottom:2px solid var(--axis);transform:rotate(-45deg);transition:transform .15s}
+details[open] > summary::before{transform:rotate(45deg)}
+details .body{margin-top:10px;font-size:.98rem}
+details .body p{margin:0 0 .7em;max-width:65ch}
+.task summary .tag{font:600 .72rem var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--reject)}
+.tablebox{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.92rem;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--grid);white-space:nowrap}
+th{font-weight:600;color:var(--muted);font-size:.82rem}
+td.num{font-family:var(--font-mono)}
+tr.hit td{background:color-mix(in srgb,var(--reject) 16%,transparent)}
+td.ok{color:var(--good);font-weight:600} td.no{color:var(--muted)}
+.four{width:100%;border-collapse:separate;border-spacing:6px;font-size:.92rem}
+.four th{white-space:normal;text-align:center}
+.four td{white-space:normal;text-align:center;border:1px solid var(--line);border-radius:8px;padding:10px 8px;vertical-align:middle}
+.four td.e1{border-color:var(--reject);color:var(--reject);font-weight:600}
+.four td.e2{border-color:var(--beta);color:var(--warn);font-weight:600}
+.four td.r{color:var(--good)}
+.four .rowh{text-align:left;color:var(--muted);font-weight:600;border:0;padding-left:0}
+.notation{font-size:.9rem;color:var(--muted);margin:8px 0 0}
+.present .explain,.present .task{display:none!important}
+.lead{font-size:1.02rem;margin:0 0 10px;max-width:65ch}
+.story{font-size:1.02rem;margin:0;max-width:65ch}
+.rulebox{margin-top:10px;padding:10px 12px;border-left:4px solid var(--curve);background:color-mix(in srgb,var(--curve) 8%,transparent);border-radius:0 8px 8px 0}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.btn.small{padding:5px 10px;font-size:.85rem}
+.eq{font:600 1.45rem var(--font-mono);font-variant-numeric:tabular-nums;margin:4px 0;white-space:nowrap;overflow-x:auto}
+.eq.g{color:var(--reject)} .eq.f{color:var(--curve)}
+.nw{white-space:nowrap}
+.steptools{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.model{margin-top:10px;padding:10px 12px;border-radius:8px;background:color-mix(in srgb,var(--good) 9%,transparent);border:1px solid color-mix(in srgb,var(--good) 35%,transparent)}
+.model p{margin:0 0 .4em;max-width:65ch}.model p:last-child{margin:0}
+.calc{font-family:var(--font-mono);font-size:.98rem;line-height:1.7}
+.calc div{white-space:nowrap}
+.fb{list-style:none;padding:0;margin:10px 0 0;display:grid;gap:6px}
+.fb li{display:flex;gap:8px;align-items:baseline}
+.fb .st{font:600 .8rem var(--font-body);padding:1px 8px;border-radius:999px;border:1px solid currentColor;flex:0 0 auto}
+.fb .ok{color:var(--good)} .fb .no{color:var(--reject)}
+.inrow{display:grid;grid-template-columns:auto 7rem;gap:8px 12px;align-items:center;margin:6px 0}
+.inrow label{font:italic 500 1.15rem var(--font-display)}
+.task ol{margin:0;padding-left:1.2em}.task li{margin-bottom:.5em;max-width:65ch}
+.vtable td,.vtable th{text-align:center}
+.vtable td.cur{background:color-mix(in srgb,var(--beta) 22%,transparent);font-weight:700}
+.score{font:600 .95rem var(--font-body);color:var(--muted)}
+.state.neutral{color:var(--muted)}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Klasse 8 · Funktionen · lineare Funktionen</p>
+      <h1>Lineare Funktionen <em>erkunden</em></h1>
+    </div>
+    <div class="tools">
+      <button class="btn" id="btnPresent" aria-pressed="false">Präsentationsmodus</button>
+      <button class="btn" id="btnTheme">Dunkel</button>
+      <button class="btn" id="btnReset">Zurücksetzen</button>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Themen">
+    <button class="tab" role="tab" data-tab="t1" aria-selected="true"><span class="no">1</span>Einführendes Beispiel</button>
+    <button class="tab" role="tab" data-tab="t2" aria-selected="false"><span class="no">2</span>Steigung m</button>
+    <button class="tab" role="tab" data-tab="t3" aria-selected="false"><span class="no">3</span>y-Achsenabschnitt und Nullstelle</button>
+    <button class="tab" role="tab" data-tab="t4" aria-selected="false"><span class="no">4</span>Gleichung bestimmen</button>
+    <button class="tab" role="tab" data-tab="t5" aria-selected="false"><span class="no">5</span>Zwei Geraden</button>
+  </nav>
+
+  <main>
+  <!-- Reiter 1: Taxifahrt -->
+  <section class="panel" id="t1" role="tabpanel">
+    <div class="stage">
+      <p class="cap" id="cap1"></p>
+      <canvas id="c1" class="main" aria-label="Graph Preis in Abhängigkeit von der Strecke"></canvas>
+      <div class="legend"><span><i style="background:var(--curve)"></i>Werte aus der Tabelle</span><span><i class="ln" style="background:var(--curve)"></i>Graph</span><span id="leg1z" hidden><i style="background:var(--beta)"></i>Zuwachs pro Kilometer</span></div>
+      <div class="tablebox" style="margin-top:12px"><table class="vtable" id="tab1"></table></div>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>Die Taxifahrt</h3>
+        <p class="story">Ein Taxiunternehmen berechnet für jede Fahrt einen <b>Grundpreis</b> und zusätzlich einen festen <b>Preis pro gefahrenem Kilometer</b>.</p>
+        <div class="slider"><label for="t1gr" class="sym" title="Grundpreis">G</label><input type="range" id="t1gr" min="0" max="10" step="0.5" value="4"><input type="number" id="t1gn" min="0" max="10" step="0.5" value="4" aria-label="Grundpreis in Euro"></div>
+        <p class="notation" style="margin:-4px 0 6px">Grundpreis in €</p>
+        <div class="slider"><label for="t1kr" class="sym" title="Preis pro km">k</label><input type="range" id="t1kr" min="0.5" max="4" step="0.1" value="2"><input type="number" id="t1kn" min="0.5" max="4" step="0.1" value="2" aria-label="Preis pro Kilometer in Euro"></div>
+        <p class="notation" style="margin:-4px 0 6px">Preis pro Kilometer in €</p>
+        <div class="slider"><label for="t1xr" class="sym" title="Strecke">x</label><input type="range" id="t1xr" min="0" max="12" step="0.5" value="5"><input type="number" id="t1xn" min="0" max="12" step="0.5" value="5" aria-label="Strecke in km"></div>
+        <p class="notation" style="margin:-4px 0 6px">gefahrene Strecke in km</p>
+        <div id="res1"></div>
+      </div>
+      <div class="card">
+        <h3>Funktionsgleichung</h3>
+        <label class="toggle"><input type="checkbox" id="t1zw">Zuwachs pro Kilometer im Graphen zeigen</label>
+        <div class="steptools"><button class="btn primary small" id="t1show">Gleichung zeigen</button></div>
+        <div class="model" id="t1eq" hidden></div>
+      </div>
+      <details class="card explain" open><summary>Worum geht es?</summary><div class="body">
+        <p>Jeder Strecke x wird genau ein Preis y zugeordnet. Eine solche eindeutige Zuordnung heißt <b>Funktion</b>.</p>
+        <p>Jeder weitere Kilometer kostet immer gleich viel mehr. Der Preis wächst also gleichmäßig. Dann liegen alle Punkte auf einer <b>Geraden</b>, und man spricht von einer <b>linearen Funktion</b>.</p>
+        <p>Der Grundpreis ist der Preis für 0 km. Dort beginnt der Graph auf der y-Achse.</p>
+      </div></details>
+      <details class="card task"><summary><span class="tag">Aufgabe für dich</span></summary><div class="body"><ol>
+        <li><b>Berechnen</b> Sie den Preis für eine Fahrt von 12 km mit Grundpreis 4 € und 2 € pro km.</li>
+        <li><b>Bestimmen</b> Sie, wie weit man für 30 € fahren kann. Kontrollieren Sie am Graphen.</li>
+        <li><b>Beschreiben</b> Sie, wie sich der Graph verändert, wenn der Grundpreis bzw. der Preis pro Kilometer größer wird.</li>
+        <li><b>Stellen</b> Sie eine Gleichung <b>auf</b>, mit der man den Preis y für jede Strecke x berechnen kann, und vergleichen Sie dann mit „Gleichung zeigen“.</li>
+      </ol></div></details>
+    </aside>
+  </section>
+
+  <!-- Reiter 2: Steigung -->
+  <section class="panel" id="t2" role="tabpanel" hidden>
+    <div class="stage">
+      <p class="cap" id="cap2"></p>
+      <canvas id="c2" class="main" aria-label="Gerade mit Steigungsdreieck"></canvas>
+      <div class="legend"><span><i class="ln" style="background:var(--curve)"></i>Graph von f</span><span><i style="background:var(--beta)"></i>Steigungsdreieck</span></div>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <p class="eq f" id="eq2"></p>
+        <div class="slider"><label for="m2r" class="sym">m</label><input type="range" id="m2r" min="-5" max="5" step="0.1" value="2"><input type="text" id="m2n" inputmode="decimal" value="2" aria-label="Steigung m, auch als Bruch"></div>
+        <div class="slider"><label for="b2r" class="sym">b</label><input type="range" id="b2r" min="-8" max="8" step="0.5" value="1"><input type="number" id="b2n" min="-8" max="8" step="0.5" value="1" aria-label="y-Achsenabschnitt b"></div>
+        <div class="chips"><button class="btn small" data-m2="2">m = 2</button><button class="btn small" data-m2="1/2">m = 1/2</button><button class="btn small" data-m2="-1">m = −1</button><button class="btn small" data-m2="-3">m = −3</button><button class="btn small" data-m2="0">m = 0</button></div>
+        <p class="notation">m kann auch als Bruch eingegeben werden, z. B. 2/3.</p>
+      </div>
+      <div class="card">
+        <h3>Steigungsdreieck</h3>
+        <div class="slider"><label for="x2r" class="sym">x₁</label><input type="range" id="x2r" min="-8" max="8" step="1" value="0"><input type="number" id="x2n" min="-8" max="8" step="1" value="0" aria-label="Startstelle des Steigungsdreiecks"></div>
+        <div class="slider"><label for="d2r" class="sym">Δx</label><input type="range" id="d2r" min="1" max="6" step="1" value="1"><input type="number" id="d2n" min="1" max="6" step="1" value="1" aria-label="Breite des Steigungsdreiecks"></div>
+        <div id="res2"></div>
+      </div>
+      <details class="card explain" open><summary>Erklärung</summary><div class="body">
+        <p>Die <b>Steigung m</b> gibt an, um wie viel sich y ändert, wenn x um 1 größer wird.</p>
+        <p>Mit einem <b>Steigungsdreieck</b> liest man sie ab: m = Δy : Δx, also Änderung in y-Richtung geteilt durch Änderung in x-Richtung. Bei einer Geraden ergibt sich überall derselbe Wert, egal wo und wie groß man das Dreieck zeichnet.</p>
+        <p>m &gt; 0: Der Graph <b>steigt</b>. m &lt; 0: Der Graph <b>fällt</b>. m = 0: Der Graph verläuft <b>waagerecht</b>. Je größer der Betrag von m, desto steiler ist die Gerade.</p>
+      </div></details>
+      <details class="card task"><summary><span class="tag">Aufgabe für dich</span></summary><div class="body"><ol>
+        <li>Verschieben Sie das Steigungsdreieck und verändern Sie Δx. <b>Begründen</b> Sie, warum sich der Wert von m dabei nicht ändert.</li>
+        <li><b>Vergleichen</b> Sie die Geraden mit m = 2, m = 1/2 und m = −1. <b>Beschreiben</b> Sie den Einfluss von Vorzeichen und Betrag.</li>
+        <li><b>Zeichnen</b> Sie im Heft die Gerade mit m = 2/3 und b = −1 mithilfe eines Steigungsdreiecks und kontrollieren Sie hier.</li>
+      </ol></div></details>
+    </aside>
+  </section>
+
+  <!-- Reiter 3: y-Achsenabschnitt und Nullstelle -->
+  <section class="panel" id="t3" role="tabpanel" hidden>
+    <div class="stage">
+      <p class="cap" id="cap3"></p>
+      <canvas id="c3" class="main" aria-label="Gerade mit y-Achsenabschnitt und Nullstelle"></canvas>
+      <div class="legend"><span><i class="ln" style="background:var(--curve)"></i>Graph von f</span><span id="leg3v" hidden><i class="ln" style="background:var(--axis)"></i>Vergleichsgerade y = m · x</span><span><i style="background:var(--reject);border-radius:50%"></i>Schnittpunkte mit den Achsen</span></div>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <p class="eq f" id="eq3"></p>
+        <div class="slider"><label for="m3r" class="sym">m</label><input type="range" id="m3r" min="-5" max="5" step="0.1" value="-2"><input type="text" id="m3n" inputmode="decimal" value="-2" aria-label="Steigung m, auch als Bruch"></div>
+        <div class="slider"><label for="b3r" class="sym">b</label><input type="range" id="b3r" min="-8" max="8" step="0.5" value="6"><input type="number" id="b3n" min="-8" max="8" step="0.5" value="6" aria-label="y-Achsenabschnitt b"></div>
+        <label class="toggle"><input type="checkbox" id="v3">Vergleichsgerade y = m · x durch den Ursprung zeigen</label>
+      </div>
+      <div class="card">
+        <h3>Schnittpunkte mit den Achsen</h3>
+        <dl class="kv" id="kv3"></dl>
+        <div class="steptools"><button class="btn primary small" id="show3">Rechnung zur Nullstelle zeigen</button></div>
+        <div class="model" id="sol3" hidden></div>
+      </div>
+      <details class="card explain" open><summary>Erklärung</summary><div class="body">
+        <p>Der <b>y-Achsenabschnitt b</b> ist der Funktionswert an der Stelle 0: f(0) = b. Dort schneidet der Graph die y-Achse im Punkt S<sub>y</sub>(0 | b).</p>
+        <p>Ändert man nur b, wird die Gerade nach oben oder unten <b>verschoben</b>. Geraden mit derselben Steigung sind <b>parallel</b>.</p>
+        <p>Eine <b>Nullstelle</b> ist eine Stelle x mit f(x) = 0. Dort schneidet der Graph die x-Achse. Man berechnet sie, indem man die Gleichung m · x + b = 0 nach x auflöst.</p>
+      </div></details>
+      <details class="card task"><summary><span class="tag">Aufgabe für dich</span></summary><div class="body"><ol>
+        <li><b>Berechnen</b> Sie die Nullstelle von f(x) = −2x + 6 und kontrollieren Sie mit der Rechnung.</li>
+        <li>Schalten Sie die Vergleichsgerade ein. <b>Erläutern</b> Sie, wie der Graph von f aus der Geraden y = m · x entsteht.</li>
+        <li><b>Untersuchen</b> Sie, für welche Werte von m und b eine lineare Funktion keine Nullstelle hat, und <b>begründen</b> Sie.</li>
+      </ol></div></details>
+    </aside>
+  </section>
+
+  <!-- Reiter 4: Gleichung bestimmen -->
+  <section class="panel" id="t4" role="tabpanel" hidden>
+    <div class="stage">
+      <p class="cap" id="cap4"></p>
+      <canvas id="c4" class="main" aria-label="Gerade, deren Gleichung bestimmt werden soll"></canvas>
+      <div class="legend"><span><i class="ln" style="background:var(--curve)"></i>gesuchte Gerade</span><span id="leg4p"><i style="background:var(--reject);border-radius:50%"></i>gegebene Punkte</span><span id="leg4d" hidden><i style="background:var(--beta)"></i>Steigungsdreieck</span></div>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>Aufgabe</h3>
+        <label class="toggle"><input type="radio" name="mode4" id="mode4g" checked>Gleichung aus dem Graphen ablesen</label>
+        <label class="toggle"><input type="radio" name="mode4" id="mode4p">Gleichung aus zwei Punkten berechnen</label>
+        <p class="rule" id="task4"></p>
+        <div class="steptools"><button class="btn small" id="new4">Neue Aufgabe</button><span class="score" id="score4"></span></div>
+      </div>
+      <div class="card">
+        <h3>Ihre Lösung: f(x) = m · x + b</h3>
+        <div class="inrow"><label for="a4m">m =</label><input type="text" id="a4m" inputmode="decimal" placeholder="z. B. 3/4"></div>
+        <div class="inrow"><label for="a4b">b =</label><input type="text" id="a4b" inputmode="decimal" placeholder="z. B. −2"></div>
+        <div class="steptools"><button class="btn primary small" id="check4">Prüfen</button><button class="btn small" id="show4">Lösung zeigen</button></div>
+        <ul class="fb" id="fb4"></ul>
+        <div class="model" id="sol4" hidden></div>
+      </div>
+      <details class="card explain" open><summary>So gehen Sie vor</summary><div class="body">
+        <p><b>Aus dem Graphen:</b> b am Schnittpunkt mit der y-Achse ablesen. Dann ein Steigungsdreieck zwischen zwei gut ablesbaren Gitterpunkten einzeichnen und m = Δy : Δx bestimmen.</p>
+        <p><b>Aus zwei Punkten</b> P(x₁ | y₁) und Q(x₂ | y₂): Zuerst m = (y₂ − y₁) : (x₂ − x₁) berechnen. Dann einen Punkt in y = m · x + b einsetzen und nach b auflösen.</p>
+        <p>Brüche dürfen als Bruch eingegeben werden, z. B. 2/3 oder −1/2.</p>
+      </div></details>
+      <details class="card task"><summary><span class="tag">Aufgabe für dich</span></summary><div class="body"><ol>
+        <li><b>Bestimmen</b> Sie die Gleichungen von mindestens drei Geraden aus dem Graphen.</li>
+        <li><b>Berechnen</b> Sie die Gleichungen von mindestens drei Geraden aus zwei Punkten. Notieren Sie den Rechenweg im Heft.</li>
+        <li><b>Erläutern</b> Sie, woran man im Graphen erkennt, ob m eine ganze Zahl oder ein Bruch ist.</li>
+      </ol></div></details>
+    </aside>
+  </section>
+
+  <!-- Reiter 5: Zwei Geraden -->
+  <section class="panel" id="t5" role="tabpanel" hidden>
+    <div class="stage">
+      <p class="cap" id="cap5"></p>
+      <canvas id="c5" class="main" aria-label="Zwei Geraden mit Schnittpunkt"></canvas>
+      <div class="legend"><span><i class="ln" style="background:var(--curve)"></i>Graph von f</span><span><i class="ln" style="background:var(--reject)"></i>Graph von g</span><span><i style="background:var(--beta);border-radius:50%"></i>Schnittpunkt</span></div>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>Beispiele</h3>
+        <div class="chips"><button class="btn small" data-ex5="kerzen">Zwei Kerzen</button><button class="btn small" data-ex5="tarif">Handytarife</button><button class="btn small" data-ex5="par">parallel</button><button class="btn small" data-ex5="frei">eigene Geraden</button></div>
+        <p class="story" id="ctx5" style="margin-top:10px"></p>
+      </div>
+      <div class="card">
+        <p class="eq f" id="eq5f"></p>
+        <div class="slider"><label for="m5ar" class="sym">m₁</label><input type="range" id="m5ar" min="-5" max="5" step="0.05" value="1"><input type="text" id="m5an" inputmode="decimal" value="1" aria-label="Steigung von f"></div>
+        <div class="slider"><label for="b5ar" class="sym">b₁</label><input type="range" id="b5ar" min="-30" max="30" step="0.5" value="-2"><input type="number" id="b5an" min="-30" max="30" step="0.5" value="-2" aria-label="y-Achsenabschnitt von f"></div>
+        <p class="eq g" id="eq5g"></p>
+        <div class="slider"><label for="m5br" class="sym">m₂</label><input type="range" id="m5br" min="-5" max="5" step="0.05" value="-0.5"><input type="text" id="m5bn" inputmode="decimal" value="-0.5" aria-label="Steigung von g"></div>
+        <div class="slider"><label for="b5br" class="sym">b₂</label><input type="range" id="b5br" min="-30" max="30" step="0.5" value="4"><input type="number" id="b5bn" min="-30" max="30" step="0.5" value="4" aria-label="y-Achsenabschnitt von g"></div>
+      </div>
+      <div class="card">
+        <h3>Schnittpunkt</h3>
+        <div id="res5"></div>
+        <div class="steptools"><button class="btn primary small" id="show5">Rechnung zeigen</button></div>
+        <div class="model" id="sol5" hidden></div>
+      </div>
+      <details class="card explain" open><summary>Erklärung</summary><div class="body">
+        <p>Im <b>Schnittpunkt</b> zweier Geraden haben beide Funktionen denselben Funktionswert. Man setzt die Funktionsterme deshalb gleich: m₁ · x + b₁ = m₂ · x + b₂, und löst nach x auf. Den y-Wert erhält man durch Einsetzen.</p>
+        <p>Sind die Steigungen gleich, sind die Geraden <b>parallel</b> und schneiden sich nicht. Stimmt zusätzlich b überein, sind sie <b>identisch</b>.</p>
+      </div></details>
+      <details class="card task"><summary><span class="tag">Aufgabe für dich</span></summary><div class="body"><ol>
+        <li>Wählen Sie „Zwei Kerzen“. <b>Berechnen</b> Sie, nach wie vielen Stunden beide Kerzen gleich lang sind, und <b>deuten</b> Sie den Schnittpunkt im Sachzusammenhang.</li>
+        <li>Wählen Sie „Handytarife“. <b>Beurteilen</b> Sie, welcher Tarif bei welcher Gesprächsdauer günstiger ist.</li>
+        <li><b>Begründen</b> Sie, warum zwei verschiedene Geraden mit derselben Steigung keinen Schnittpunkt haben.</li>
+      </ol></div></details>
+    </aside>
+  </section>
+  </main>
+</div>
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const $$=s=>document.querySelectorAll(s);
+const root=document.documentElement;
+const C=n=>getComputedStyle(root).getPropertyValue(n).trim();
+const minus=s=>String(s).replace(/-/g,'−');
+const fmtT=(x,d=2)=>minus((Math.abs(x)<1e-12?0:x).toLocaleString('de-DE',{minimumFractionDigits:0,maximumFractionDigits:d}));
+const fmt=(x,d=2)=>minus((Math.abs(x)<1e-12?0:x).toLocaleString('de-DE',{minimumFractionDigits:d,maximumFractionDigits:d}));
+const parseNum=s=>{s=String(s).trim().replace(/\s/g,'').replace(/−/g,'-').replace(',','.');if(s.includes('/')){const [a,b]=s.split('/').map(Number);return b?a/b:NaN;}return s===''?NaN:Number(s);};
+const near=(a,b)=>Math.abs(a-b)<1e-9;
+/* Zahl als Dezimalzahl oder, falls periodisch, als Bruch */
+function numStr(v){
+  if(near(v,Math.round(v*100)/100))return fmtT(v,2);
+  for(let q=2;q<=12;q++){const p=Math.round(v*q);if(near(v*q,p))return (p<0?'−':'')+Math.abs(p)+'/'+q;}
+  return fmtT(v,3);
+}
+const isFrac=v=>numStr(v).includes('/');
+const par=v=>v<0?`(${numStr(v)})`:numStr(v);
+/* Funktionsterm m · x + b in Schulschreibweise */
+function term(m,b){
+  let s='';
+  if(!near(m,0)){s=near(m,1)?'x':near(m,-1)?'−x':numStr(m)+(isFrac(m)?' x':'x');}
+  if(near(b,0))return s||'0';
+  if(!s)return numStr(b);
+  return s+(b<0?' − ':' + ')+numStr(Math.abs(b));
+}
+const eqStr=(m,b,n='f')=>`${n}(x) = ${term(m,b)}`;
+const nb=s=>s.replace(/ /g,' ');
+
+/* ---------- Koordinatensystem ---------- */
+function coord(cv,xr,yr,o={}){
+  const dpr=window.devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;if(!w||!h)return null;
+  cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);
+  const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+  const box=o.mode==='box';
+  const pad=box?{l:62,r:18,t:16,b:46}:{l:12,r:12,t:12,b:12};
+  const pw=w-pad.l-pad.r,ph=h-pad.t-pad.b;
+  if(o.equal){
+    let sx=pw/(xr[1]-xr[0]),sy=ph/(yr[1]-yr[0]);const s=Math.min(sx,sy);
+    if(sx>s){const c=(xr[0]+xr[1])/2,half=pw/s/2;xr=[c-half,c+half];}
+    else{const c=(yr[0]+yr[1])/2,half=ph/s/2;yr=[c-half,c+half];}
+  }
+  const X=x=>pad.l+(x-xr[0])/(xr[1]-xr[0])*pw;
+  const Y=y=>h-pad.b-(y-yr[0])/(yr[1]-yr[0])*ph;
+  const fs=w<500?12:14;ctx.font=`${fs}px "Source Code Pro",ui-monospace,monospace`;
+  const step=(span,px)=>{const raw=span/(px/56);const mag=10**Math.floor(Math.log10(raw));const r=raw/mag;return (r<1.5?1:r<3?2:r<7?5:10)*mag;};
+  const xs=o.xStep||Math.max(1,step(xr[1]-xr[0],pw)),ys=o.yStep||Math.max(box?0.5:1,step(yr[1]-yr[0],ph));
+  const fine=!box&&X(1)-X(0)>=14;
+  ctx.lineWidth=1;
+  if(fine){ctx.strokeStyle=C('--grid');for(let x=Math.ceil(xr[0]);x<=xr[1];x++){ctx.beginPath();ctx.moveTo(X(x),pad.t);ctx.lineTo(X(x),h-pad.b);ctx.stroke();}for(let y=Math.ceil(yr[0]);y<=yr[1];y++){ctx.beginPath();ctx.moveTo(pad.l,Y(y));ctx.lineTo(w-pad.r,Y(y));ctx.stroke();}}
+  else{ctx.strokeStyle=C('--grid');for(let i=Math.ceil(xr[0]/xs);i*xs<=xr[1]+1e-9;i++){ctx.beginPath();ctx.moveTo(X(i*xs),pad.t);ctx.lineTo(X(i*xs),h-pad.b);ctx.stroke();}for(let i=Math.ceil(yr[0]/ys);i*ys<=yr[1]+1e-9;i++){ctx.beginPath();ctx.moveTo(pad.l,Y(i*ys));ctx.lineTo(w-pad.r,Y(i*ys));ctx.stroke();}}
+  ctx.strokeStyle=C('--axis');ctx.fillStyle=C('--muted');ctx.lineWidth=1.5;
+  const ax=box?xr[0]:0,ay=box?yr[0]:0;
+  const arrow=(x1,y1,x2,y2)=>{ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();const a=Math.atan2(y2-y1,x2-x1);ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-9*Math.cos(a-0.4),y2-9*Math.sin(a-0.4));ctx.lineTo(x2-9*Math.cos(a+0.4),y2-9*Math.sin(a+0.4));ctx.closePath();ctx.fillStyle=C('--axis');ctx.fill();};
+  if(ay>=yr[0]&&ay<=yr[1])arrow(pad.l,Y(ay),w-pad.r,Y(ay));
+  if(ax>=xr[0]&&ax<=xr[1])arrow(X(ax),h-pad.b,X(ax),pad.t);
+  ctx.fillStyle=C('--muted');
+  const ly=Math.min(Math.max(Y(ay),pad.t),h-pad.b),lx=Math.min(Math.max(X(ax),pad.l),w-pad.r);
+  ctx.textAlign='center';ctx.textBaseline='top';
+  for(let i=Math.ceil(xr[0]/xs);i*xs<=xr[1]+1e-9;i++){const x=i*xs;if(!box&&near(x,0))continue;const px=X(x);if(px<pad.l+8||px>w-pad.r-16)continue;ctx.beginPath();ctx.moveTo(px,ly-4);ctx.lineTo(px,ly+4);ctx.strokeStyle=C('--axis');ctx.stroke();ctx.fillText(fmtT(x,2),px,ly+7);}
+  ctx.textAlign='right';ctx.textBaseline='middle';
+  for(let i=Math.ceil(yr[0]/ys);i*ys<=yr[1]+1e-9;i++){const y=i*ys;if(!box&&near(y,0))continue;const py=Y(y);if(py<pad.t+14||py>h-pad.b-4)continue;ctx.beginPath();ctx.moveTo(lx-4,py);ctx.lineTo(lx+4,py);ctx.stroke();ctx.fillText(fmtT(y,2),lx-8,py);}
+  if(!box){ctx.textAlign='right';ctx.textBaseline='top';ctx.fillText('0',X(0)-6,Y(0)+6);}
+  ctx.font=`italic 500 ${fs+4}px "Source Serif 4",Georgia,serif`;ctx.fillStyle=C('--ink');
+  if(box){ctx.font=`600 ${fs}px "Source Sans 3",system-ui,sans-serif`;ctx.fillStyle=C('--muted');ctx.textAlign='right';ctx.textBaseline='bottom';ctx.fillText(o.xt||'x',w-pad.r,h-4);ctx.save();ctx.translate(16,pad.t);ctx.rotate(-Math.PI/2);ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillText(o.yt||'y',0,0);ctx.restore();}
+  else{ctx.textAlign='right';ctx.textBaseline='bottom';ctx.fillText('x',w-pad.r-4,ly-6);ctx.textAlign='left';ctx.textBaseline='top';ctx.fillText('y',lx+8,pad.t);}
+  return {ctx,X,Y,w,h,pad,xr,yr};
+}
+function clip(P){const c=P.ctx;c.save();c.beginPath();c.rect(P.pad.l,P.pad.t,P.w-P.pad.l-P.pad.r,P.h-P.pad.t-P.pad.b);c.clip();}
+function gline(P,m,b,col,o={}){const c=P.ctx;clip(P);c.strokeStyle=col;c.lineWidth=o.lw||3;c.setLineDash(o.dash||[]);const x0=o.from??P.xr[0],x1=P.xr[1];c.beginPath();c.moveTo(P.X(x0),P.Y(m*x0+b));c.lineTo(P.X(x1),P.Y(m*x1+b));c.stroke();c.restore();}
+function seg(P,x1,y1,x2,y2,col,lw=2,dash=[]){const c=P.ctx;clip(P);c.strokeStyle=col;c.lineWidth=lw;c.setLineDash(dash);c.beginPath();c.moveTo(P.X(x1),P.Y(y1));c.lineTo(P.X(x2),P.Y(y2));c.stroke();c.restore();}
+function dot(P,x,y,col,r=6){const c=P.ctx;if(x<P.xr[0]||x>P.xr[1]||y<P.yr[0]||y>P.yr[1])return;c.save();c.fillStyle=col;c.strokeStyle=C('--sheet');c.lineWidth=2;c.beginPath();c.arc(P.X(x),P.Y(y),r,0,7);c.fill();c.stroke();c.restore();}
+function label(P,text,px,py,col,o={}){const c=P.ctx;c.save();c.font=`600 ${P.w<500?12:14}px "Source Code Pro",ui-monospace,monospace`;const w=c.measureText(text).width;let x=o.left?px:px-w/2;x=Math.max(P.pad.l+2,Math.min(P.w-P.pad.r-w-4,x));let y=Math.max(P.pad.t+2,Math.min(P.h-P.pad.b-22,py));c.globalAlpha=.92;c.fillStyle=C('--sheet');c.fillRect(x-4,y-1,w+8,20);c.globalAlpha=1;c.fillStyle=col||C('--ink');c.textBaseline='top';c.textAlign='left';c.fillText(text,x,y+1);c.restore();}
+function tri(P,x1,y1,dx,dy,o={}){const c=P.ctx,col=C('--beta');clip(P);c.fillStyle=col;c.globalAlpha=.18;c.beginPath();c.moveTo(P.X(x1),P.Y(y1));c.lineTo(P.X(x1+dx),P.Y(y1));c.lineTo(P.X(x1+dx),P.Y(y1+dy));c.closePath();c.fill();c.globalAlpha=1;c.strokeStyle=col;c.lineWidth=2.5;c.beginPath();c.moveTo(P.X(x1),P.Y(y1));c.lineTo(P.X(x1+dx),P.Y(y1));c.lineTo(P.X(x1+dx),P.Y(y1+dy));c.stroke();c.restore();
+  if(o.labels!==false){label(P,`Δx = ${fmtT(dx,2)}`,P.X(x1+dx/2),P.Y(y1)+(dy>=0?6:-26),C('--warn'));label(P,`Δy = ${fmtT(dy,2)}`,P.X(x1+dx)+8,P.Y(y1+dy/2)-10,C('--warn'),{left:true});}}
+const EQ=[-10,10];
+
+/* ---------- Reiter 1: Taxifahrt ---------- */
+let show1=false;
+function r1(){
+  const G=parseNum($('#t1gn').value),k=parseNum($('#t1kn').value),x=parseNum($('#t1xn').value);
+  if(!(G>=0)||!(k>0)||!(x>=0)){$('#res1').innerHTML='<p class="err">Bitte gültige, nicht negative Werte eingeben.</p>';return;}
+  const f=t=>k*t+G,y=f(x);
+  $('#cap1').textContent=`Preis y in Abhängigkeit von der Strecke x: Grundpreis ${fmt(G)} €, ${fmt(k)} € pro km`;
+  $('#res1').innerHTML=`<p style="margin:6px 0 0">Preis für ${fmtT(x,1)} km:</p><p class="eq f">${fmt(y)} €</p><p class="notation nw" style="margin:0">${fmt(G)} € + ${fmtT(x,1)} · ${fmt(k)} € = ${fmt(y)} €</p>`;
+  const xi=[];for(let i=0;i<=10;i++)xi.push(i);
+  $('#tab1').innerHTML=`<tr><th>Strecke x in km</th>${xi.map(i=>`<td class="num${near(i,x)?' cur':''}">${i}</td>`).join('')}</tr><tr><th>Preis y in €</th>${xi.map(i=>`<td class="num${near(i,x)?' cur':''}">${fmt(f(i))}</td>`).join('')}</tr>`;
+  $('#t1show').textContent=show1?'Gleichung verdecken':'Gleichung zeigen';
+  $('#t1eq').hidden=!show1;
+  $('#t1eq').innerHTML=`<p>Preis = Grundpreis + Preis pro km · Strecke</p><p class="eq f" style="font-size:1.25rem">${nb(eqStr(k,G))}</p><p>Allgemein hat eine lineare Funktion die Form <span class="nw">f(x) = m · x + b</span>. Hier ist m = ${numStr(k)} der Preis pro Kilometer und b = ${numStr(G)} der Grundpreis.</p>`;
+  const zw=$('#t1zw').checked;$('#leg1z').hidden=!zw;
+  const yMax=Math.max(10,f(12))*1.08;
+  const P=coord($('#c1'),[0,12.5],[0,yMax],{mode:'box',xt:'Strecke x in km',yt:'Preis y in €',xStep:1});if(!P)return;
+  gline(P,k,G,C('--curve'),{from:0});
+  if(zw){for(let i=0;i<10;i++){seg(P,i,f(i),i+1,f(i),C('--beta'),2.5);seg(P,i+1,f(i),i+1,f(i+1),C('--beta'),2.5);}label(P,`+ ${fmt(k)} € pro km`,P.X(1.5),P.Y(f(2))-34,C('--warn'));}
+  for(const i of xi)dot(P,i,f(i),C('--curve'),5);
+  seg(P,x,0,x,y,C('--ink'),1.5,[5,4]);seg(P,0,y,x,y,C('--ink'),1.5,[5,4]);dot(P,x,y,C('--ink'),7);
+  label(P,`${fmtT(x,1)} km → ${fmt(y)} €`,P.X(x)+12,P.Y(y)-30,C('--ink'),{left:true});
+  label(P,`Grundpreis ${fmt(G)} €`,P.X(0)+8,P.Y(G)+8,C('--muted'),{left:true});
+}
+
+/* ---------- Reiter 2: Steigung ---------- */
+function getMB(mi,bi){const m=parseNum($(mi).value),b=parseNum($(bi).value);return (isFinite(m)&&isFinite(b))?{m,b}:null;}
+function r2(){
+  const V=getMB('#m2n','#b2n');if(!V){$('#res2').innerHTML='<p class="err">Bitte Zahlen für m und b eingeben.</p>';return;}
+  const {m,b}=V,x1=Math.round(+$('#x2n').value)||0,dx=Math.max(1,Math.round(+$('#d2n').value)||1),dy=m*dx;
+  $('#eq2').textContent=nb(eqStr(m,b));
+  $('#cap2').textContent='Graph von f mit Steigungsdreieck';
+  const art=m>1e-12?'Der Graph <b>steigt</b>: Wird x um 1 größer, wird y um '+numStr(m)+' größer.':m<-1e-12?'Der Graph <b>fällt</b>: Wird x um 1 größer, wird y um '+numStr(-m)+' kleiner.':'Der Graph verläuft <b>waagerecht</b>: y ändert sich nicht.';
+  $('#res2').innerHTML=`<p class="calc nw" style="margin:4px 0">m = Δy : Δx = ${par(dy)} : ${dx} = ${numStr(m)}</p><p class="rule" style="margin-top:6px">${art}</p>`;
+  const P=coord($('#c2'),EQ,EQ,{equal:true});if(!P)return;
+  gline(P,m,b,C('--curve'));
+  tri(P,x1,m*x1+b,dx,dy);
+  dot(P,x1,m*x1+b,C('--beta'),5);dot(P,x1+dx,m*(x1+dx)+b,C('--beta'),5);
+  label(P,nb(eqStr(m,b)),P.X(P.xr[0]+1),P.pad.t+6,C('--curve'),{left:true});
+}
+
+/* ---------- Reiter 3: b und Nullstelle ---------- */
+let show3=false;
+function r3(){
+  const V=getMB('#m3n','#b3n');if(!V){$('#kv3').innerHTML='<p class="err">Bitte Zahlen für m und b eingeben.</p>';return;}
+  const {m,b}=V,vg=$('#v3').checked;$('#leg3v').hidden=!vg;
+  $('#eq3').textContent=nb(eqStr(m,b));$('#cap3').textContent='Graph von f mit den Schnittpunkten mit den Achsen';
+  const hasN=!near(m,0),x0=hasN?-b/m:null;
+  $('#kv3').innerHTML=`<dt>Schnittpunkt mit der y-Achse</dt><dd>S<sub>y</sub>(0 | ${numStr(b)}), denn f(0) = ${numStr(b)}</dd><dt>Nullstelle</dt><dd>${show3?(hasN?`x₀ = ${numStr(x0)}, N(${numStr(x0)} | 0)`:near(b,0)?'jede Stelle x':'keine'):'noch verdeckt'}</dd>`;
+  $('#show3').textContent=show3?'Rechnung verdecken':'Rechnung zur Nullstelle zeigen';
+  $('#sol3').hidden=!show3;
+  $('#sol3').innerHTML=hasN?`<div class="calc"><div>f(x) = 0</div><div>${term(m,b)} = 0&nbsp;&nbsp;&nbsp;| ${b<0?'+ '+numStr(-b):'− '+numStr(b)}</div><div>${term(m,0)} = ${numStr(-b)}&nbsp;&nbsp;&nbsp;| : ${par(m)}</div><div>x = ${numStr(x0)}</div></div><p style="margin-top:6px">Die Nullstelle ist x₀ = ${numStr(x0)}. Der Graph schneidet die x-Achse im Punkt N(${numStr(x0)} | 0).</p>`
+    :near(b,0)?'<p>Mit m = 0 und b = 0 ist f(x) = 0 für alle x. Der Graph liegt auf der x-Achse, jede Stelle ist eine Nullstelle.</p>':`<p>Mit m = 0 ist f(x) = ${numStr(b)} für alle x. Weil ${numStr(b)} ≠ 0 ist, gibt es keine Nullstelle. Der Graph verläuft parallel zur x-Achse.</p>`;
+  const P=coord($('#c3'),EQ,EQ,{equal:true});if(!P)return;
+  if(vg){gline(P,m,0,C('--axis'),{lw:2,dash:[7,5]});if(!near(b,0)){const c=P.ctx;clip(P);c.strokeStyle=C('--muted');c.lineWidth=1.5;c.setLineDash([3,4]);const xa=Math.max(P.xr[0]+1,Math.min(P.xr[1]-1,hasN?Math.min(x0,0)-2:-4));c.beginPath();c.moveTo(P.X(xa),P.Y(m*xa));c.lineTo(P.X(xa),P.Y(m*xa+b));c.stroke();c.restore();label(P,`um ${numStr(Math.abs(b))} nach ${b>0?'oben':'unten'}`,P.X(xa)+8,P.Y(m*xa+b/2)-10,C('--muted'),{left:true});}}
+  gline(P,m,b,C('--curve'));
+  dot(P,0,b,C('--reject'));label(P,`Sy(0 | ${numStr(b)})`,P.X(0)+10,P.Y(b)-26,C('--reject'),{left:true});
+  if(show3&&hasN){dot(P,x0,0,C('--reject'));label(P,`N(${numStr(x0)} | 0)`,P.X(x0),P.Y(0)+10,C('--reject'));}
+  label(P,nb(eqStr(m,b)),P.X(P.xr[0]+1),P.pad.t+6,C('--curve'),{left:true});
+}
+
+/* ---------- Reiter 4: Gleichung bestimmen ---------- */
+let T4=null,sol4=false,fb4=false,score={ok:0,n:0},counted=false;
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+function newTask(){
+  const pts=$('#mode4p').checked;
+  let p,q,b,m;
+  do{q=[1,1,2,2,3,4][ri(0,5)];p=ri(-3*q,3*q);m=p/q;b=ri(-6,6);}while(p===0||(!pts&&q===4)||(q>1&&p%q===0));
+  const g=gcd(Math.abs(p),q);p/=g;q/=g;
+  let P1=null,P2=null;
+  if(pts){for(let t=0;t<200;t++){const x1=ri(-7,3),k=ri(1,Math.max(1,Math.floor(6/q))),x2=x1+k*q;const y1=m*x1+b,y2=m*x2+b;if(Math.abs(y1)<=9&&Math.abs(y2)<=9&&x2<=8&&Number.isInteger(Math.round(y1*1e9)/1e9)){P1=[x1,y1];P2=[x2,y2];break;}}if(!P1){P1=[0,b];P2=[q,b+p];}}
+  T4={m,b,p,q,pts,P1,P2};sol4=false;fb4=false;counted=false;$('#a4m').value='';$('#a4b').value='';score.n++;
+}
+function gcd(a,b){return b?gcd(b,a%b):a||1;}
+function r4(){
+  if(!T4||T4.pts!==$('#mode4p').checked)newTask();
+  const {m,b,p,q,pts,P1,P2}=T4;
+  $('#cap4').textContent=pts?'Gegeben sind zwei Punkte der Geraden':'Bestimmen Sie die Gleichung dieser Geraden';
+  $('#task4').innerHTML=pts?`Die Gerade geht durch die Punkte <span class="nw">P(${numStr(P1[0])} | ${numStr(P1[1])})</span> und <span class="nw">Q(${numStr(P2[0])} | ${numStr(P2[1])})</span>. Berechnen Sie die Funktionsgleichung.`:'Lesen Sie b und m am Graphen ab. Nutzen Sie ein Steigungsdreieck zwischen zwei Gitterpunkten.';
+  $('#leg4p').hidden=!pts;$('#leg4d').hidden=!sol4;
+  $('#score4').textContent=`Richtig gelöst: ${score.ok} von ${score.n}`;
+  $('#show4').textContent=sol4?'Lösung verdecken':'Lösung zeigen';
+  if(fb4){
+    const am=parseNum($('#a4m').value),ab=parseNum($('#a4b').value),okm=near(am,m),okb=near(ab,b),items=[];
+    const add=(ok,t,h)=>items.push(`<li><span class="st ${ok?'ok':'no'}">${ok?'richtig':'noch nicht'}</span><span>${t}${ok?'':'<br><span class="notation" style="margin:0">'+h+'</span>'}</span></li>`);
+    add(okm,'Steigung m',isFinite(am)&&near(am,-m)&&!near(m,0)?'Der Betrag stimmt, aber das Vorzeichen nicht. Steigt oder fällt die Gerade?':isFinite(am)&&!near(m,0)&&near(am,1/m)?'Sie haben Δx : Δy gerechnet. Richtig ist m = Δy : Δx.':'Zeichnen Sie ein Steigungsdreieck zwischen zwei Gitterpunkten und berechnen Sie m = Δy : Δx.');
+    add(okb,'y-Achsenabschnitt b',pts?'Setzen Sie einen Punkt in y = m · x + b ein und lösen Sie nach b auf.':'b ist der y-Wert des Schnittpunkts mit der y-Achse.');
+    $('#fb4').innerHTML=items.join('');
+    if(okm&&okb&&!counted&&!sol4){score.ok++;counted=true;$('#score4').textContent=`Richtig gelöst: ${score.ok} von ${score.n}`;}
+  }else $('#fb4').innerHTML='';
+  $('#sol4').hidden=!sol4;
+  if(sol4){
+    if(pts){const dx=P2[0]-P1[0],dy=P2[1]-P1[1];
+      $('#sol4').innerHTML=`<div class="calc"><div>m = (${numStr(P2[1])} − ${par(P1[1])}) : (${numStr(P2[0])} − ${par(P1[0])})</div><div>m = ${numStr(dy)} : ${numStr(dx)} = ${numStr(m)}</div><div style="margin-top:6px">P einsetzen: ${numStr(P1[1])} = ${par(m)} · ${par(P1[0])} + b</div><div>${numStr(P1[1])} = ${numStr(m*P1[0])} + b&nbsp;&nbsp;&nbsp;| ${m*P1[0]<0?'+ '+numStr(-m*P1[0]):'− '+numStr(m*P1[0])}</div><div>b = ${numStr(b)}</div></div><p class="eq f" style="font-size:1.2rem;margin-top:6px">${nb(eqStr(m,b))}</p>`;}
+    else $('#sol4').innerHTML=`<p>Schnittpunkt mit der y-Achse bei (0 | ${numStr(b)}), also b = ${numStr(b)}.</p><p>${p===0?'Die Gerade verläuft waagerecht, also m = 0.':`Steigungsdreieck: ${q} nach rechts, ${Math.abs(p)} nach ${p>0?'oben':'unten'}, also <span class="nw">m = ${minus(p)} : ${q} = ${numStr(m)}</span>.`}</p><p class="eq f" style="font-size:1.2rem">${nb(eqStr(m,b))}</p>`;
+  }
+  const P=coord($('#c4'),EQ,EQ,{equal:true});if(!P)return;
+  if(!pts||sol4)gline(P,m,b,C('--curve'));
+  if(sol4){if(pts)tri(P,P1[0],P1[1],P2[0]-P1[0],P2[1]-P1[1]);else{tri(P,0,b,q,p);dot(P,0,b,C('--beta'),5);dot(P,q,b+p,C('--beta'),5);}}
+  if(pts){dot(P,P1[0],P1[1],C('--reject'),7);dot(P,P2[0],P2[1],C('--reject'),7);label(P,'P',P.X(P1[0])-14,P.Y(P1[1])-30,C('--reject'));label(P,'Q',P.X(P2[0])+14,P.Y(P2[1])-30,C('--reject'));}
+}
+
+/* ---------- Reiter 5: Zwei Geraden ---------- */
+const EX5={
+ kerzen:{m1:-2,b1:20,m2:-1,b2:14,box:true,xr:[0,12.5],yr:[0,22],xt:'Zeit x in Stunden',yt:'Länge y in cm',nf:'Kerze A',ng:'Kerze B',
+   text:'Kerze A ist 20 cm lang und brennt pro Stunde 2 cm ab. Kerze B ist 14 cm lang und brennt pro Stunde 1 cm ab. Beide werden gleichzeitig angezündet.',
+   deut:(x,y)=>`Nach ${numStr(x)} Stunden sind beide Kerzen ${numStr(y)} cm lang.`},
+ tarif:{m1:0.1,b1:5,m2:0.05,b2:8,box:true,xr:[0,125],yr:[0,16],xt:'Gesprächsdauer x in min',yt:'Kosten y in €',nf:'Tarif A',ng:'Tarif B',
+   text:'Tarif A kostet 5 € Grundgebühr und 0,10 € pro Minute. Tarif B kostet 8 € Grundgebühr und 0,05 € pro Minute.',
+   deut:(x,y)=>`Bei ${numStr(x)} Minuten kosten beide Tarife ${fmt(y)} €. Bei kürzerer Gesprächsdauer ist Tarif A günstiger, bei längerer Tarif B.`},
+ par:{m1:0.5,b1:3,m2:0.5,b2:-2,text:'Zwei Geraden mit derselben Steigung m = 0,5, aber verschiedenen y-Achsenabschnitten.'},
+ frei:{m1:1,b1:-2,m2:-0.5,b2:4,text:'Stellen Sie zwei beliebige Geraden ein.'}
+};
+let ex5='frei',show5=false;
+function setMB5(e){const S=(id,v)=>{$(id+'r').value=v;$(id+'n').value=String(v).replace('.',',');};S('#m5a',e.m1);S('#b5a',e.b1);S('#m5b',e.m2);S('#b5b',e.b2);}
+function r5(){
+  const e=EX5[ex5];
+  const m1=parseNum($('#m5an').value),b1=parseNum($('#b5an').value),m2=parseNum($('#m5bn').value),b2=parseNum($('#b5bn').value);
+  if(![m1,b1,m2,b2].every(isFinite)){$('#res5').innerHTML='<p class="err">Bitte Zahlen eingeben.</p>';return;}
+  $('#ctx5').textContent=e.text;
+  $('#eq5f').textContent=nb(eqStr(m1,b1,'f'));$('#eq5g').textContent=nb(eqStr(m2,b2,'g'));
+  $('#cap5').textContent=e.nf?`${e.nf}: Graph von f, ${e.ng}: Graph von g`:'Graphen von f und g';
+  $$('[data-ex5]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.ex5===ex5)));
+  const parallel=near(m1,m2),same=parallel&&near(b1,b2);
+  const xs=parallel?null:(b2-b1)/(m1-m2),ys=parallel?null:m1*xs+b1;
+  $('#res5').innerHTML=parallel?`<p class="rule" style="margin:0">${same?'Die Geraden sind <b>identisch</b>: Sie haben unendlich viele gemeinsame Punkte.':'Die Geraden sind <b>parallel</b>: gleiche Steigung, verschiedene y-Achsenabschnitte. Es gibt keinen Schnittpunkt.'}</p>`
+    :`<p class="rule" style="margin:0">${show5?`Schnittpunkt <span class="nw">S(${numStr(xs)} | ${numStr(ys)})</span>`:'Die Geraden schneiden sich in genau einem Punkt S. Berechnen Sie ihn zuerst selbst.'}</p>`;
+  $('#show5').hidden=parallel;$('#show5').textContent=show5?'Rechnung verdecken':'Rechnung zeigen';
+  $('#sol5').hidden=!(show5&&!parallel);
+  if(show5&&!parallel){
+    const dm=m1-m2,db=b2-b1;
+    $('#sol5').innerHTML=`<div class="calc"><div>f(x) = g(x)</div><div>${term(m1,b1)} = ${term(m2,b2)}</div><div>${term(dm,0)} = ${numStr(db)}&nbsp;&nbsp;&nbsp;| : ${par(dm)}</div><div>x = ${numStr(xs)}</div><div style="margin-top:6px">y = f(${numStr(xs)}) = ${par(m1)} · ${par(xs)} + ${par(b1)} = ${numStr(ys)}</div></div><p style="margin-top:6px">Schnittpunkt <span class="nw">S(${numStr(xs)} | ${numStr(ys)})</span>.${e.deut?' '+e.deut(xs,ys):''}</p>`;
+  }
+  const P=e.box?coord($('#c5'),e.xr,e.yr,{mode:'box',xt:e.xt,yt:e.yt}):coord($('#c5'),EQ,EQ,{equal:true});if(!P)return;
+  const from=e.box?0:undefined;
+  gline(P,m1,b1,C('--curve'),{from});gline(P,m2,b2,C('--reject'),{from});
+  label(P,(e.nf?e.nf+': ':'')+nb(eqStr(m1,b1,'f')),P.X(P.xr[0])+8,P.pad.t+6,C('--curve'),{left:true});
+  label(P,(e.ng?e.ng+': ':'')+nb(eqStr(m2,b2,'g')),P.X(P.xr[0])+8,P.pad.t+32,C('--reject'),{left:true});
+  if(!parallel){dot(P,xs,ys,C('--beta'),7);if(show5){seg(P,xs,e.box?0:P.yr[0],xs,ys,C('--beta'),1.5,[5,4]);label(P,`S(${numStr(xs)} | ${numStr(ys)})`,P.X(xs)+12,P.Y(ys)+8,C('--warn'),{left:true});}}
+}
+
+/* ---------- Steuerung ---------- */
+const R={t1:r1,t2:r2,t3:r3,t4:r4,t5:r5};let active='t1',raf=0;
+function update(){cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>R[active]());}
+$$('.tab').forEach(b=>b.addEventListener('click',()=>{active=b.dataset.tab;$$('.tab').forEach(x=>x.setAttribute('aria-selected',String(x===b)));$$('.panel').forEach(p=>p.hidden=p.id!==active);update();}));
+/* Schieberegler und Eingabefeld koppeln; Eingabefelder für m nehmen auch Brüche an */
+function pair(r,n){const R_=$(r),N=$(n);R_.addEventListener('input',()=>{N.value=String(R_.value).replace('.',',');update();});N.addEventListener('input',()=>{const v=parseNum(N.value);if(isFinite(v))R_.value=v;update();});}
+[['#t1gr','#t1gn'],['#t1kr','#t1kn'],['#t1xr','#t1xn'],['#m2r','#m2n'],['#b2r','#b2n'],['#x2r','#x2n'],['#d2r','#d2n'],['#m3r','#m3n'],['#b3r','#b3n'],['#m5ar','#m5an'],['#b5ar','#b5an'],['#m5br','#m5bn'],['#b5br','#b5bn']].forEach(([a,b])=>pair(a,b));
+$('#t1zw').addEventListener('change',update);
+$('#t1show').addEventListener('click',()=>{show1=!show1;update();});
+$$('[data-m2]').forEach(b=>b.addEventListener('click',()=>{$('#m2n').value=b.dataset.m2.replace('-','−');$('#m2r').value=parseNum(b.dataset.m2);update();}));
+$('#v3').addEventListener('change',update);
+$('#show3').addEventListener('click',()=>{show3=!show3;update();});
+['#m3n','#b3n','#m3r','#b3r'].forEach(s=>$(s).addEventListener('input',()=>{show3=false;}));
+['#mode4g','#mode4p'].forEach(s=>$(s).addEventListener('change',()=>{newTask();update();}));
+$('#new4').addEventListener('click',()=>{newTask();update();});
+$('#check4').addEventListener('click',()=>{fb4=true;update();});
+$('#show4').addEventListener('click',()=>{sol4=!sol4;update();});
+['#a4m','#a4b'].forEach(s=>$(s).addEventListener('keydown',e=>{if(e.key==='Enter'){fb4=true;update();}}));
+$$('[data-ex5]').forEach(b=>b.addEventListener('click',()=>{ex5=b.dataset.ex5;show5=false;setMB5(EX5[ex5]);update();}));
+['#m5an','#b5an','#m5bn','#b5bn','#m5ar','#b5ar','#m5br','#b5br'].forEach(s=>$(s).addEventListener('input',()=>{show5=false;}));
+$('#show5').addEventListener('click',()=>{show5=!show5;update();});
+
+/* Farbschema: folgt der Systemeinstellung, Umschaltung wird gemerkt, Präsentationsmodus immer hell */
+const TKEY='lf-theme';
+const mq=matchMedia('(prefers-color-scheme: dark)');
+const savedTheme=()=>{try{const s=localStorage.getItem(TKEY);return s==='light'||s==='dark'?s:null;}catch(e){return null;}};
+const applyTheme=()=>{const s=root.classList.contains('present')?'light':savedTheme();if(s)root.setAttribute('data-theme',s);else root.removeAttribute('data-theme');};
+const isDark=()=>{const t=root.getAttribute('data-theme');return t?t==='dark':mq.matches;};
+const themeLabel=()=>{$('#btnTheme').textContent=isDark()?'Hell':'Dunkel';};
+$('#btnPresent').addEventListener('click',e=>{const on=root.classList.toggle('present');e.currentTarget.setAttribute('aria-pressed',String(on));applyTheme();themeLabel();update();});
+$('#btnTheme').addEventListener('click',()=>{const n=isDark()?'light':'dark';root.setAttribute('data-theme',n);try{localStorage.setItem(TKEY,n);}catch(e){}themeLabel();update();});
+mq.addEventListener('change',()=>{themeLabel();update();});
+
+function resetAll(){
+  const S=(r,n,v)=>{$(r).value=v;$(n).value=String(v).replace('.',',');};
+  S('#t1gr','#t1gn',4);S('#t1kr','#t1kn',2);S('#t1xr','#t1xn',5);$('#t1zw').checked=false;show1=false;
+  S('#m2r','#m2n',2);S('#b2r','#b2n',1);S('#x2r','#x2n',0);S('#d2r','#d2n',1);
+  S('#m3r','#m3n',-2);S('#b3r','#b3n',6);$('#v3').checked=false;show3=false;
+  $('#mode4g').checked=true;score={ok:0,n:0};newTask();
+  ex5='frei';show5=false;setMB5(EX5.frei);
+}
+$('#btnReset').addEventListener('click',()=>{resetAll();update();});
+new ResizeObserver(()=>update()).observe(document.querySelector('main'));
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(update);
+applyTheme();themeLabel();resetAll();update();
+})();
+</script>
