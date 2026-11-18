@@ -10,7 +10,14 @@
 :root{
   --paper:#fbfaf6; --card:#ffffff; --ink:#1e2a3a; --muted:#5b6676; --line:#d9dee5; --soft:#f2f4f7;
   --f:#1f5fbf; --fs:#e3ecfa; --d:#d9601a; --ds:#fbe7da; --e:#0f766e; --es:#dcf2ef; --warn:#9a3412;
+  --grid:#eef0f3; --axis:#9aa4b2; --wrongbg:#fdecec; --wrongln:#c24141; --wrongtx:#8f1f1f; --primhover:#0b5f58;
   --body:"Source Sans 3", system-ui, sans-serif; --head:"Source Serif 4", Georgia, serif; --mono:"Source Code Pro", ui-monospace, monospace;
+}
+html[data-theme="dark"]{
+  --paper:#12161c; --card:#1a2029; --ink:#e6eaf0; --muted:#9aa5b4; --line:#2e3744; --soft:#222a35;
+  --f:#6ea3ff; --fs:#1c2a42; --d:#ff9a5c; --ds:#3a2618; --e:#3cc3b3; --es:#12302d; --warn:#ffb38a;
+  --grid:#232b36; --axis:#5b6676; --wrongbg:#3a1d1d; --wrongln:#e06c6c; --wrongtx:#ffb4b4; --primhover:#2aa597;
+  color-scheme:dark;
 }
 *{box-sizing:border-box}
 html{scrollbar-gutter:stable;font-size:19px}
@@ -34,7 +41,7 @@ h1{font-size:clamp(1.8rem,4.2vw,2.6rem);margin:.25rem 0 .2rem}
 .btn:hover{border-color:var(--ink)}
 .btn:disabled{opacity:.4;cursor:default;border-color:var(--line)}
 .btn.primary{background:var(--e);border-color:var(--e);color:#fff}
-.btn.primary:hover{background:#0b5f58}
+.btn.primary:hover{background:var(--primhover)}
 
 /* Kapitelreiter */
 nav.tabs{display:flex;gap:4px;overflow-x:auto;margin-top:16px;scrollbar-width:thin}
@@ -120,7 +127,7 @@ tr.cur td{background:var(--fs)}
 .q .opts button{text-align:left;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:8px 12px;cursor:pointer;color:var(--ink);line-height:1.35}
 .q .opts button:hover{border-color:var(--ink)}
 .q .opts button.right{background:var(--es);border-color:var(--e);color:var(--e);font-weight:600}
-.q .opts button.wrong{background:#fdecec;border-color:#c24141;color:#8f1f1f}
+.q .opts button.wrong{background:var(--wrongbg);border-color:var(--wrongln);color:var(--wrongtx)}
 .q .fb{margin-top:6px;font-size:.92rem;color:var(--muted)}
 
 footer{border-top:1px solid var(--line);padding:16px 0 26px;font-size:.85rem;color:var(--muted)}
@@ -141,6 +148,7 @@ footer{border-top:1px solid var(--line);padding:16px 0 26px;font-size:.85rem;col
         <span class="eyebrow">E-Phase · Analysis · Exponentialfunktionen</span>
       </div>
       <div class="fontsize" role="group" aria-label="Schriftgröße">
+        <button type="button" class="btn" id="themeBtn" aria-pressed="false">Dunkler Modus</button>
         <button type="button" class="btn" id="fsm" title="Schrift kleiner" aria-label="Schrift kleiner">A−</button>
         <button type="button" class="btn" id="fsp" title="Schrift größer" aria-label="Schrift größer">A+</button>
       </div>
@@ -415,6 +423,15 @@ if(/github\.io$/.test(location.hostname)||location.hostname==="localhost") $("ba
   apply();
 })();
 
+/* ---------- Heller und dunkler Modus (Start immer hell, Wahl wird gemerkt) ---------- */
+(function(){
+  const btn=$("themeBtn");
+  function apply(dark){document.documentElement.dataset.theme=dark?"dark":"light";btn.textContent=dark?"Heller Modus":"Dunkler Modus";btn.setAttribute("aria-pressed",dark?"true":"false");}
+  let dark=false; try{dark=localStorage.getItem("ez-theme")==="dark";}catch(e){}
+  apply(dark);
+  btn.onclick=()=>{dark=!dark;apply(dark);try{localStorage.setItem("ez-theme",dark?"dark":"light");}catch(e){}};
+})();
+
 /* ---------- Kapitel und Schritte ---------- */
 const chapters=[...document.querySelectorAll("section.chapter")];
 const tabs=[...document.querySelectorAll("nav.tabs button")];
@@ -442,7 +459,7 @@ chapters.forEach(c=>{
 /* ---------- SVG-Hilfen ---------- */
 const NS="http://www.w3.org/2000/svg";
 function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
-function txt(parent,x,y,s,attrs){const t=el("text",Object.assign({x,y,"font-size":15,fill:"#5b6676"},attrs||{}),parent);t.textContent=s;return t;}
+function txt(parent,x,y,s,attrs){const t=el("text",Object.assign({x,y,"font-size":15,fill:"var(--muted)"},attrs||{}),parent);t.textContent=s;return t;}
 
 /* ---------- Kapitel 2: Labor f' = f ---------- */
 const A={a:2,h:1e-4};
@@ -453,9 +470,9 @@ function drawA(){
   const W=640,H=440,L=46,R=16,T=14,B=36, xmin=-2,xmax=2,ymin=0,ymax=6;
   const X=x=>L+(x-xmin)/(xmax-xmin)*(W-L-R), Y=y=>T+(ymax-y)/(ymax-ymin)*(H-T-B);
   const g=el("g",{},svg);
-  for(let x=xmin;x<=xmax;x+=0.5){el("line",{x1:X(x),y1:T,x2:X(x),y2:H-B,stroke:x===0?"#9aa4b2":"#eef0f3","stroke-width":x===0?1.5:1},g);
+  for(let x=xmin;x<=xmax;x+=0.5){el("line",{x1:X(x),y1:T,x2:X(x),y2:H-B,stroke:x===0?"var(--axis)":"var(--grid)","stroke-width":x===0?1.5:1},g);
     if(Number.isInteger(x)) txt(g,X(x),H-B+22,de(x,0).replace("-","−"),{"text-anchor":"middle"});}
-  for(let y=ymin;y<=ymax;y+=1){el("line",{x1:L,y1:Y(y),x2:W-R,y2:Y(y),stroke:y===0?"#9aa4b2":"#eef0f3","stroke-width":y===0?1.5:1},g);
+  for(let y=ymin;y<=ymax;y+=1){el("line",{x1:L,y1:Y(y),x2:W-R,y2:Y(y),stroke:y===0?"var(--axis)":"var(--grid)","stroke-width":y===0?1.5:1},g);
     txt(g,L-10,Y(y)+5,String(y),{"text-anchor":"end"});}
   txt(g,W-R-4,Y(0)-8,"x",{"text-anchor":"end","font-style":"italic"});
   txt(g,X(0)+8,T+14,"y",{"font-style":"italic"});
@@ -466,11 +483,11 @@ function drawA(){
   el("path",{d:path(x=>1+m*x),fill:"none",stroke:"var(--e)","stroke-width":2.5},pg);
   el("path",{d:path(x=>Math.pow(A.a,x)),fill:"none",stroke:"var(--f)","stroke-width":3.5},pg);
   el("path",{d:path(x=>m*Math.pow(A.a,x)),fill:"none",stroke:"var(--d)","stroke-width":3,"stroke-dasharray":"9 7"},pg);
-  el("circle",{cx:X(0),cy:Y(1),r:6,fill:"var(--e)",stroke:"#fff","stroke-width":2},svg);
+  el("circle",{cx:X(0),cy:Y(1),r:6,fill:"var(--e)",stroke:"var(--card)","stroke-width":2},svg);
   /* Steigungsdreieck */
   const sx=0.5; el("path",{d:`M${X(0)} ${Y(1)} L${X(sx)} ${Y(1)} L${X(sx)} ${Y(1+m*sx)}`,fill:"none",stroke:"var(--e)","stroke-width":1.5,"stroke-dasharray":"3 3"},svg);
-  txt(svg,X(sx)+6,(Y(1)+Y(1+m*sx))/2+5,"m ≈ "+de(m,3),{fill:"#0f766e","font-weight":600});
-  txt(svg,X(1.55),Y(Math.min(Math.pow(A.a,1.55),5.7))-10,"f",{fill:"#1f5fbf","font-weight":700,"font-size":18,"font-style":"italic","text-anchor":"end"});
+  txt(svg,X(sx)+6,(Y(1)+Y(1+m*sx))/2+5,"m ≈ "+de(m,3),{fill:"var(--e)","font-weight":600});
+  txt(svg,X(1.55),Y(Math.min(Math.pow(A.a,1.55),5.7))-10,"f",{fill:"var(--f)","font-weight":700,"font-size":18,"font-style":"italic","text-anchor":"end"});
 }
 function updA(){
   const m=slope(A.a,A.h);
@@ -520,21 +537,21 @@ function drawB(){
   while(svg.firstChild) svg.removeChild(svg.firstChild);
   const W=640,H=420,L=52,R=16,T=16,B2=58, lmin=0,lmax=8, ymin=2,ymax=2.8;
   const X=l=>L+(l-lmin)/(lmax-lmin)*(W-L-R), Y=y=>T+(ymax-y)/(ymax-ymin)*(H-T-B2);
-  for(let k=0;k<=8;k++){el("line",{x1:X(k),y1:T,x2:X(k),y2:H-B2,stroke:"#eef0f3"},svg);
+  for(let k=0;k<=8;k++){el("line",{x1:X(k),y1:T,x2:X(k),y2:H-B2,stroke:"var(--grid)"},svg);
     txt(svg,X(k),H-B2+22,k<=3?String(Math.pow(10,k)).replace(/\B(?=(\d{3})+$)/g,"."):"10"+["","","","","⁴","⁵","⁶","⁷","⁸"][k],{"text-anchor":"middle"});}
   txt(svg,(L+W-R)/2,H-8,"Anzahl der Gutschriften n (logarithmische Achse)",{"text-anchor":"middle","font-size":13});
-  for(let y=2;y<=2.8001;y+=0.1){el("line",{x1:L,y1:Y(y),x2:W-R,y2:Y(y),stroke:"#eef0f3"},svg);txt(svg,L-8,Y(y)+5,de(y,1),{"text-anchor":"end"});}
+  for(let y=2;y<=2.8001;y+=0.1){el("line",{x1:L,y1:Y(y),x2:W-R,y2:Y(y),stroke:"var(--grid)"},svg);txt(svg,L-8,Y(y)+5,de(y,1),{"text-anchor":"end"});}
   el("line",{x1:L,y1:Y(E),x2:W-R,y2:Y(E),stroke:"var(--e)","stroke-width":2.5,"stroke-dasharray":"8 6"},svg);
-  txt(svg,W-R-4,Y(E)-8,"e",{"text-anchor":"end",fill:"#0f766e","font-weight":700,"font-style":"italic","font-size":18});
+  txt(svg,W-R-4,Y(E)-8,"e",{"text-anchor":"end",fill:"var(--e)","font-weight":700,"font-style":"italic","font-size":18});
   const pts=[]; for(let k=1;k<=10;k++)pts.push(k); [20,50,100,200,500,1e3,2e3,5e3,1e4,1e5,1e6,1e7,1e8].forEach(k=>pts.push(k));
   let d=""; pts.forEach((k,i)=>{d+=(i?"L":"M")+X(Math.log10(k)).toFixed(1)+" "+Y(an(k)).toFixed(1);});
   el("path",{d,fill:"none",stroke:"var(--f)","stroke-width":1.5,opacity:.5},svg);
   pts.forEach(k=>el("circle",{cx:X(Math.log10(k)),cy:Y(an(k)),r:4.5,fill:"var(--f)"},svg));
   const cx=X(Math.log10(B.n)),cy=Y(an(B.n));
   el("line",{x1:cx,y1:cy,x2:cx,y2:H-B2,stroke:"var(--d)","stroke-width":1.5,"stroke-dasharray":"3 3"},svg);
-  el("circle",{cx,cy,r:8,fill:"var(--d)",stroke:"#fff","stroke-width":2.5},svg);
+  el("circle",{cx,cy,r:8,fill:"var(--d)",stroke:"var(--card)","stroke-width":2.5},svg);
   const lbl="n = "+B.n.toLocaleString("de-DE")+": "+de(an(B.n),5);
-  txt(svg,Math.min(cx+12,W-R-200),Math.max(cy+26,T+16)>H-B2-6?cy-14:cy+26,lbl,{fill:"#9a3412","font-weight":600});
+  txt(svg,Math.min(cx+12,W-R-200),Math.max(cy+26,T+16)>H-B2-6?cy-14:cy+26,lbl,{fill:"var(--warn)","font-weight":600});
 }
 updB();
 
