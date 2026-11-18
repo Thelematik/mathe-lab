@@ -82,6 +82,11 @@ section.chapter[hidden]{display:none}
 .timeline li>span:last-child{min-width:0;overflow-wrap:anywhere}
 .timeline .year{font-family:var(--mono);font-weight:600;color:var(--e);text-align:right;padding-top:2px}
 .timeline .euler::before{background:var(--e)}
+.portrait{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:20px;align-items:start}
+.portrait figure{margin:0}
+.portrait img{display:block;width:100%;height:auto;border-radius:8px;border:1px solid var(--line);aspect-ratio:480/620;background:var(--soft)}
+.portrait figcaption{font-size:.75rem;color:var(--muted);margin-top:6px;line-height:1.35}
+@media (max-width:640px){.portrait{grid-template-columns:minmax(0,1fr)}.portrait figure{max-width:240px;margin:0 auto}}
 .facts{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0}
 .facts dt{font-weight:700}
 .facts dd{margin:0}
@@ -174,6 +179,12 @@ footer{border-top:1px solid var(--line);padding:16px 0 26px;font-size:.85rem;col
   <div class="step">
     <div class="card">
       <h3>Leonhard Euler (1707 bis 1783)</h3>
+      <div class="portrait">
+      <figure>
+        <img src="bilder/euler-handmann-1753.jpg" width="480" height="620" alt="Porträt von Leonhard Euler: ein Mann mittleren Alters mit weißem Tuch um den Kopf und blau gestreiftem Gewand, der zur Seite blickt" loading="lazy">
+        <figcaption>Leonhard Euler, Pastell von Jakob Emanuel Handmann, 1753, Kunstmuseum Basel. Gemeinfrei, via Wikimedia Commons.</figcaption>
+      </figure>
+      <div>
       <dl class="facts">
         <dt>Geboren</dt><dd>15. April 1707 in Basel (Schweiz)</dd>
         <dt>Gestorben</dt><dd>18. September 1783 in Sankt Petersburg (Russland)</dd>
@@ -186,6 +197,8 @@ footer{border-top:1px solid var(--line);padding:16px 0 26px;font-size:.85rem;col
         <li><b>1741</b>Akademie in Berlin</li>
         <li><b>1766</b>zurück nach Sankt Petersburg</li>
       </ul>
+      </div>
+      </div>
     </div>
   </div>
 
