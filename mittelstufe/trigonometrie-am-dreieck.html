@@ -516,4 +516,5 @@ try{var s=localStorage.getItem(KEY);if(s==='light'||s==='dark')root.setAttribute
 if(btn)btn.addEventListener('click',function(){var n=isDark()?'light':'dark';root.setAttribute('data-theme',n);try{localStorage.setItem(KEY,n);}catch(e){}changed();});
 if(mq&&mq.addEventListener)mq.addEventListener('change',changed);label();})();
 </script>
+<script src="../assets/zur-uebersicht.js" defer></script>
 </body></html>

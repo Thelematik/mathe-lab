@@ -112,7 +112,7 @@ code,kbd,samp,pre{font-family:"Source Code Pro", ui-monospace, monospace}
 <header>
   <h1>Galton-Brett: Der Binomialkoeffizient als Anzahl von Wegen</h1>
   <p>Eine Kugel landet in Fach k, wenn sie an genau k der n Nagelreihen nach rechts abgelenkt wird.</p>
-  <p class="links"><button type="button" id="themeBtn" class="themebtn">Dunkel</button><a href="../">‹ Zur Übersicht</a><a href="arbeitsblaetter/galton-bernoulli.pdf" target="_blank" rel="noopener">Arbeitsblatt „Vom Galton-Brett zur Formel von Bernoulli“ (PDF)</a><a href="galton-bernoulli.html">Weiter zu Simulation 2: Formel von Bernoulli</a></p>
+  <p class="links"><button type="button" id="themeBtn" class="themebtn">Dunkel</button><a href="arbeitsblaetter/galton-bernoulli.pdf" target="_blank" rel="noopener">Arbeitsblatt „Vom Galton-Brett zur Formel von Bernoulli“ (PDF)</a><a href="galton-bernoulli.html">Weiter zu Simulation 2: Formel von Bernoulli</a></p>
 </header>
 <main>
   <div class="stage" id="stage"><canvas id="board"></canvas></div>
@@ -560,5 +560,6 @@ try{var s=localStorage.getItem(KEY);if(s==='light'||s==='dark')root.setAttribute
 if(btn)btn.addEventListener('click',function(){var n=isDark()?'light':'dark';root.setAttribute('data-theme',n);try{localStorage.setItem(KEY,n);}catch(e){}changed();});
 if(mq&&mq.addEventListener)mq.addEventListener('change',changed);label();})();
 </script>
+<script src="../assets/zur-uebersicht.js" defer></script>
 </body>
 </html>

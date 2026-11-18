@@ -149,7 +149,6 @@ footer{border-top:1px solid var(--line);padding:16px 0 26px;font-size:.85rem;col
   <div class="wrap">
     <div class="top">
       <div>
-        <a class="back" id="backLink" href="../" hidden>‹ Zur Übersicht</a>
         <span class="eyebrow">E-Phase · Analysis · Exponentialfunktionen</span>
       </div>
       <div class="fontsize" role="group" aria-label="Schriftgröße">
@@ -423,8 +422,6 @@ const narrowMQ=window.matchMedia("(max-width:700px)");
 function renderBlocks(){document.querySelectorAll(".formula[data-tex]").forEach(el=>renderTeX(el,(narrowMQ.matches&&el.dataset.narrow)||el.dataset.tex,true));}
 renderBlocks(); try{narrowMQ.addEventListener("change",renderBlocks);}catch(e){}
 
-/* ---------- Link zur Übersicht nur auf der Website ---------- */
-if(/github\.io$/.test(location.hostname)||location.hostname==="localhost") $("backLink").hidden=false;
 
 /* ---------- Schriftgröße ---------- */
 (function(){
@@ -598,5 +595,6 @@ window.addEventListener("hashchange",fromHash);
 fromHash();
 })();
 </script>
+<script src="../assets/zur-uebersicht.js" defer></script>
 </body>
 </html>
