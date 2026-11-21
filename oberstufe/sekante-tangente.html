@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Von der Sekante zur Tangente</title>
+<link rel="stylesheet" href="../assets/fonts/fonts.css">
+<script src="../assets/lib/katex/katex.min.js"></script>
+<style>
+:root{
+  --paper:#fbfaf6; --card:#ffffff; --ink:#1e2a3a; --muted:#5b6676; --line:#d9dee5; --soft:#f2f4f7;
+  --f:#1f5fbf; --fs:#e3ecfa; --s:#d9601a; --ss:#fbe7da; --t:#0f766e; --ts:#dcf2ef; --warn:#9a3412;
+  --grid:#eef0f3; --axis:#9aa4b2; --wrongbg:#fdecec; --wrongln:#c24141; --wrongtx:#8f1f1f; --primhover:#0b5f58;
+  --body:"Source Sans 3", system-ui, sans-serif; --head:"Source Serif 4", Georgia, serif; --mono:"Source Code Pro", ui-monospace, monospace;
+}
+html[data-theme="dark"]{
+  --paper:#12161c; --card:#1a2029; --ink:#e6eaf0; --muted:#9aa5b4; --line:#2e3744; --soft:#222a35;
+  --f:#6ea3ff; --fs:#1c2a42; --s:#ff9a5c; --ss:#3a2618; --t:#3cc3b3; --ts:#12302d; --warn:#ffb38a;
+  --grid:#232b36; --axis:#5b6676; --wrongbg:#3a1d1d; --wrongln:#e06c6c; --wrongtx:#ffb4b4; --primhover:#2aa597;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scrollbar-gutter:stable;font-size:19px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);line-height:1.5}
+h1,h2,h3{font-family:var(--head);line-height:1.2;text-wrap:balance}
+p,li{text-wrap:pretty}
+button,input,select{font-family:inherit;font-size:inherit}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+
+header{border-bottom:1px solid var(--line);background:var(--paper)}
+header .wrap{padding-top:20px;padding-bottom:14px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--t);font-weight:600}
+h1{font-size:clamp(1.8rem,4.2vw,2.6rem);margin:.25rem 0 .2rem}
+.lead{color:var(--muted);margin:0;max-width:54rem}
+.tools{display:flex;gap:6px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:6px 12px;cursor:pointer;font-weight:600;font-size:.9rem}
+.btn:hover{border-color:var(--ink)}
+.btn:disabled{opacity:.4;cursor:default;border-color:var(--line)}
+.btn.primary{background:var(--t);border-color:var(--t);color:#fff}
+.btn.primary:hover{background:var(--primhover)}
+
+nav.tabs{display:flex;gap:4px;overflow-x:auto;margin-top:16px;scrollbar-width:thin}
+nav.tabs button{flex:0 0 auto;border:0;background:transparent;padding:10px 14px;border-bottom:3px solid transparent;color:var(--muted);font-weight:600;cursor:pointer;font-size:.95rem}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--t)}
+nav.tabs .num{font-family:var(--mono);font-size:.8em;margin-right:6px;color:var(--t)}
+
+main{padding:22px 0 40px}
+section.chapter[hidden]{display:none}
+.chapter h2{font-size:1.55rem;margin:.2rem 0 .6rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:0 0 16px}
+.card h3{font-size:1.15rem;margin:0 0 .5rem}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.grid-lab{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:880px){.grid2,.grid-lab{grid-template-columns:minmax(0,1fr)}}
+.step.hidden{display:none}
+.stepbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:6px 0 18px}
+.stepbar .count{font-family:var(--mono);font-size:.8rem;color:var(--muted)}
+.pager{display:flex;justify-content:space-between;gap:10px;margin-top:24px;border-top:1px solid var(--line);padding-top:16px}
+.pager .btn{max-width:48%;text-align:left;line-height:1.3}
+.pager .next{margin-left:auto;text-align:right}
+.pager small{display:block;font-weight:400;color:var(--muted);font-size:.8rem}
+
+.merk{border-left:5px solid var(--t);background:var(--ts);border-radius:10px;padding:14px 18px;margin:12px 0}
+.merk strong{color:var(--t)}
+.question{border-left:5px solid var(--f);background:var(--fs);border-radius:10px;padding:14px 18px;margin:12px 0;font-size:1.05rem}
+.formula{overflow-x:auto;padding:6px 0;text-align:center;font-size:1.15rem}
+.formula math{font-size:1.12em}
+.small{font-size:.88rem;color:var(--muted)}
+
+/* Zeitleiste */
+.timeline{--yc:5.2rem;list-style:none;margin:0;padding:0;position:relative}
+@media (max-width:520px){.timeline{--yc:3.6rem}.timeline .year{font-size:.78rem}}
+.timeline::before{content:"";position:absolute;left:calc(var(--yc) + .85rem - 1px);top:6px;bottom:6px;width:2px;background:var(--line)}
+.timeline li{display:grid;grid-template-columns:var(--yc) 1fr;gap:1.7rem;padding:8px 0;position:relative}
+.timeline li::before{content:"";position:absolute;left:calc(var(--yc) + .85rem - 9px);top:15px;width:18px;height:18px;box-sizing:border-box;border-radius:50%;background:var(--card);border:3px solid var(--t)}
+.timeline li>span:last-child{min-width:0;overflow-wrap:anywhere}
+.tl-pic{display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:18px;align-items:start}
+.tl-pic figure{margin:0}
+.tl-pic img{display:block;width:100%;height:auto;border-radius:6px;border:1px solid var(--line);background:var(--soft)}
+.tl-pic figcaption{font-size:.7rem;color:var(--muted);line-height:1.3;margin-top:5px}
+@media (max-width:640px){.tl-pic{grid-template-columns:minmax(0,1fr);gap:8px}.tl-pic figure{display:grid;grid-template-columns:96px minmax(0,1fr);gap:10px;align-items:end}.tl-pic figcaption{margin:0}}
+.timeline .year{font-family:var(--mono);font-weight:600;color:var(--t);text-align:right;padding-top:2px;font-size:.92rem}
+.timeline .key::before{background:var(--t)}
+
+/* Labor */
+svg.plot{width:100%;height:auto;display:block;background:var(--card);border:1px solid var(--line);border-radius:12px}
+svg text{font-family:var(--body)}
+.ctrl{margin:0 0 14px}
+.ctrl label{display:flex;justify-content:space-between;align-items:baseline;font-weight:600;gap:10px}
+.ctrl output{font-family:var(--mono);font-size:1.02rem}
+input[type=range]{width:100%;accent-color:var(--s);height:28px}
+#x0R{accent-color:var(--f)}
+.row{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 0}
+.row .btn{padding:4px 10px;font-size:.84rem}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap}
+.seg button{border:0;background:var(--card);color:var(--muted);padding:6px 12px;font-weight:600;cursor:pointer;font-size:.9rem}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+select.fsel{width:100%;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+.readout{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;font-size:.95rem;margin:10px 0 0}
+.readout dt{color:var(--muted)}
+.readout dd{margin:0;font-family:var(--mono);font-weight:600;text-align:right;white-space:nowrap}
+.readout .tg{color:var(--t)}
+.check{display:flex;align-items:center;gap:8px;margin:8px 0;cursor:pointer;font-weight:600;font-size:.95rem}
+.check input{width:18px;height:18px;accent-color:var(--t)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.85rem;color:var(--muted);margin-top:8px}
+.legend i{display:inline-block;width:22px;height:0;border-top:3px solid;vertical-align:middle;margin-right:6px}
+.dqbox{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-top:12px}
+@media (max-width:400px){.dqbox .formula{font-size:.95rem}}
+.dqbox .lbl{font-size:.78rem;font-family:var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+table{border-collapse:collapse;width:100%;font-size:.95rem}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right}
+th:first-child,td:first-child{text-align:left}
+th{font-weight:600;color:var(--muted);font-size:.85rem}
+td.num{font-family:var(--mono)}
+tr.cur td{background:var(--ss)}
+.tablewrap{overflow-x:auto}
+@media (max-width:520px){table{font-size:.85rem}th,td{padding:5px 5px}.fcol{display:none}}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 12px}
+.chips .btn{font-size:.85rem;padding:5px 10px;font-family:var(--mono)}
+.chips .btn[aria-pressed="true"]{background:var(--s);border-color:var(--s);color:#fff}
+.big{font-family:var(--mono);font-size:1.5rem;font-weight:600;color:var(--s);margin:.2rem 0}
+.hidden-answer[hidden]{display:none}
+
+/* Quiz */
+.q{margin:0 0 16px}
+.q p{font-weight:600;margin:0 0 8px}
+.q .opts{display:grid;gap:6px}
+.q .opts button{text-align:left;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:8px 12px;cursor:pointer;color:var(--ink);line-height:1.35}
+.q .opts button:hover{border-color:var(--ink)}
+.q .opts button.right{background:var(--ts);border-color:var(--t);color:var(--t);font-weight:600}
+.q .opts button.wrong{background:var(--wrongbg);border-color:var(--wrongln);color:var(--wrongtx)}
+.q .fb{margin-top:6px;font-size:.92rem;color:var(--muted)}
+
+footer{border-top:1px solid var(--line);padding:16px 0 26px;font-size:.85rem;color:var(--muted)}
+@media (pointer:coarse){svg.plot{touch-action:pan-y}}
+@media (max-width:520px){.wrap{padding:0 14px}.card{padding:14px}.formula{font-size:1rem}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="top">
+      <span class="eyebrow">E-Phase · Analysis · Ableitung</span>
+      <div class="tools" role="group" aria-label="Ansicht">
+        <button type="button" class="btn" id="themeBtn" aria-pressed="false">Dunkler Modus</button>
+        <button type="button" class="btn" id="fsm" title="Schrift kleiner" aria-label="Schrift kleiner">A−</button>
+        <button type="button" class="btn" id="fsp" title="Schrift größer" aria-label="Schrift größer">A+</button>
+      </div>
+    </div>
+    <h1>Von der Sekante zur Tangente</h1>
+    <p class="lead">Wie steil ist ein Graph genau an einer Stelle? Wir nähern uns der Antwort mit Sekanten, die immer kürzer werden, und rechnen sie mit der x-Methode oder der h-Methode aus.</p>
+    <nav class="tabs" role="tablist" aria-label="Kapitel">
+      <button role="tab" data-ch="1" aria-selected="true"><span class="num">1</span>Geschichte</button>
+      <button role="tab" data-ch="2" aria-selected="false"><span class="num">2</span>Einstieg</button>
+      <button role="tab" data-ch="3" aria-selected="false"><span class="num">3</span>Labor</button>
+      <button role="tab" data-ch="4" aria-selected="false"><span class="num">4</span>Rechnen</button>
+      <button role="tab" data-ch="5" aria-selected="false"><span class="num">5</span>Sicherung</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ========== 1 Geschichte ========== -->
+<section class="chapter" id="ch1" data-ch="1">
+  <h2>Das Tangentenproblem in der Geschichte</h2>
+  <div class="stepbar"><button class="btn primary" data-next>Nächster Schritt</button><button class="btn" data-all>Alles zeigen</button><span class="count"></span></div>
+
+  <div class="step">
+    <div class="card">
+      <h3>Eine alte Frage</h3>
+      <p>Schon in der Antike fragte man, wie man an eine Kurve eine Gerade legt, die sie in einem Punkt nur „berührt“. Für den Kreis ist das leicht: Die Tangente steht senkrecht auf dem Radius. Für andere Kurven fehlte lange ein allgemeines Verfahren.</p>
+      <p>Im 17. Jahrhundert wurde das Problem drängend: Physiker wollten Geschwindigkeiten in einem Augenblick bestimmen, Astronomen die Bahnen der Planeten beschreiben und Mathematiker Hoch- und Tiefpunkte von Kurven finden.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="card">
+      <h3>Zeitleiste</h3>
+      <ol class="timeline">
+        <li><span class="year">um 300 v. Chr.</span><span>Euklid beschreibt in den „Elementen“ die Tangente an den Kreis als Gerade, die den Kreis berührt, ohne ihn zu schneiden.</span></li>
+        <li><span class="year">um 225 v. Chr.</span><span>Archimedes konstruiert Tangenten an die nach ihm benannte Spirale, eine erste Tangente an eine „krumme“ Kurve außer dem Kreis.</span></li>
+        <li class="key"><span class="year">um 1630</span><span>Pierre de Fermat entwickelt ein Verfahren für Extremwerte und Tangenten: Er verschiebt eine Stelle um eine kleine Größe E, vereinfacht und lässt E danach weg. Das ist im Kern die h-Methode.</span></li>
+        <li><span class="year">1637</span><span>René Descartes stellt in „La Géométrie“ eine eigene Methode vor, bei der er Kreise an die Kurve legt.</span></li>
+        <li class="key"><span class="year">1665</span><span class="tl-pic"><span>Isaac Newton entwickelt seine „Fluxionenrechnung“, mit der er Änderungsraten wie Geschwindigkeiten berechnet. Er veröffentlicht sie erst viel später.</span><figure><img src="bilder/newton-kneller-1689.jpg" loading="lazy" width="300" height="361" alt="Porträt von Isaac Newton mit langem grauem Haar und braunem Mantel"><figcaption>Isaac Newton, Gemälde von Godfrey Kneller (1689). Gemeinfrei, Wikimedia Commons.</figcaption></figure></span></li>
+        <li class="key"><span class="year">1684</span><span class="tl-pic"><span>Gottfried Wilhelm Leibniz veröffentlicht als Erster eine Differentialrechnung. Von ihm stammt die Schreibweise <span class="m">\frac{dy}{dx}</span>, die wir noch heute benutzen.</span><figure><img src="bilder/leibniz-francke-1695.jpg" loading="lazy" width="300" height="370" alt="Porträt von Gottfried Wilhelm Leibniz mit großer dunkler Lockenperücke und braunem Umhang"><figcaption>Gottfried Wilhelm Leibniz, Gemälde von Christoph Bernhard Francke (um 1695). Gemeinfrei, Wikimedia Commons.</figcaption></figure></span></li>
+        <li><span class="year">ab 1700</span><span>Zwischen Newton und Leibniz entbrennt ein heftiger Streit, wer die Differentialrechnung zuerst erfunden hat. Heute gilt: beide unabhängig voneinander.</span></li>
+        <li><span class="year">1821</span><span>Augustin-Louis Cauchy fasst den Grenzwertbegriff genauer. Damit bekommt das „unendlich kleine“ E von Fermat und Leibniz ein sicheres Fundament.</span></li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="question">Die Idee, die alle verbindet: Man betrachtet zwei Punkte, die immer näher zusammenrücken. Was passiert dabei mit der Geraden durch diese beiden Punkte? Genau das untersuchen wir in diesem Labor.</div>
+  </div>
+
+  <div class="pager"><button class="btn next" data-go="2">Weiter ›<small>Einstieg</small></button></div>
+</section>
+
+<!-- ========== 2 Einstieg ========== -->
+<section class="chapter" id="ch2" data-ch="2" hidden>
+  <h2>Einstieg: Wie schnell ist der Stein genau jetzt?</h2>
+  <div class="stepbar"><button class="btn primary" data-next>Nächster Schritt</button><button class="btn" data-all>Alles zeigen</button><span class="count"></span></div>
+
+  <div class="step">
+    <div class="card">
+      <p>Ein Stein fällt von einer Brücke. Vereinfacht gilt für den Fallweg nach <span class="m">t</span> Sekunden</p>
+      <div class="formula" data-tex="s(t)=5t^{2}\quad(s\ \text{in Metern},\ t\ \text{in Sekunden})." data-narrow="\begin{gathered}s(t)=5t^{2}\\[2pt]\text{(s in Metern, t in Sekunden)}\end{gathered}">
+      </div>
+      <div class="question">Mit welcher Geschwindigkeit fällt der Stein genau nach 1 Sekunde? Ein Tacho, der das direkt anzeigt, haben wir nicht. Wir kennen nur die Wege zu verschiedenen Zeitpunkten.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="grid-lab">
+      <div>
+        <svg class="plot" id="plotIntro" viewBox="0 0 640 420" role="img" aria-label="Weg-Zeit-Graph mit Sekante"></svg>
+        <div class="legend">
+          <span><i style="border-color:var(--f)"></i>Weg s(t)</span>
+          <span><i style="border-color:var(--s)"></i>Sekante</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Durchschnittsgeschwindigkeit</h3>
+        <p class="small">Wähle das Ende des Zeitintervalls. Der Anfang ist immer t = 1 s.</p>
+        <div class="chips" id="introChips"></div>
+        <div class="formula" id="introFormula"></div>
+        <div class="big" id="introValue"></div>
+        <div class="tablewrap"><table>
+          <thead><tr><th>Intervall</th><th>Δs</th><th>v̄ = Δs/Δt</th></tr></thead>
+          <tbody id="introTable"></tbody>
+        </table></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="merk">Die Durchschnittsgeschwindigkeit ist die <strong>Steigung der Sekante</strong> durch die beiden Punkte des Graphen. Je kürzer das Zeitintervall, desto näher liegt sie bei <strong>10 m/s</strong>. Diese Momentangeschwindigkeit ist die <strong>Steigung der Tangente</strong> im Punkt (1 | 5).</div>
+    <p>Dieselbe Idee funktioniert für jede Funktion: Aus der Steigung einer Sekante wird im Grenzfall die Steigung der Tangente. Das probieren wir jetzt im Labor aus.</p>
+  </div>
+
+  <div class="pager"><button class="btn" data-go="1">‹ Zurück<small>Geschichte</small></button><button class="btn next" data-go="3">Weiter ›<small>Labor</small></button></div>
+</section>
+
+<!-- ========== 3 Labor ========== -->
+<section class="chapter" id="ch3" data-ch="3" hidden>
+  <h2>Labor: Die Sekante wird zur Tangente</h2>
+  <div class="grid-lab">
+    <div>
+      <svg class="plot" id="plotLab" viewBox="0 0 640 460" role="img" aria-label="Graph mit Sekante durch P und Q und Tangente in P"></svg>
+      <div class="legend">
+        <span><i style="border-color:var(--f)"></i>Graph von f</span>
+        <span><i style="border-color:var(--s)"></i>Sekante durch P und Q</span>
+        <span><i style="border-color:var(--t);border-top-style:dashed"></i>Tangente in P</span>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <h3>Differenzenquotienten, wenn Q sich P nähert</h3>
+        <div class="tablewrap"><table>
+          <thead id="labHead"></thead>
+          <tbody id="labTable"></tbody>
+        </table></div>
+        <p class="small" id="labTableNote"></p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ctrl">
+        <label for="fSel">Funktion</label>
+        <select id="fSel" class="fsel"></select>
+      </div>
+      <div class="ctrl">
+        <label>Methode</label>
+        <div class="seg" id="methodSeg">
+          <button type="button" data-m="x" aria-pressed="false">x-Methode</button>
+          <button type="button" data-m="h" aria-pressed="true">h-Methode</button>
+        </div>
+      </div>
+      <div class="ctrl">
+        <label for="x0R">Berührpunkt P bei x₀ <output id="x0Out"></output></label>
+        <input type="range" id="x0R" step="0.05">
+      </div>
+      <div class="ctrl">
+        <label for="qR" id="qLabel">Abstand h <output id="qOut"></output></label>
+        <input type="range" id="qR" min="-1" max="1" step="0.001" value="0.7">
+        <div class="row">
+          <button class="btn" id="halve">Abstand halbieren</button>
+          <button class="btn" id="tenth">Abstand ÷ 10</button>
+          <button class="btn" id="flip">andere Seite</button>
+          <button class="btn primary" id="animate">Q wandert zu P</button>
+        </div>
+      </div>
+      <div class="dqbox"><div class="lbl" id="dqLbl">Differenzenquotient</div><div class="formula" id="dqFormula"></div></div>
+      <dl class="readout">
+        <dt>Steigung der Sekante</dt><dd id="msOut"></dd>
+        <dt class="tg" id="mtLbl" hidden>Steigung der Tangente f′(x₀)</dt><dd class="tg" id="mtOut" hidden></dd>
+      </dl>
+      <label class="check"><input type="checkbox" id="showT"> Tangente und Grenzwert zeigen</label>
+      <label class="check"><input type="checkbox" id="showTri" checked> Steigungsdreieck zeigen</label>
+    </div>
+  </div>
+  <div class="pager"><button class="btn" data-go="2">‹ Zurück<small>Einstieg</small></button><button class="btn next" data-go="4">Weiter ›<small>Rechnen</small></button></div>
+</section>
+
+<!-- ========== 4 Rechnen ========== -->
+<section class="chapter" id="ch4" data-ch="4" hidden>
+  <h2>Den Grenzwert exakt berechnen</h2>
+  <div class="card">
+    <p>Im Labor haben wir uns dem Wert nur genähert. Mit einer Rechnung können wir ihn exakt bestimmen. Wähle Funktion, Stelle und Methode und gehe die Rechnung Schritt für Schritt durch.</p>
+    <div class="row" style="gap:14px;align-items:flex-end">
+      <div class="ctrl" style="margin:0;min-width:180px"><label for="cF">Funktion</label>
+        <select id="cF" class="fsel"><option value="sq">f(x) = x²</option><option value="cube">f(x) = x³</option><option value="rec">f(x) = 1/x</option></select></div>
+      <div class="ctrl" style="margin:0;min-width:120px"><label for="cX">Stelle x₀</label>
+        <select id="cX" class="fsel"></select></div>
+      <div class="ctrl" style="margin:0"><label>Methode</label>
+        <div class="seg" id="cMethod"><button type="button" data-m="x" aria-pressed="false">x-Methode</button><button type="button" data-m="h" aria-pressed="true">h-Methode</button></div></div>
+    </div>
+  </div>
+  <div class="stepbar"><button class="btn primary" id="cNext">Nächster Rechenschritt</button><button class="btn" id="cAll">Alles zeigen</button><span class="count" id="cCount"></span></div>
+  <div class="card" id="calcSteps"></div>
+  <div class="merk" id="calcResult" hidden></div>
+  <div class="pager"><button class="btn" data-go="3">‹ Zurück<small>Labor</small></button><button class="btn next" data-go="5">Weiter ›<small>Sicherung</small></button></div>
+</section>
+
+<!-- ========== 5 Sicherung ========== -->
+<section class="chapter" id="ch5" data-ch="5" hidden>
+  <h2>Sicherung</h2>
+  <div class="stepbar"><button class="btn primary" data-next>Nächster Schritt</button><button class="btn" data-all>Alles zeigen</button><span class="count"></span></div>
+
+  <div class="step">
+    <div class="grid2">
+      <div class="card">
+        <h3>x-Methode</h3>
+        <p>Der zweite Punkt hat die Stelle <span class="m">x</span>, und <span class="m">x</span> läuft gegen <span class="m">x_0</span>.</p>
+        <div class="formula" data-tex="f'(x_0)=\lim_{x\to x_0}\frac{f(x)-f(x_0)}{x-x_0}"></div>
+      </div>
+      <div class="card">
+        <h3>h-Methode</h3>
+        <p>Der zweite Punkt liegt um <span class="m">h</span> neben <span class="m">x_0</span>, und <span class="m">h</span> läuft gegen 0.</p>
+        <div class="formula" data-tex="f'(x_0)=\lim_{h\to 0}\frac{f(x_0+h)-f(x_0)}{h}"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="merk"><strong>Merke</strong>
+      <ul style="margin:.4rem 0 0;padding-left:1.2rem">
+        <li>Der <strong>Differenzenquotient</strong> ist die Steigung einer Sekante, also eine mittlere Änderungsrate.</li>
+        <li>Sein Grenzwert heißt <strong>Differentialquotient</strong> oder <strong>Ableitung</strong> <span class="m">f'(x_0)</span>. Er ist die Steigung der Tangente, also die lokale Änderungsrate.</li>
+        <li>Beide Methoden liefern dasselbe, denn mit <span class="m">x=x_0+h</span> geht die eine in die andere über.</li>
+        <li>Wichtig: Man darf <span class="m">h=0</span> nicht einfach einsetzen, denn dann steht <span class="m">\frac{0}{0}</span> da. Erst kürzen, dann den Grenzwert bilden.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="card" id="quiz"><h3>Teste dich</h3></div>
+  </div>
+
+  <div class="pager"><button class="btn" data-go="4">‹ Zurück<small>Rechnen</small></button><button class="btn next" data-go="1">Von vorn ›<small>Geschichte</small></button></div>
+</section>
+
+</main>
+<footer><div class="wrap">Mathematik · E-Phase · Verantwortlich: S. Thel</div></footer>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const de=(x,d)=>(Object.is(x,-0)?0:x).toLocaleString("de-DE",{minimumFractionDigits:d,maximumFractionDigits:d});
+const deMax=(x,d)=>(Math.abs(x)<1e-12?0:x).toLocaleString("de-DE",{maximumFractionDigits:d});
+const tx=s=>String(s).replace(/\./g,"\\,").replace(",","{,}").replace(/^-/,"-");
+const T=(x,d)=>tx(deMax(x,d));
+
+function renderTeX(el,src,display){
+  if(!window.katex){el.textContent=src;return;}
+  try{katex.render(src,el,{throwOnError:false,displayMode:!!display,output:"mathml"});}catch(e){el.textContent=src;}
+}
+document.querySelectorAll(".m").forEach(el=>renderTeX(el,el.textContent,false));
+const narrow=window.matchMedia("(max-width:700px)");
+function renderBlocks(){document.querySelectorAll(".formula[data-tex]").forEach(el=>renderTeX(el,(narrow.matches&&el.dataset.narrow)||el.dataset.tex,true));}
+renderBlocks();
+
+/* ---------- Schriftgröße und Modus ---------- */
+(function(){
+  const scales=[0.85,0.92,1,1.1,1.22,1.36,1.5]; let si=2; const base=19;
+  try{const raw=localStorage.getItem("st-scale");const v=+raw;if(raw!==null&&v>=0&&v<scales.length)si=v;}catch(e){}
+  function apply(){document.documentElement.style.fontSize=(base*scales[si])+"px";$("fsm").disabled=si===0;$("fsp").disabled=si===scales.length-1;try{localStorage.setItem("st-scale",si);}catch(e){}}
+  $("fsm").onclick=()=>{if(si>0){si--;apply();}};
+  $("fsp").onclick=()=>{if(si<scales.length-1){si++;apply();}};
+  apply();
+  const btn=$("themeBtn"); let dark=false; try{dark=localStorage.getItem("st-theme")==="dark";}catch(e){}
+  function th(){document.documentElement.dataset.theme=dark?"dark":"light";btn.textContent=dark?"Heller Modus":"Dunkler Modus";btn.setAttribute("aria-pressed",dark?"true":"false");}
+  btn.onclick=()=>{dark=!dark;th();try{localStorage.setItem("st-theme",dark?"dark":"light");}catch(e){}};
+  th();
+})();
+
+/* ---------- Kapitel und Schritte ---------- */
+const chapters=[...document.querySelectorAll("section.chapter")];
+const tabs=[...document.querySelectorAll("nav.tabs button")];
+function show(n,top){
+  chapters.forEach(c=>c.hidden=c.dataset.ch!==String(n));
+  tabs.forEach(t=>t.setAttribute("aria-selected",t.dataset.ch===String(n)?"true":"false"));
+  try{history.replaceState(null,"","#kapitel-"+n);}catch(e){}
+  if(top) window.scrollTo({top:0,behavior:"smooth"});
+  redraw();
+}
+tabs.forEach(t=>t.onclick=()=>show(+t.dataset.ch));
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>show(+b.dataset.go,true));
+chapters.forEach(c=>{
+  const steps=[...c.querySelectorAll(".step")]; if(!steps.length) return; let shown=1;
+  const next=c.querySelector("[data-next]"), all=c.querySelector("[data-all]"), cnt=c.querySelector(".count");
+  function upd(){steps.forEach((s,i)=>s.classList.toggle("hidden",i>=shown));next.disabled=shown>=steps.length;cnt.textContent="Schritt "+shown+" von "+steps.length;all.textContent=shown>=steps.length?"Schrittweise zeigen":"Alles zeigen";redraw();}
+  next.onclick=()=>{if(shown<steps.length){shown++;upd();steps[shown-1].scrollIntoView({behavior:"smooth",block:"nearest"});}};
+  all.onclick=()=>{shown=shown>=steps.length?1:steps.length;upd();};
+  upd();
+});
+
+/* ---------- SVG-Hilfen ---------- */
+const NS="http://www.w3.org/2000/svg";
+function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
+function txt(parent,x,y,s,attrs){const t=el("text",Object.assign({x,y,"font-size":15,fill:"var(--muted)"},attrs||{}),parent);t.textContent=s;return t;}
+function axes(svg,W,H,box,X,Y,step,labels){
+  const [xmin,xmax,ymin,ymax]=box, [L,R,Tp,B]=labels.pad;
+  const sx=step[0], sy=step[1];
+  for(let x=Math.ceil(xmin/sx)*sx;x<=xmax+1e-9;x+=sx){const on=Math.abs(x)<1e-9;el("line",{x1:X(x),y1:Tp,x2:X(x),y2:H-B,stroke:on?"var(--axis)":"var(--grid)","stroke-width":on?1.5:1},svg);
+    txt(svg,X(x),H-B+20,deMax(x,2).replace("-","−"),{"text-anchor":"middle","font-size":14});}
+  for(let y=Math.ceil(ymin/sy)*sy;y<=ymax+1e-9;y+=sy){const on=Math.abs(y)<1e-9;el("line",{x1:L,y1:Y(y),x2:W-R,y2:Y(y),stroke:on?"var(--axis)":"var(--grid)","stroke-width":on?1.5:1},svg);
+    txt(svg,L-8,Y(y)+5,deMax(y,2).replace("-","−"),{"text-anchor":"end","font-size":14});}
+  txt(svg,W-R-4,H-B-8,labels.x,{"text-anchor":"end","font-style":"italic"});
+  txt(svg,L+8,Tp+16,labels.y,{"font-style":"italic"});
+}
+function curvePath(fn,X,Y,a,b,ymin,ymax){
+  let d="",pen=false;
+  for(let i=0;i<=400;i++){const x=a+(b-a)*i/400;const y=fn(x);
+    if(!isFinite(y)||y<ymin-50||y>ymax+50){pen=false;continue;}
+    d+=(pen?"L":"M")+X(x).toFixed(1)+" "+Y(y).toFixed(1);pen=true;}
+  return d;
+}
+
+/* ---------- Kapitel 2: Einstieg ---------- */
+const s=t=>5*t*t;
+const introEnds=[2,1.5,1.1,1.01,1.001];
+let introT=2;
+$("introChips").innerHTML=introEnds.map(t=>`<button class="btn" data-t="${t}" aria-pressed="false">t = ${deMax(t,3)} s</button>`).join("");
+document.querySelectorAll("#introChips [data-t]").forEach(b=>b.onclick=()=>{introT=+b.dataset.t;updIntro();});
+function updIntro(){
+  const dt=introT-1, ds=s(introT)-5, v=ds/dt;
+  document.querySelectorAll("#introChips [data-t]").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.t===introT?"true":"false"));
+  const iA=`\\bar v=\\frac{s(${T(introT,3)})-s(1)}{${T(introT,3)}-1}`, iB=`\\frac{${T(s(introT),6)}-5}{${T(dt,3)}}`;
+  renderTeX($("introFormula"),narrow.matches?`\\begin{gathered}${iA}\\\\[4pt]=${iB}\\end{gathered}`:`${iA}=${iB}`,true);
+  $("introValue").textContent="v̄ = "+de(v,3)+" m/s";
+  $("introTable").innerHTML=introEnds.map(t=>{const d=t-1,dd=s(t)-5;return `<tr${t===introT?' class="cur"':''}><td class="num">[1; ${deMax(t,3)}]</td><td class="num">${deMax(dd,5)} m</td><td class="num">${de(dd/d,3)} m/s</td></tr>`;}).join("");
+  drawIntro();
+}
+function drawIntro(){
+  const svg=$("plotIntro"); if(!svg||svg.closest("section").hidden||svg.closest(".step.hidden")) return;
+  while(svg.firstChild) svg.removeChild(svg.firstChild);
+  const W=640,H=420,L=48,R=16,Tp=14,B=34, box=[0,2.2,0,22];
+  const X=x=>L+(x-box[0])/(box[1]-box[0])*(W-L-R), Y=y=>Tp+(box[3]-y)/(box[3]-box[2])*(H-Tp-B);
+  axes(svg,W,H,box,X,Y,[0.5,5],{pad:[L,R,Tp,B],x:"t in s",y:"s in m"});
+  const cl=el("clipPath",{id:"clipI"},svg); el("rect",{x:L,y:Tp,width:W-L-R,height:H-Tp-B},cl);
+  const g=el("g",{"clip-path":"url(#clipI)"},svg);
+  el("path",{d:curvePath(s,X,Y,0,2.2,0,22),fill:"none",stroke:"var(--f)","stroke-width":3.5},g);
+  const m=(s(introT)-5)/(introT-1);
+  el("line",{x1:X(0),y1:Y(5-m),x2:X(2.2),y2:Y(5+m*1.2),stroke:"var(--s)","stroke-width":2.5},g);
+  el("circle",{cx:X(1),cy:Y(5),r:6,fill:"var(--f)",stroke:"var(--card)","stroke-width":2},svg);
+  el("circle",{cx:X(introT),cy:Y(s(introT)),r:6,fill:"var(--s)",stroke:"var(--card)","stroke-width":2},svg);
+  txt(svg,X(1)-10,Y(5)+22,"(1 | 5)",{"text-anchor":"end",fill:"var(--f)","font-weight":600});
+}
+updIntro();
+
+/* ---------- Kapitel 3: Labor ---------- */
+const FN={
+  sq:{name:"f(x) = x²",tex:"x^{2}",f:x=>x*x,d:x=>2*x,box:[-3,3,-1.5,9],step:[1,1],x0:[-2.5,2.5,1],dom:[-Infinity,Infinity]},
+  cube:{name:"f(x) = x³",tex:"x^{3}",f:x=>x*x*x,d:x=>3*x*x,box:[-2.2,2.2,-6,6],step:[1,2],x0:[-1.8,1.8,1],dom:[-Infinity,Infinity]},
+  par:{name:"f(x) = 0,5x² − 2x + 3",tex:"0{,}5x^{2}-2x+3",f:x=>0.5*x*x-2*x+3,d:x=>x-2,box:[-1,6,-0.5,7],step:[1,1],x0:[-0.5,5.5,4],dom:[-Infinity,Infinity]},
+  rec:{name:"f(x) = 1/x (für x > 0)",tex:"\\frac{1}{x}",f:x=>1/x,d:x=>-1/(x*x),box:[0,5,-0.5,4.5],step:[1,1],x0:[0.4,4.5,1],dom:[0.05,Infinity]},
+  sqrt:{name:"f(x) = √x",tex:"\\sqrt{x}",f:x=>Math.sqrt(x),d:x=>1/(2*Math.sqrt(x)),box:[0,6,-0.5,3],step:[1,0.5],x0:[0.2,5.5,1],dom:[0,Infinity]}
+};
+const S={fn:"sq",x0:1,h:0.7,m:"h",showT:false,tri:true};
+$("fSel").innerHTML=Object.entries(FN).map(([k,v])=>`<option value="${k}">${v.name}</option>`).join("");
+const hFromSlider=v=>Math.sign(v)*Math.pow(Math.abs(v),3)*2; /* fein um 0, grob außen */
+const sliderFromH=h=>Math.sign(h)*Math.cbrt(Math.abs(h)/2);
+function clampH(h){const F=FN[S.fn];const lo=F.dom[0]-S.x0, hi=F.box[1]-S.x0;
+  if(S.x0+h<=F.dom[0]) h=Math.max(h,F.dom[0]-S.x0+1e-3);
+  if(Math.abs(h)<1e-6) h=h<0?-1e-6:1e-6; return Math.max(Math.min(h,2),-2);}
+function setFn(k){S.fn=k;const F=FN[k];const r=$("x0R");r.min=F.x0[0];r.max=F.x0[1];S.x0=F.x0[2];r.value=S.x0;S.h=clampH(1);updLab();}
+$("fSel").onchange=e=>setFn(e.target.value);
+$("x0R").oninput=e=>{S.x0=+e.target.value;S.h=clampH(S.h);updLab();};
+$("qR").oninput=e=>{stopAnim();S.h=clampH(hFromSlider(+e.target.value));updLab();};
+$("halve").onclick=()=>{stopAnim();S.h=clampH(S.h/2);updLab();};
+$("tenth").onclick=()=>{stopAnim();S.h=clampH(S.h/10);updLab();};
+$("flip").onclick=()=>{stopAnim();S.h=clampH(-S.h);updLab();};
+$("showT").onchange=e=>{S.showT=e.target.checked;updLab();};
+$("showTri").onchange=e=>{S.tri=e.target.checked;updLab();};
+document.querySelectorAll("#methodSeg button").forEach(b=>b.onclick=()=>{S.m=b.dataset.m;document.querySelectorAll("#methodSeg button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));updLab();});
+let anim=null;
+function stopAnim(){if(anim){cancelAnimationFrame(anim);anim=null;$("animate").textContent="Q wandert zu P";}}
+$("animate").onclick=()=>{
+  if(anim){stopAnim();return;}
+  const h0=Math.abs(S.h)<0.01?(S.h<0?-1.5:1.5):S.h, h1=Math.sign(h0)*0.001, t0=performance.now(), dur=4000;
+  $("animate").textContent="Anhalten";
+  const stepA=now=>{const u=Math.min(1,(now-t0)/dur);S.h=clampH(h0*Math.pow(h1/h0,u));updLab();if(u<1)anim=requestAnimationFrame(stepA);else stopAnim();};
+  anim=requestAnimationFrame(stepA);
+};
+function fmtH(h){const a=Math.abs(h);const d=a>=0.1?2:a>=0.01?3:a>=0.001?4:a>=0.0001?5:6;return de(h,d);}
+function updLab(){
+  const F=FN[S.fn], x0=S.x0, h=S.h, x=x0+h, y0=F.f(x0), y=F.f(x), ms=(y-y0)/h, mt=F.d(x0);
+  $("x0Out").textContent=de(x0,2);
+  $("qR").value=sliderFromH(h);
+  const isX=S.m==="x";
+  $("qLabel").firstChild.textContent=isX?"Stelle x von Q ":"Abstand h ";
+  $("qOut").textContent=isX?("x = "+fmtH(x)):("h = "+fmtH(h));
+  $("dqLbl").textContent=S.m==="x"?"Differenzenquotient (x-Methode)":"Differenzenquotient (h-Methode)";
+  const hx=fmtH(h), xs=fmtH(x), x0s=deMax(x0,2);
+  const gx=`\\frac{f(${tx(xs)})-f(${tx(x0s)})}{${tx(xs)}-${tx(x0s)}}`;
+  const gh=`\\frac{f(${tx(x0s)}+${h<0?"("+tx(hx)+")":tx(hx)})-f(${tx(x0s)})}{${h<0?"("+tx(hx)+")":tx(hx)}}`;
+  const res=`\\approx ${tx(de(ms,4))}`;
+  let src;
+  if(S.m==="x") src=`\\begin{gathered}${gx}\\\\[4pt]${res}\\end{gathered}`;
+  else src=`\\begin{gathered}${gh}\\\\[4pt]${res}\\end{gathered}`;
+  renderTeX($("dqFormula"),src,true);
+  $("msOut").textContent=de(ms,4);
+  $("mtLbl").hidden=!S.showT; $("mtOut").hidden=!S.showT; $("mtOut").textContent=de(mt,4);
+  /* Tabelle */
+  const hs=[1,0.5,0.1,0.01,0.001].map(v=>Math.sign(h||1)*v).filter(v=>x0+v>F.dom[0]);
+  const show=isX?"x":"h";
+  $("labHead").innerHTML=`<tr>${show!=="h"?"<th>x</th>":""}${show!=="x"?"<th>h</th>":""}<th class="fcol">${isX?"f(x)":"f(x₀+h)"}</th><th>Sekantensteigung</th></tr>`;
+  $("labTable").innerHTML=hs.map(v=>{const q=(F.f(x0+v)-y0)/v;return `<tr>${show!=="h"?`<td class="num">${fmtH(x0+v)}</td>`:""}${show!=="x"?`<td class="num">${fmtH(v)}</td>`:""}<td class="num fcol">${de(F.f(x0+v),5)}</td><td class="num">${de(q,5)}</td></tr>`;}).join("")
+    +(S.showT?`<tr class="cur"><td>Grenzwert</td><td class="fcol"></td><td class="num">${de(mt,5)}</td></tr>`:"");
+  $("labTableNote").textContent=S.showT?"Die Sekantensteigungen nähern sich der Tangentensteigung f′(x₀) = "+de(mt,4)+".":"Welchem Wert nähern sich die Sekantensteigungen? Vermute, bevor du den Grenzwert einblendest.";
+  drawLab();
+}
+function drawLab(){
+  const svg=$("plotLab"); if(!svg||svg.closest("section").hidden) return;
+  while(svg.firstChild) svg.removeChild(svg.firstChild);
+  const F=FN[S.fn], W=640,H=460,L=46,R=16,Tp=14,B=34, box=F.box;
+  const X=x=>L+(x-box[0])/(box[1]-box[0])*(W-L-R), Y=y=>Tp+(box[3]-y)/(box[3]-box[2])*(H-Tp-B);
+  axes(svg,W,H,box,X,Y,F.step,{pad:[L,R,Tp,B],x:"x",y:"y"});
+  const cl=el("clipPath",{id:"clipL"},svg); el("rect",{x:L,y:Tp,width:W-L-R,height:H-Tp-B},cl);
+  const g=el("g",{"clip-path":"url(#clipL)"},svg);
+  const x0=S.x0,h=S.h,x1=x0+h,y0=F.f(x0),y1=F.f(x1),ms=(y1-y0)/h,mt=F.d(x0);
+  el("path",{d:curvePath(x=>x<F.dom[0]?NaN:F.f(x),X,Y,Math.max(box[0],F.dom[0]),box[1],box[2],box[3]),fill:"none",stroke:"var(--f)","stroke-width":3.5},g);
+  const line=(m,c,attrs)=>el("line",Object.assign({x1:X(box[0]),y1:Y(c+m*(box[0]-x0)),x2:X(box[1]),y2:Y(c+m*(box[1]-x0))},attrs),g);
+  if(S.showT) line(mt,y0,{stroke:"var(--t)","stroke-width":2.5,"stroke-dasharray":"9 7"});
+  line(ms,y0,{stroke:"var(--s)","stroke-width":2.5});
+  if(S.tri&&Math.abs(X(x1)-X(x0))>14){
+    el("path",{d:`M${X(x0)} ${Y(y0)} L${X(x1)} ${Y(y0)} L${X(x1)} ${Y(y1)}`,fill:"none",stroke:"var(--s)","stroke-width":1.5,"stroke-dasharray":"4 4"},g);
+    const isX=S.m==="x";
+    txt(g,(X(x0)+X(x1))/2,Y(y0)+(y1>y0?20:-8),isX?"x − x₀":"h",{"text-anchor":"middle",fill:"var(--warn)","font-weight":600,"font-size":14});
+    txt(g,X(x1)+(h>0?6:-6),(Y(y0)+Y(y1))/2+5,isX?"f(x) − f(x₀)":"f(x₀+h) − f(x₀)",{"text-anchor":h>0?"start":"end",fill:"var(--warn)","font-weight":600,"font-size":14});
+  }
+  el("circle",{cx:X(x0),cy:Y(y0),r:7,fill:"var(--f)",stroke:"var(--card)","stroke-width":2.5},svg);
+  el("circle",{cx:X(x1),cy:Y(y1),r:6,fill:"var(--s)",stroke:"var(--card)","stroke-width":2.5},svg);
+  const far=Math.abs(X(x1)-X(x0))>26;
+  txt(svg,X(x0)-10,Y(y0)-12,"P",{"text-anchor":"end",fill:"var(--f)","font-weight":700,"font-size":18});
+  if(far) txt(svg,X(x1)+(h>0?10:-10),Y(y1)-12,"Q",{"text-anchor":h>0?"start":"end",fill:"var(--s)","font-weight":700,"font-size":18});
+}
+setFn("sq");
+
+/* ---------- Kapitel 4: exakt rechnen ---------- */
+const C={f:"sq",x0:2,m:"h",shown:1};
+const X0S={sq:[-1,1,2,3],cube:[1,2,-1],rec:[1,2,0.5]};
+function fillX0(){$("cX").innerHTML=X0S[C.f].map(v=>`<option value="${v}">${deMax(v,2)}</option>`).join("");C.x0=X0S[C.f][C.f==="sq"?2:0];$("cX").value=C.x0;}
+$("cF").onchange=e=>{C.f=e.target.value;fillX0();C.shown=1;buildCalc();};
+$("cX").onchange=e=>{C.x0=+e.target.value;C.shown=1;buildCalc();};
+document.querySelectorAll("#cMethod button").forEach(b=>b.onclick=()=>{C.m=b.dataset.m;document.querySelectorAll("#cMethod button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));C.shown=1;buildCalc();});
+$("cNext").onclick=()=>{C.shown++;buildCalc();};
+$("cAll").onclick=()=>{C.shown=C.shown>=99?1:99;buildCalc();};
+const P=v=>v<0?`(${T(v,2)})`:T(v,2);
+function calcSteps(){
+  const a=C.x0, A=T(a,2), Ap=P(a);
+  if(C.f==="sq"){
+    const r=2*a;
+    if(C.m==="h") return {steps:[
+      [`Differenzenquotient aufstellen`,`\\frac{f(${A}+h)-f(${A})}{h}=\\frac{(${A}+h)^{2}-${Ap}^{2}}{h}`],
+      [`Klammer ausmultiplizieren (binomische Formel)`,`=\\frac{${T(a*a,2)}+${T(2*a,2)}h+h^{2}-${T(a*a,2)}}{h}`.replace("+-","-")],
+      [`Zusammenfassen und h ausklammern`,`=\\frac{${T(2*a,2)}h+h^{2}}{h}=\\frac{h\\,(${T(2*a,2)}+h)}{h}`],
+      [`Kürzen (erlaubt, weil h ≠ 0)`,`=${T(2*a,2)}+h`],
+      [`Grenzwert bilden: h geht gegen 0`,`f'(${A})=\\lim_{h\\to 0}\\,(${T(2*a,2)}+h)=${T(r,2)}`]],res:r};
+    return {steps:[
+      [`Differenzenquotient aufstellen`,`\\frac{f(x)-f(${A})}{x-${Ap}}=\\frac{x^{2}-${T(a*a,2)}}{x-${Ap}}`],
+      [`Zähler mit der 3. binomischen Formel zerlegen`,`=\\frac{(x-${Ap})(x+${Ap})}{x-${Ap}}`],
+      [`Kürzen (erlaubt, weil x ≠ ${A})`,`=x+${Ap}`],
+      [`Grenzwert bilden: x geht gegen ${A}`,`f'(${A})=\\lim_{x\\to ${A}}\\,(x+${Ap})=${T(r,2)}`]],res:r};
+  }
+  if(C.f==="cube"){
+    const r=3*a*a;
+    if(C.m==="h") return {steps:[
+      [`Differenzenquotient aufstellen`,`\\frac{f(${A}+h)-f(${A})}{h}=\\frac{(${A}+h)^{3}-${Ap}^{3}}{h}`],
+      [`Ausmultiplizieren mit (a+h)³ = a³ + 3a²h + 3ah² + h³`,`=\\frac{${T(a**3,2)}+${T(3*a*a,2)}h+${T(3*a,2)}h^{2}+h^{3}-${T(a**3,2)}}{h}`.replace(/\+-/g,"-")],
+      [`Zusammenfassen und h ausklammern`,`=\\frac{h\\,(${T(3*a*a,2)}+${T(3*a,2)}h+h^{2})}{h}`.replace(/\+-/g,"-")],
+      [`Kürzen (erlaubt, weil h ≠ 0)`,`=${T(3*a*a,2)}+${T(3*a,2)}h+h^{2}`.replace(/\+-/g,"-")],
+      [`Grenzwert bilden: h geht gegen 0`,`f'(${A})=\\lim_{h\\to 0}\\,(${T(3*a*a,2)}+${T(3*a,2)}h+h^{2})=${T(r,2)}`.replace(/\+-/g,"-")]],res:r};
+    return {steps:[
+      [`Differenzenquotient aufstellen`,`\\frac{f(x)-f(${A})}{x-${Ap}}=\\frac{x^{3}-${P(a**3)}}{x-${Ap}}`],
+      [`Zähler zerlegen mit x³ − a³ = (x − a)(x² + ax + a²)`,`=\\frac{(x-${Ap})(x^{2}+${Ap}x+${T(a*a,2)})}{x-${Ap}}`],
+      [`Kürzen (erlaubt, weil x ≠ ${A})`,`=x^{2}+${Ap}x+${T(a*a,2)}`],
+      [`Grenzwert bilden: x geht gegen ${A}`,`f'(${A})=\\lim_{x\\to ${A}}\\,(x^{2}+${Ap}x+${T(a*a,2)})=${T(a*a,2)}+${T(a*a,2)}+${T(a*a,2)}=${T(r,2)}`]],res:r};
+  }
+  /* 1/x */
+  const r=-1/(a*a);
+  if(C.m==="h") return {steps:[
+    [`Differenzenquotient aufstellen`,`\\frac{f(${A}+h)-f(${A})}{h}=\\frac{\\frac{1}{${A}+h}-\\frac{1}{${A}}}{h}`],
+    [`Brüche im Zähler auf den Hauptnenner bringen`,`=\\frac{\\frac{${A}-(${A}+h)}{${A}\\,(${A}+h)}}{h}=\\frac{\\frac{-h}{${A}\\,(${A}+h)}}{h}`],
+    [`Durch h teilen und kürzen (erlaubt, weil h ≠ 0)`,`=\\frac{-1}{${A}\\,(${A}+h)}`],
+    [`Grenzwert bilden: h geht gegen 0`,`f'(${A})=\\lim_{h\\to 0}\\frac{-1}{${A}\\,(${A}+h)}=-\\frac{1}{${T(a*a,4)}}=${T(r,4)}`]],res:r};
+  return {steps:[
+    [`Differenzenquotient aufstellen`,`\\frac{f(x)-f(${A})}{x-${A}}=\\frac{\\frac{1}{x}-\\frac{1}{${A}}}{x-${A}}`],
+    [`Brüche im Zähler auf den Hauptnenner bringen`,`=\\frac{\\frac{${A}-x}{${A}\\,x}}{x-${A}}=\\frac{-(x-${A})}{${A}\\,x\\,(x-${A})}`],
+    [`Kürzen (erlaubt, weil x ≠ ${A})`,`=\\frac{-1}{${A}\\,x}`],
+    [`Grenzwert bilden: x geht gegen ${A}`,`f'(${A})=\\lim_{x\\to ${A}}\\frac{-1}{${A}\\,x}=-\\frac{1}{${T(a*a,4)}}=${T(r,4)}`]],res:r};
+}
+function buildCalc(){
+  const {steps,res}=calcSteps(); const n=Math.min(C.shown,steps.length); C.shown=Math.min(C.shown,99);
+  const box=$("calcSteps"); box.innerHTML="";
+  steps.slice(0,n).forEach(([t,f],i)=>{const d=document.createElement("div");d.style.margin=i?"10px 0 0":"0";
+    d.innerHTML=`<div class="small" style="font-weight:600;color:var(--ink)">${i+1}. ${t}</div><div class="formula"></div>`;box.appendChild(d);renderTeX(d.querySelector(".formula"),f,true);});
+  $("cNext").disabled=n>=steps.length; $("cCount").textContent="Schritt "+n+" von "+steps.length;
+  $("cAll").textContent=n>=steps.length?"Schrittweise zeigen":"Alles zeigen";
+  const fn={sq:"x^{2}",cube:"x^{3}",rec:"\\frac{1}{x}"}[C.f];
+  const rb=$("calcResult"); rb.hidden=n<steps.length;
+  if(!rb.hidden){rb.innerHTML=`<strong>Ergebnis:</strong> Die Tangente an den Graphen von <span class="m2"></span> im Punkt mit <span class="m3"></span> hat die Steigung <strong>${de(res,4).replace(/,?0+$/,"")}</strong>. Prüfe das im Labor mit derselben Funktion und Stelle.`;
+    renderTeX(rb.querySelector(".m2"),`f(x)=${fn}`,false);renderTeX(rb.querySelector(".m3"),`x_0=${T(C.x0,2)}`,false);}
+}
+fillX0(); buildCalc();
+
+/* ---------- Kapitel 5: Quiz ---------- */
+const QUIZ=[
+  {q:"Was gibt der Differenzenquotient geometrisch an?",o:["Die Steigung der Sekante durch zwei Punkte des Graphen","Die Steigung der Tangente","Den Abstand der beiden Punkte"],r:0,fb:"Der Differenzenquotient ist Δy/Δx für zwei Punkte, also die Steigung der Sekante. Erst sein Grenzwert ist die Tangentensteigung."},
+  {q:"Warum darf man in (f(x₀+h) − f(x₀))/h nicht einfach h = 0 einsetzen?",o:["Weil dann 0/0 entsteht, was nicht definiert ist","Weil h immer positiv sein muss","Weil f(x₀) dann nicht existiert"],r:0,fb:"Zähler und Nenner würden 0. Deshalb wird zuerst umgeformt und gekürzt, danach der Grenzwert gebildet."},
+  {q:"Für f(x) = x² ergibt die h-Methode an der Stelle 3 den Term 6 + h. Was ist f′(3)?",o:["6","6 + h","9"],r:0,fb:"Für h gegen 0 strebt 6 + h gegen 6. Also hat die Tangente an der Stelle 3 die Steigung 6."},
+  {q:"Wie hängen x-Methode und h-Methode zusammen?",o:["Mit x = x₀ + h geht die eine in die andere über, beide liefern dasselbe","Die x-Methode liefert genauere Werte","Die h-Methode funktioniert nur für Parabeln"],r:0,fb:"Der Abstand x − x₀ ist genau h. Beide Schreibweisen beschreiben dieselbe Sekante und denselben Grenzwert."},
+  {q:"Beim Stein mit s(t) = 5t² ist die Durchschnittsgeschwindigkeit zwischen 1 s und 1,01 s 10,05 m/s. Was ist die Momentangeschwindigkeit nach 1 s?",o:["10 m/s","10,05 m/s","5 m/s"],r:0,fb:"Die Durchschnittsgeschwindigkeiten nähern sich 10 m/s, das ist die Steigung der Tangente an der Stelle 1."}
+];
+(function(){
+  const box=$("quiz");
+  QUIZ.forEach((item,qi)=>{
+    const order=item.o.map((_,i)=>i).sort(()=>Math.random()-.5);
+    const d=document.createElement("div"); d.className="q";
+    d.innerHTML=`<p>${qi+1}. ${item.q}</p><div class="opts">${order.map(i=>`<button type="button" data-i="${i}">${item.o[i]}</button>`).join("")}</div><div class="fb" hidden></div>`;
+    d.querySelectorAll("button").forEach(b=>b.onclick=()=>{const i=+b.dataset.i,fb=d.querySelector(".fb");
+      d.querySelectorAll("button").forEach(x=>x.classList.remove("right","wrong"));b.classList.add(i===item.r?"right":"wrong");
+      fb.hidden=false;fb.textContent=i===item.r?"Richtig. "+item.fb:"Noch nicht. Versuche es noch einmal.";});
+    box.appendChild(d);
+  });
+})();
+
+function redraw(){try{drawIntro();}catch(e){} try{drawLab();}catch(e){}}
+try{narrow.addEventListener("change",()=>{renderBlocks();updIntro();updLab();});}catch(e){}
+function fromHash(){const m=/^#kapitel-([1-5])$/.exec(location.hash);show(m?+m[1]:1);}
+window.addEventListener("hashchange",fromHash);
+fromHash();
+})();
+</script>
+<script src="../assets/zur-uebersicht.js" defer></script>
+</body>
+</html>
