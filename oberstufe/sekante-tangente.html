@@ -390,7 +390,7 @@ renderBlocks();
   $("fsm").onclick=()=>{if(si>0){si--;apply();}};
   $("fsp").onclick=()=>{if(si<scales.length-1){si++;apply();}};
   apply();
-  const btn=$("themeBtn"); let dark=false; try{dark=localStorage.getItem("st-theme")==="dark";}catch(e){}
+  const btn=$("themeBtn"); let dark=false; try{const saved=localStorage.getItem("st-theme");dark=saved?saved==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;}catch(e){} /* ohne gespeicherte Wahl: Systemeinstellung */
   function th(){document.documentElement.dataset.theme=dark?"dark":"light";btn.textContent=dark?"Heller Modus":"Dunkler Modus";btn.setAttribute("aria-pressed",dark?"true":"false");}
   btn.onclick=()=>{dark=!dark;th();try{localStorage.setItem("st-theme",dark?"dark":"light");}catch(e){}};
   th();
