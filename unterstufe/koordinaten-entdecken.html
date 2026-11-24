@@ -529,7 +529,8 @@ ul.pts button{font:inherit;font-size:.85rem;background:none;border:0;color:var(-
       var ul=$('#ptList');ul.innerHTML='';
       st.pts.forEach(function(p,i){
         var li=document.createElement('li');
-        li.innerHTML='<span><b>'+p.name+'</b>(<span class="cx">'+fmt(p.x)+'</span>|<span class="cy">'+fmt(p.y)+'</span>)</span>';
+        li.innerHTML='<span><b></b>(<span class="cx">'+fmt(p.x)+'</span>|<span class="cy">'+fmt(p.y)+'</span>)</span>';
+        li.querySelector('b').textContent=p.name;
         var b=document.createElement('button');b.type='button';b.textContent='entfernen';
         b.addEventListener('click',function(){st.pts.splice(i,1);listPts();draw()});
         li.appendChild(b);ul.appendChild(li);
