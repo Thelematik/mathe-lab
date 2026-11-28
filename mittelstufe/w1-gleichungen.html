@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>W1: Gleichungen und Ungleichungen</title>
+<link rel="stylesheet" href="../assets/fonts/fonts.css">
+<style id="typo-basis">
+/* Platz für die Scrollleiste immer freihalten, damit nichts springt, wenn die Seite länger wird */
+html{scrollbar-gutter:stable}
+/* Einheitliche Schriften: Text Source Sans 3, Überschriften Source Serif 4, Zahlen Source Code Pro */
+html{font-size:1rem}
+body{font-family:"Source Sans 3", system-ui, sans-serif}
+h1,h2,h3{font-family:"Source Serif 4", Georgia, serif}
+button,input,select,textarea{font-family:inherit}
+code,kbd,samp,pre{font-family:"Source Code Pro", ui-monospace, monospace}
+</style>
+<style>
+/* VOICE: ruhig, klar, wie ein gutes Lösungsblatt der Lehrkraft
+   IDEA: ein Heftblatt, auf dem die Lösung Zeile für Zeile entsteht, korrigiert mit dem Rotstift
+   PICTURE: Säulendiagramm des Produkts für ganzzahlige x mit Zielwert, dazu Zahlenstrahlen
+   COLOUR and TYPE: Weiß und Tintenblau, Rotstift als einziger Akzent; Source Sans 3, Source Serif 4
+   LAYOUT: Kopfband mit Jahrgangswahl, darunter Aufgabenkarten a bis d in einer Spalte */
+:root{color-scheme:light;--head:#1f4fb8;--bg:#ffffff;--paper:#f4f6fa;--line:#dfe4ee;--ink:#18233a;--mute:#5b6678;--blue:#1f4fb8;--blue-s:#e8eefc;--red:#d1312a;--red-s:#fdecea;--grid:#e9eef7}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){color-scheme:dark;--head:#1a2f5c;--bg:#10141b;--paper:#171c25;--line:#2a3240;--ink:#e7ebf3;--mute:#9aa5b8;--blue:#7ea6ff;--blue-s:#1c2944;--red:#ff6b61;--red-s:#3a1d1d;--grid:#1d2430}}
+:root[data-theme="dark"]{color-scheme:dark;--head:#1a2f5c;--bg:#10141b;--paper:#171c25;--line:#2a3240;--ink:#e7ebf3;--mute:#9aa5b8;--blue:#7ea6ff;--blue-s:#1c2944;--red:#ff6b61;--red-s:#3a1d1d;--grid:#1d2430}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font-size:1rem;line-height:1.55;overflow-x:clip}
+.band{padding:clamp(28px,4vw,56px) max(5vw,16px)}
+.wrap{max-width:1040px;margin:0 auto}
+header.band{background:var(--head);color:#fff;padding-bottom:0}
+.top{display:flex;justify-content:flex-end;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.top button{font-size:.85rem;font-weight:700;min-height:40px;min-width:44px;padding:0 10px;border-radius:8px;border:1px solid rgba(255,255,255,.5);background:rgba(255,255,255,.12);color:#fff}
+.fig{touch-action:pan-y}
+header h1{font-size:clamp(1.7rem,5vw,2.6rem);line-height:1.05;margin:0 0 10px;text-wrap:balance}
+header p{margin:0 0 22px;max-width:62ch;opacity:.9}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tabs a{color:#fff;text-decoration:none;padding:12px 20px;border-radius:10px 10px 0 0;font-weight:700;background:rgba(255,255,255,.14);min-height:44px}
+.tabs a[aria-current=true]{background:var(--bg);color:var(--blue)}
+.tabs a:focus-visible,button:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+.plan{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:14px;margin-bottom:8px}
+.plan div{background:var(--paper);border-radius:12px;padding:14px 16px;font-size:0.842rem}
+.plan b{display:block;color:var(--blue);margin-bottom:2px}
+.task{border:1px solid var(--line);border-radius:16px;margin:26px 0;overflow:hidden;background:var(--bg)}
+.task>h2{margin:0;padding:16px 20px;font-size:1.05rem;display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;background:var(--paper);border-bottom:1px solid var(--line)}
+.task>h2 .k{background:var(--head);color:#fff;border-radius:8px;padding:2px 11px}
+.task>h2 .eq{font-weight:400}
+.body{padding:18px 20px 22px;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:22px 22px}
+.m{font-family:"Source Serif 4",Georgia,serif;white-space:nowrap}
+var{font-style:italic;font-family:"Source Serif 4",Georgia,serif}
+ol.steps{list-style:none;margin:0;padding:0}
+ol.steps li{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px;align-items:center;padding:9px 12px;border-radius:10px;background:var(--bg);margin-bottom:6px;border:1px solid var(--line)}
+ol.steps li.hid{display:none}
+ol.steps li.new{animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}}
+@media(prefers-reduced-motion:reduce){ol.steps li.new{animation:none}}
+ol.steps .m{font-size:1.05rem;overflow-x:auto}
+ol.steps .c{color:var(--mute);font-size:0.816rem}
+ol.steps .c .op{display:inline-block;font-family:"Source Code Pro",ui-monospace,monospace;color:var(--blue);background:var(--blue-s);border-radius:6px;padding:0 7px;margin-right:6px;white-space:nowrap}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+button{font:inherit;font-size:0.842rem;min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+button.pri{background:var(--head);border-color:var(--head);color:#fff;font-weight:700}
+button:disabled{opacity:.45;cursor:default}
+.res{margin-top:14px;border-left:4px solid var(--red);background:var(--red-s);border-radius:0 12px 12px 0;padding:12px 16px}
+.res.hid{display:none}
+.res .L{font-size:1.16rem;font-weight:700;color:var(--red)}
+.res p{margin:6px 0 0}
+.ok{color:var(--red);font-weight:700}
+.nl{width:100%;height:84px;display:block;margin-top:8px}
+.note{background:var(--bg);border:1px dashed var(--line);border-radius:12px;padding:12px 16px;margin:12px 0}
+.note b{color:var(--blue)}
+.cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px;margin:12px 0}
+.case{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.case h3{margin:0 0 8px;font-size:0.895rem;color:var(--blue)}
+table{border-collapse:collapse;width:100%;font-size:0.842rem}
+td,th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th{color:var(--mute);font-weight:400;text-align:right}
+td:first-child,th:first-child{text-align:left}
+tr.hit td{color:var(--red);font-weight:700}
+.try{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:18px;align-items:start;margin:12px 0}
+@media(max-width:700px){.try{grid-template-columns:1fr}ol.steps li{grid-template-columns:1fr;gap:2px}}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{min-width:48px;padding:0 10px}
+.chips button.on{background:var(--head);border-color:var(--head);color:#fff}
+.chips button.hit{border-color:var(--red);color:var(--red);font-weight:700}
+.chips button.hit.on{background:var(--red);color:#fff}
+.out{white-space:normal!important;font-size:1.11rem;margin:12px 0 4px;min-height:34px}
+.fig{position:relative;min-height:300px;background:var(--bg);border:1px solid var(--line);border-radius:12px}
+.fig>svg{position:absolute;inset:0;width:100%;height:100%}
+.scroll{overflow-x:auto}
+footer a{color:var(--ink)}
+footer{color:var(--mute);font-size:0.737rem}
+h2.sec{font-size:clamp(1.3rem,3vw,1.7rem);margin:34px 0 4px}
+</style>
+</head>
+<body>
+<header class="band"><div class="wrap">
+  <div class="top"><button id="fsm" title="Schrift kleiner" aria-label="Schrift kleiner">A−</button><button id="fsp" title="Schrift größer" aria-label="Schrift größer">A+</button><button id="theme" aria-label="Hell oder dunkel umschalten">Dunkel</button><button id="full">Vollbild</button></div>
+  <h1>W1: Gleichungen und Ungleichungen Schritt für Schritt</h1>
+  <p>Mathematik-Wettbewerb Hessen, 1. Runde, Aufgabengruppe A. Gib die Lösungsmenge in aufzählender Form an, Grundmenge ist <span class="m">G = ℤ</span>. Bei a), b) und c) wird eine Rechnung verlangt.</p>
+  <nav class="tabs" aria-label="Wettbewerbsjahr">
+    <a href="#w2526" id="t-w2526">2025/26</a><a href="#w2425" id="t-w2425">2024/25</a>
+  </nav>
+</div></header>
+
+<main class="band"><div class="wrap">
+  <div class="plan">
+    <div><b>1. Klammern auflösen</b>Jedes Glied mit jedem multiplizieren, Minus vor der Klammer dreht alle Vorzeichen.</div>
+    <div><b>2. Zusammenfassen</b>Auf jeder Seite gleichartige Glieder sortieren. Gleiche <span class="m"><var>x</var>²</span> auf beiden Seiten fallen weg.</div>
+    <div><b>3. <var>x</var> isolieren</b>Äquivalenzumformungen notieren. Bei Ungleichungen: Mal oder geteilt durch eine negative Zahl dreht das Zeichen.</div>
+    <div><b>4. Lösungsmenge in ℤ</b>Nur ganze Zahlen zählen. Bei Ungleichungen aufzählen mit Pünktchen, dann die Probe.</div>
+  </div>
+  <div id="app"></div>
+  <footer>Rechnungen nachgeprüft. Aufgabentexte nach den Aufgabenblättern der 1. Runde, Aufgabengruppe A.<br>
+  Verantwortlich: S. Thel · <a href="../impressum.html">Impressum</a> · <a href="mathewettbewerb-8.html">Zur Wettbewerbsvorbereitung</a> · <a href="../">Zur Übersicht</a> · Diese Seite verwendet keine Cookies und überträgt keine Daten an Dritte.</footer>
+</div></main>
+
+<script>
+{
+const X = s => s.replace(/(^|[^a-zA-Z&#;])x(?![a-zA-Z])/g, '$1<var>x</var>');
+const step = (m, op, c) => ({m, op, c});
+
+const DATA = {
+w2526: {
+  name: "2025/26",
+  tasks: [
+   {k:"a", eq:"7x + 13 = 2 · (3x − 5) − 7 · (2x + 1)", steps:[
+     step("7x + 13 = 2 · (3x − 5) − 7 · (2x + 1)", "", "Ausgangsgleichung"),
+     step("7x + 13 = 6x − 10 − 14x − 7", "", "Klammern auflösen. Achtung: −7 · (+1) = −7"),
+     step("7x + 13 = −8x − 17", "", "Rechts zusammenfassen: 6x − 14x = −8x"),
+     step("15x + 13 = −17", "+ 8x", "x-Glieder nach links"),
+     step("15x = −30", "− 13", "Zahlen nach rechts"),
+     step("x = −2", ": 15", "durch den Koeffizienten teilen")],
+    L:"L = {−2}", probe:"Probe mit x = −2: links 7 · (−2) + 13 = −1, rechts 2 · (−11) − 7 · (−3) = −22 + 21 = −1. <span class='ok'>Stimmt.</span>"},
+   {k:"b", eq:"100 − 2x + 9x² = (3x + 5) · (3x − 4)", steps:[
+     step("100 − 2x + 9x² = (3x + 5) · (3x − 4)", "", "Ausgangsgleichung"),
+     step("100 − 2x + 9x² = 9x² − 12x + 15x − 20", "", "Jedes Glied mit jedem multiplizieren"),
+     step("100 − 2x + 9x² = 9x² + 3x − 20", "", "Zusammenfassen: −12x + 15x = 3x"),
+     step("100 − 2x = 3x − 20", "− 9x²", "Das quadratische Glied fällt weg. Es bleibt eine lineare Gleichung."),
+     step("120 = 5x", "+ 2x + 20", "x-Glieder nach rechts, Zahlen nach links"),
+     step("x = 24", ": 5", "Seiten tauschen und teilen")],
+    L:"L = {24}", probe:"Probe mit x = 24: links 100 − 48 + 9 · 576 = 5236, rechts 77 · 68 = 5236. <span class='ok'>Stimmt.</span>"},
+   {k:"c", eq:"−0,5 · (3x − 8) < 13 − (−9 − 4,5x)", ineq:true, steps:[
+     step("−0,5 · (3x − 8) < 13 − (−9 − 4,5x)", "", "Ausgangsungleichung"),
+     step("−1,5x + 4 < 13 + 9 + 4,5x", "", "Links ausmultiplizieren, rechts dreht das Minus vor der Klammer beide Vorzeichen"),
+     step("−1,5x + 4 < 22 + 4,5x", "", "Zusammenfassen"),
+     step("4 < 22 + 6x", "+ 1,5x", "x-Glieder nach rechts, so bleibt der Koeffizient positiv"),
+     step("−18 < 6x", "− 22", "Zahlen nach links"),
+     step("−3 < x", ": 6", "Teilen durch eine positive Zahl: Das Zeichen bleibt")],
+    L:"L = {−2; −1; 0; 1; 2; …}", nl:{min:-7,max:4,ok:x=>x>-3,bound:-3},
+    probe:"−3 gehört nicht dazu, denn −3 < x ist echt kleiner. Probe mit x = −3: links −0,5 · (−17) = 8,5, rechts 22 − 13,5 = 8,5, und 8,5 < 8,5 ist falsch. Mit x = −2: 7 < 13. <span class='ok'>Stimmt.</span>"},
+  ],
+  d:"d2526"
+},
+w2425: {
+  name: "2024/25",
+  tasks: [
+   {k:"a", eq:"5 · (2x + 7) = 2 · (4 + 1,5x) − 2x", steps:[
+     step("5 · (2x + 7) = 2 · (4 + 1,5x) − 2x", "", "Ausgangsgleichung"),
+     step("10x + 35 = 8 + 3x − 2x", "", "Klammern auflösen"),
+     step("10x + 35 = 8 + x", "", "Zusammenfassen"),
+     step("9x + 35 = 8", "− x", "x-Glieder nach links"),
+     step("9x = −27", "− 35", "Zahlen nach rechts"),
+     step("x = −3", ": 9", "teilen")],
+    L:"L = {−3}", probe:"Probe mit x = −3: links 5 · 1 = 5, rechts 2 · (4 − 4,5) + 6 = −1 + 6 = 5. <span class='ok'>Stimmt.</span>"},
+   {k:"b", eq:"5x² − 2 · (2x² − 1,5) = (x − 2) · (x + 1)", steps:[
+     step("5x² − 2 · (2x² − 1,5) = (x − 2) · (x + 1)", "", "Ausgangsgleichung"),
+     step("5x² − 4x² + 3 = x² + x − 2x − 2", "", "Links: −2 · (−1,5) = +3. Rechts: jedes Glied mit jedem"),
+     step("x² + 3 = x² − x − 2", "", "Zusammenfassen"),
+     step("3 = −x − 2", "− x²", "Das quadratische Glied fällt weg"),
+     step("5 = −x", "+ 2", "Zahlen nach links"),
+     step("x = −5", "· (−1)", "Vorzeichen umkehren")],
+    L:"L = {−5}", probe:"Probe mit x = −5: links 125 − 2 · 48,5 = 28, rechts (−7) · (−4) = 28. <span class='ok'>Stimmt.</span>"},
+   {k:"c", eq:"−8x + 70 − 6x² > (5 + 2x) · (7 − 3x)", ineq:true, steps:[
+     step("−8x + 70 − 6x² > (5 + 2x) · (7 − 3x)", "", "Ausgangsungleichung"),
+     step("−8x + 70 − 6x² > 35 − 15x + 14x − 6x²", "", "Rechts jedes Glied mit jedem multiplizieren"),
+     step("−8x + 70 − 6x² > 35 − x − 6x²", "", "Zusammenfassen"),
+     step("−8x + 70 > 35 − x", "+ 6x²", "Das quadratische Glied fällt weg"),
+     step("70 > 35 + 7x", "+ 8x", "x-Glieder nach rechts, Koeffizient positiv"),
+     step("35 > 7x", "− 35", "Zahlen nach links"),
+     step("5 > x", ": 7", "Teilen durch eine positive Zahl: Das Zeichen bleibt")],
+    L:"L = {…; 2; 3; 4}", nl:{min:-2,max:8,ok:x=>x<5,bound:5},
+    probe:"5 gehört nicht dazu. Probe mit x = 5: links −40 + 70 − 150 = −120, rechts 15 · (−8) = −120, und −120 > −120 ist falsch. Mit x = 4: −58 > −65. <span class='ok'>Stimmt.</span>"},
+  ],
+  d:"d2425"
+}};
+
+const card = (t, id) => `
+<section class="task" id="${id}">
+ <h2><span class="k">${t.k})</span><span class="eq m">${X(t.eq)}</span></h2>
+ <div class="body">
+  <ol class="steps">${t.steps.map((s,i)=>`<li class="${i?'hid':''}"><span class="m">${X(s.m)}</span><span class="c">${s.op?`<span class="op">| ${X(s.op)}</span>`:''}${X(s.c)}</span></li>`).join('')}</ol>
+  <div class="ctrl"><button class="pri" data-a="next">Nächster Schritt</button><button data-a="all">Alles zeigen</button><button data-a="reset">Zurücksetzen</button></div>
+  <div class="res hid"><div class="L m">${t.L}</div>${t.nl?'<svg class="nl" role="img" aria-label="Lösungsmenge auf dem Zahlenstrahl"></svg>':''}<p>${X(t.probe)}</p></div>
+ </div>
+</section>`;
+
+const D2526 = `
+<section class="task" id="d">
+ <h2><span class="k">d)</span><span class="eq m">${X("(x − 2) · (x + 1) = 10")}</span></h2>
+ <div class="body">
+  <div class="note"><b>Idee:</b> Hier ist keine Rechnung verlangt. Ausmultiplizieren führt auf eine quadratische Gleichung, die ihr noch nicht lösen müsst. Weil <var>x</var> eine ganze Zahl ist, sind auch beide Faktoren ganze Zahlen. Gesucht sind also zwei ganze Zahlen mit dem Produkt 10.</div>
+  <h3>Weg 1: Logisches Ausprobieren</h3>
+  <div class="try">
+   <div><p>Tippe Werte für <var>x</var> an. Die Säulen zeigen den Wert von <span class="m">${X("(x − 2) · (x + 1)")}</span>, die rote Linie den Zielwert 10.</p>
+    <div class="chips" id="chips"></div><div class="out m" id="out" aria-live="polite"></div></div>
+   <div class="fig" id="fig"><svg id="chart" role="img" aria-label="Säulendiagramm der Produktwerte"></svg></div>
+  </div>
+  <div class="note"><b>Warum reicht das?</b> Für <span class="m"><var>x</var> ≥ 3</span> werden beide Faktoren mit jedem Schritt größer, das Produkt wächst also: 4, 10, 18, … Für <span class="m"><var>x</var> ≤ −2</span> werden beide Faktoren immer stärker negativ, das Produkt wächst ebenfalls: 4, 10, 18, … Dazwischen liegen nur 0, −2, −2 und 0. Also gibt es genau die Lösungen −3 und 4.</div>
+  <h3>Weg 2: Fallunterscheidung</h3>
+  <p>Der zweite Faktor ist immer um 3 größer als der erste: <span class="m">${X("(x + 1) − (x − 2) = 3")}</span>. Das Produkt 10 ist positiv, also haben beide Faktoren dasselbe Vorzeichen. Null kann kein Faktor sein.</p>
+  <div class="cases">
+   <div class="case"><h3>Fall 1: beide Faktoren positiv</h3>
+    <div class="scroll"><table><tr><th>${X("x − 2")}</th><th>${X("x + 1")}</th><th>Abstand 3?</th></tr>
+    <tr><td>1</td><td>10</td><td>nein</td></tr><tr class="hit"><td>2</td><td>5</td><td>ja</td></tr><tr><td>5</td><td>2</td><td>nein</td></tr><tr><td>10</td><td>1</td><td>nein</td></tr></table></div>
+    <p class="m">${X("x − 2 = 2 ⇒ x = 4")}</p></div>
+   <div class="case"><h3>Fall 2: beide Faktoren negativ</h3>
+    <div class="scroll"><table><tr><th>${X("x − 2")}</th><th>${X("x + 1")}</th><th>Abstand 3?</th></tr>
+    <tr><td>−1</td><td>−10</td><td>nein</td></tr><tr><td>−2</td><td>−5</td><td>nein</td></tr><tr class="hit"><td>−5</td><td>−2</td><td>ja</td></tr><tr><td>−10</td><td>−1</td><td>nein</td></tr></table></div>
+    <p class="m">${X("x − 2 = −5 ⇒ x = −3")}</p></div>
+  </div>
+  <div class="res"><div class="L m">L = {−3; 4}</div><p>Probe: <span class="m">2 · 5 = 10</span> und <span class="m">(−5) · (−2) = 10</span>. <span class="ok">Stimmt.</span></p></div>
+ </div>
+</section>`;
+
+const D2425 = `
+<section class="task" id="d">
+ <h2><span class="k">d)</span><span class="eq m">${X("(5x + 5) · (x − 5) = 0")}</span></h2>
+ <div class="body">
+  <div class="note"><b>Idee:</b> Ein Produkt ist genau dann 0, wenn mindestens ein Faktor 0 ist. Nicht ausmultiplizieren, sondern die Faktoren einzeln betrachten.</div>
+  <h3>Fallunterscheidung</h3>
+  <div class="cases">
+   <div class="case"><h3>Fall 1: erster Faktor ist 0</h3><p class="m">${X("5x + 5 = 0")}</p><p class="m">${X("5x = −5 ⇒ x = −1")}</p></div>
+   <div class="case"><h3>Fall 2: zweiter Faktor ist 0</h3><p class="m">${X("x − 5 = 0 ⇒ x = 5")}</p></div>
+  </div>
+  <h3>Kontrolle durch Ausprobieren</h3>
+  <div class="try">
+   <div><p>Tippe Werte für <var>x</var> an. Nur bei −1 und 5 trifft das Produkt die Null.</p><div class="chips" id="chips"></div><div class="out m" id="out" aria-live="polite"></div></div>
+   <div class="fig" id="fig"><svg id="chart" role="img" aria-label="Säulendiagramm der Produktwerte"></svg></div>
+  </div>
+  <div class="res"><div class="L m">L = {−1; 5}</div><p>Beide Werte sind ganze Zahlen, also liegen sie in G = ℤ.</p></div>
+ </div>
+</section>`;
+
+const TRY = {
+  d2526:{f:x=>(x-2)*(x+1), term:x=>`(${mn(x)} − 2) · (${mn(x)} + 1) = ${fmt(x-2)} · ${fmt(x+1)}`, target:10, xs:[-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7]},
+  d2425:{f:x=>(5*x+5)*(x-5), term:x=>`(5 · ${fmt(x)} + 5) · (${mn(x)} − 5) = ${fmt(5*x+5)} · ${fmt(x-5)}`, target:0, xs:[-3,-2,-1,0,1,2,3,4,5,6,7]}
+};
+function fmt(n){return n<0?`(${String(n).replace('-','−')})`:String(n)}
+const mn = n => String(n).replace('-','−');
+
+const app = document.getElementById('app');
+let ro = null;
+
+function render(key){
+  const d = DATA[key];
+  for (const k of Object.keys(DATA)) document.getElementById('t-'+k).setAttribute('aria-current', k===key);
+  app.innerHTML = `<h2 class="sec">Wettbewerb ${d.name}</h2>` + d.tasks.map((t,i)=>card(t,'t'+i)).join('') + (d.d==='d2526'?D2526:D2425);
+  d.tasks.forEach((t,i)=>wire(document.getElementById('t'+i), t));
+  wireTry(TRY[d.d]);
+}
+
+function wire(sec, t){
+  const lis=[...sec.querySelectorAll('ol.steps li')], res=sec.querySelector('.res'), next=sec.querySelector('[data-a=next]');
+  let n=1;
+  const show=()=>{lis.forEach((li,i)=>{const was=li.classList.contains('hid');li.classList.toggle('hid',i>=n);if(was&&i<n)li.classList.add('new')});
+    const done=n>=lis.length;res.classList.toggle('hid',!done);next.disabled=done;if(done&&t.nl){const svg=res.querySelector('.nl');numberLine(svg,t.nl);if(!svg._ro){svg._ro=new ResizeObserver(()=>numberLine(svg,t.nl));svg._ro.observe(svg)}}};
+  sec.querySelector('.ctrl').addEventListener('click',e=>{const a=e.target.dataset.a;if(!a)return;
+    if(a==='next')n++;else if(a==='all')n=lis.length;else{n=1;lis.forEach(li=>li.classList.remove('new'))}show()});
+  show();
+}
+
+function numberLine(svg, o){
+  const W=svg.clientWidth||600,H=84,pad=24,n=o.max-o.min,step=W<480?2:1,sx=v=>pad+(v-o.min)*(W-2*pad)/n;
+  let s=`<line x1="${pad-10}" y1="40" x2="${W-pad+10}" y2="40" stroke="currentColor" stroke-width="1.5" opacity=".6"/>`;
+  for(let v=o.min;v<=o.max;v++){const ok=o.ok(v);
+    s+=`<line x1="${sx(v)}" y1="33" x2="${sx(v)}" y2="47" stroke="currentColor" opacity=".5"/>`;if((v-o.min)%step===0||v===o.bound)s+=`<text x="${sx(v)}" y="72" text-anchor="middle" font-size="14" fill="currentColor">${mn(v)}</text>`;
+    if(ok)s+=`<circle cx="${sx(v)}" cy="40" r="7" fill="var(--red)"/>`;
+    else if(v===o.bound)s+=`<circle cx="${sx(v)}" cy="40" r="7" fill="var(--bg)" stroke="var(--red)" stroke-width="2.5"/>`;}
+  const dir=o.ok(o.max)?1:-1, ex=dir>0?W-6:6;
+  s+=`<text x="${ex}" y="20" text-anchor="${dir>0?'end':'start'}" font-size="14" fill="var(--red)">${dir>0?'usw. →':'← usw.'}</text>`;
+  svg.innerHTML=s;svg.style.color='var(--ink)';
+}
+
+function wireTry(T){
+  const chips=document.getElementById('chips'), out=document.getElementById('out'), svg=document.getElementById('chart'), fig=document.getElementById('fig');
+  let sel=null;
+  chips.innerHTML=T.xs.map(x=>`<button data-x="${x}" class="${T.f(x)===T.target?'hit':''}" aria-pressed="false">${mn(x)}</button>`).join('');
+  const draw=()=>{
+    const W=svg.clientWidth,H=svg.clientHeight; if(!W)return;
+    const vals=T.xs.map(T.f), top=Math.max(...vals,T.target), bot=Math.min(0,...vals);
+    const pl=44,pr=12,pt=18,pb=34, bw=(W-pl-pr)/T.xs.length;
+    const sy=v=>pt+(top-v)*(H-pt-pb)/(top-bot||1);
+    let s='';
+    const stepT=top>50?20:5;
+    for(let v=Math.ceil(bot/stepT)*stepT;v<=top;v+=stepT){s+=`<line x1="${pl}" x2="${W-pr}" y1="${sy(v)}" y2="${sy(v)}" stroke="var(--line)"/>${W>420?`<text x="${pl-8}" y="${sy(v)+5}" text-anchor="end" font-size="13" fill="var(--mute)">${mn(v)}</text>`:''}`}
+    T.xs.forEach((x,i)=>{const v=T.f(x),hit=v===T.target,y0=sy(0),y1=sy(v),cx=pl+bw*i+bw/2,w=Math.max(bw*.62,4);
+      const on=sel===x;
+      s+=`<rect x="${cx-w/2}" y="${Math.min(y0,y1)}" width="${w}" height="${Math.max(Math.abs(y1-y0),2)}" rx="3" fill="${hit?'var(--red)':'var(--blue)'}" opacity="${sel===null||on?1:.35}"/>`;
+      if(W>420||i%2===0)s+=`<text x="${cx}" y="${H-12}" text-anchor="middle" font-size="13" fill="var(--mute)">${mn(x)}</text>`;});
+    s+=`<line x1="${pl}" x2="${W-pr}" y1="${sy(0)}" y2="${sy(0)}" stroke="var(--ink)" stroke-width="1.5"/>`;
+    s+=`<line x1="${pl}" x2="${W-pr}" y1="${sy(T.target)}" y2="${sy(T.target)}" stroke="var(--red)" stroke-width="2.5" stroke-dasharray="7 5"/>`;
+    const mid=pl+bw*(T.xs.length/2);s+=`<text x="${mid}" y="${sy(T.target)-8}" text-anchor="middle" font-size="14" font-weight="700" fill="var(--red)">Ziel ${T.target}</text>`;
+    svg.innerHTML=s;
+  };
+  chips.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;sel=+b.dataset.x;
+    chips.querySelectorAll('button').forEach(c=>{c.classList.toggle('on',c===b);c.setAttribute('aria-pressed',c===b)});
+    const v=T.f(sel);out.innerHTML=X(`x = ${mn(sel)}: ${T.term(sel)} = ${mn(v)}`)+(v===T.target?` <span class="ok">Treffer!</span>`:'');draw();});
+  if(ro)ro.disconnect(); ro=new ResizeObserver(draw); ro.observe(fig); draw();
+}
+
+
+const scales=[.8,.9,1,1.12,1.25,1.4,1.6];let si=2;
+try{const raw=localStorage.getItem('w1-scale');const v=+raw;if(raw!==null&&v>=0&&v<scales.length)si=v}catch(_){}
+const applyScale=()=>{document.documentElement.style.fontSize=(19*scales[si])+'px';try{localStorage.setItem('w1-scale',si)}catch(_){}};applyScale();
+document.getElementById('fsm').onclick=()=>{if(si>0){si--;applyScale()}};
+document.getElementById('fsp').onclick=()=>{if(si<scales.length-1){si++;applyScale()}};
+const root=document.documentElement,tb=document.getElementById('theme');
+const sysDark=()=>matchMedia('(prefers-color-scheme: dark)').matches;
+const isDark=()=>root.dataset.theme?root.dataset.theme==='dark':sysDark();
+const setTheme=m=>{root.dataset.theme=m;tb.textContent=m==='dark'?'Hell':'Dunkel';tb.title=m==='dark'?'Zum hellen Modus wechseln':'Zum dunklen Modus wechseln'};
+const saved=()=>{let v=null;try{v=localStorage.getItem('w1-theme')}catch(_){}return v==='dark'||v==='light'?v:(sysDark()?'dark':'light')};
+setTheme(saved());
+tb.onclick=()=>{const m=isDark()?'light':'dark';setTheme(m);try{localStorage.setItem('w1-theme',m)}catch(_){}};
+const fb=document.getElementById('full');
+if(!document.documentElement.requestFullscreen)fb.hidden=true;
+fb.onclick=()=>{try{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen().catch(()=>{})}catch(_){}};
+/* Im Vollbild (Activeboard) immer hell, danach wieder gemerkte Wahl oder Systemeinstellung */
+document.addEventListener('fullscreenchange',()=>{fb.textContent=document.fullscreenElement?'Vollbild beenden':'Vollbild';setTheme(document.fullscreenElement?'light':saved())});
+const route=()=>{const h=location.hash.slice(1);render(DATA[h]?h:'w2526')};
+addEventListener('hashchange',route); route();
+}
+</script>
+<script src="../assets/zur-uebersicht.js" defer></script>
+</body>
+</html>
