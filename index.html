@@ -195,7 +195,7 @@ p { text-wrap: pretty; }
 const KATEGORIEN = [
   { id: "unterstufe",  name: "Unterstufe",          stufe: "5 bis 7",  beschreibung: "Rechnen, Brüche, Geometrie" },
   { id: "mittelstufe", name: "Mittelstufe",         stufe: "8 bis 10", beschreibung: "Funktionen, Pythagoras, Trigonometrie, Wahrscheinlichkeit" },
-  { id: "oberstufe",   name: "Oberstufe",           stufe: "E und Q",  beschreibung: "Analysis, Lineare Algebra, Stochastik" }
+  { id: "oberstufe",   name: "Oberstufe",           stufe: "E und Q",  beschreibung: "Analysis, Lineare Algebra und Analytische Geometrie, Stochastik" }
 ];
 
 const INHALTE = [
@@ -212,17 +212,17 @@ const INHALTE = [
   { titel: "Lineare Funktionen erkunden", beschreibung: "Von der Taxifahrt zur Geraden: Steigung mit dem Steigungsdreieck, y-Achsenabschnitt, Nullstelle, Gleichung bestimmen und Schnittpunkt zweier Geraden.", kategorie: "mittelstufe", typ: "Labor", link: "mittelstufe/lineare-funktionen.html" },
   { titel: "Satz des Pythagoras", beschreibung: "Schritt für Schritt erklärt, mit einem anschaulichen Beweis zum Durchklicken.", kategorie: "mittelstufe", typ: "Erklärung", link: "" },
   { titel: "Zufallsexperimente", beschreibung: "Würfel und Münzen tausendfach werfen und die relative Häufigkeit beobachten.", kategorie: "mittelstufe", typ: "Labor", link: "" },
-  { titel: "Auswertungsblatt: Würfelexperiment", beschreibung: "Gruppenarbeit für bis zu 10 Gruppen: absolute und relative Häufigkeit beim einfachen und zweifachen Würfelwurf, Gesetz der großen Zahlen (Excel).", kategorie: "oberstufe", typ: "Übung", link: "oberstufe/arbeitsblaetter/wuerfelexperiment-gesetz-der-grossen-zahlen.xlsx" },
-  { titel: "Die Eulersche Zahl e", beschreibung: "Leonhard Euler und die Geschichte von e, die Suche nach einer Funktion mit f' = f und der Grenzwert von (1 + 1/n)ⁿ beim Zinseszins.", kategorie: "oberstufe", typ: "Erklärung", link: "oberstufe/eulersche-zahl.html" },
-  { titel: "Galton-Brett: Binomialkoeffizient", beschreibung: "Wege durch das Galton-Brett zählen, alle Pfade zeigen lassen und das Pascalsche Dreieck entdecken. Simulation 1 zum Arbeitsblatt.", kategorie: "oberstufe", typ: "Labor", link: "oberstufe/galton-brett.html" },
+  { titel: "Auswertungsblatt: Würfelexperiment", beschreibung: "Gruppenarbeit für bis zu 10 Gruppen: absolute und relative Häufigkeit beim einfachen und zweifachen Würfelwurf, empirisches Gesetz der großen Zahlen (Excel).", kategorie: "oberstufe", typ: "Übung", link: "oberstufe/arbeitsblaetter/wuerfelexperiment-gesetz-der-grossen-zahlen.xlsx" },
+  { titel: "Die eulersche Zahl e", beschreibung: "Leonhard Euler und die Geschichte von e, die Suche nach einer Funktion mit f' = f und der Grenzwert von (1 + 1/n)ⁿ beim Zinseszins.", kategorie: "oberstufe", typ: "Erklärung", link: "oberstufe/eulersche-zahl.html" },
+  { titel: "Galton-Brett: Binomialkoeffizient", beschreibung: "Wege durch das Galton-Brett zählen, alle Pfade zeigen lassen und das pascalsche Dreieck entdecken. Simulation 1 zum Arbeitsblatt.", kategorie: "oberstufe", typ: "Labor", link: "oberstufe/galton-brett.html" },
   { titel: "Galton-Brett: Formel von Bernoulli", beschreibung: "Mit verstellbarer Wahrscheinlichkeit p von der Wahrscheinlichkeit eines Weges zur Formel von Bernoulli. Simulation 2 zum Arbeitsblatt.", kategorie: "oberstufe", typ: "Labor", link: "oberstufe/galton-bernoulli.html" },
   { titel: "Arbeitsblatt: Vom Galton-Brett zur Formel von Bernoulli", beschreibung: "Vier Seiten zu beiden Galton-Simulationen: Wege abzählen, Binomialkoeffizient, Pfadregeln und Formel von Bernoulli (PDF).", kategorie: "oberstufe", typ: "Übung", link: "oberstufe/arbeitsblaetter/galton-bernoulli.pdf" },
-  { titel: "Binomialverteilung", beschreibung: "Parameter n und p verändern und Histogramm, kumulierte Verteilung und Kenngrößen live verfolgen.", kategorie: "oberstufe", typ: "Labor", link: "oberstufe/binomialverteilung.html" },
+  { titel: "Binomialverteilung", beschreibung: "Parameter n und p verändern und Histogramm, kumulierte Verteilung und Kenngrößen live verfolgen, dazu systematisches Probieren bei inversen Fragestellungen.", kategorie: "oberstufe", typ: "Labor", link: "oberstufe/binomialverteilung.html" },
   { titel: "Gauß-Labor Normalverteilung", beschreibung: "Die Normalverteilung erkunden: Glockenkurve, Erwartungswert, Standardabweichung und Wahrscheinlichkeiten.", kategorie: "oberstufe", typ: "Labor", link: "oberstufe/normalverteilung.html" },
   { titel: "Hypothesentest-Labor", beschreibung: "Entscheidungsregeln durch Probieren finden, Fehler 1. und 2. Art, Operationscharakteristik und Gütefunktion.", kategorie: "oberstufe", typ: "Labor", link: "oberstufe/hypothesentest.html" },
   { titel: "Funktionsplotter", beschreibung: "Beliebige Funktionen zeichnen, Nullstellen und Extrema ablesen.", kategorie: "oberstufe", typ: "Tool", link: "" },
-  { titel: "Von der Sekante zur Tangente", beschreibung: "Vom Fallexperiment zur Ableitung: Sekanten werden zu Tangenten, mit x-Methode oder h-Methode, exakter Rechnung und Quiz.", kategorie: "oberstufe", typ: "Labor", link: "oberstufe/sekante-tangente.html" },
-  { titel: "Ableitungsregeln üben", beschreibung: "Aufgaben zu Produkt-, Quotienten- und Kettenregel mit Lösungsweg.", kategorie: "oberstufe", typ: "Übung", link: "" }
+  { titel: "Von der Sekante zur Tangente", beschreibung: "Vom Fallexperiment zur Ableitung: Sekanten werden zu Tangenten, mit x-Methode oder h-Methode, exakter Rechnung, Tangente und Normale und Quiz.", kategorie: "oberstufe", typ: "Labor", link: "oberstufe/sekante-tangente.html" },
+  { titel: "Ableitungsregeln üben", beschreibung: "Aufgaben zu Produkt- und Kettenregel mit Lösungsweg.", kategorie: "oberstufe", typ: "Übung", link: "" }
 ];
 
 /* ========= Ab hier musst du nichts mehr ändern ========= */

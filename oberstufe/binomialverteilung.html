@@ -44,6 +44,12 @@ header{display:flex;justify-content:space-between;align-items:flex-start;gap:12p
 .theme:hover{border-color:var(--ink)}
 header h1{font-family:var(--display);font-size:clamp(1.6rem,3.2vw,2.3rem);margin:0;text-wrap:balance}
 header p{margin:4px 0 0;color:var(--muted)}
+.invintro{margin:10px 0;color:var(--muted)}
+.invrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:12px}
+.invrow select,.invrow input{box-sizing:border-box;width:100%;font:inherit}
+#invBox summary{cursor:pointer;font-weight:700}
+#invTb tr.on td{font-weight:700}
+.invres{margin:10px 0 0;line-height:1.5}
 .main{display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start}
 @media (max-width:860px){.main{grid-template-columns:1fr}}
 .panel{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
@@ -95,8 +101,8 @@ tr.on td{background:var(--hit-soft)}
 
 <div class="wrap">
   <header>
-    <h1>Binomialverteilung interaktiv</h1>
-    <div><p>Histogramm von <span id="hdr"></span>, Formel von Bernoulli und kumulierte Wahrscheinlichkeiten</p></div>
+    <div><p class="eyebrow">Q3.2 Wahrscheinlichkeitsverteilungen · binomialverteilte Zufallsgrößen</p><h1>Binomialverteilung interaktiv</h1>
+    <p>Histogramm von <span id="hdr"></span>, Formel von Bernoulli und kumulierte Wahrscheinlichkeiten</p></div>
     <button type="button" class="theme" id="theme">Dunkel</button>
   </header>
 
@@ -160,7 +166,7 @@ tr.on td{background:var(--hit-soft)}
       <div class="formula gen" id="fGen"></div>
       <div class="formula" id="fNum"></div>
       <div class="result" id="res"></div>
-      <p class="calchint" id="calcHint" hidden>Im Taschenrechner über die kumulierte Binomialverteilung (je nach Modell z.&nbsp;B. „Binomial-KD“ oder „binomcdf“) mit n, p und k als Obergrenze. Das funktioniert auch für große n.</p>
+      <p class="calchint" id="calcHint" hidden>Im Taschenrechner über die kumulierte Binomialverteilung (je nach Modell z.&nbsp;B. „Binomial-KD“ oder „binomcdf“) mit n, p und k als Obergrenze. Das funktioniert auch für große n. In der Lösung wird nicht die Rechnerschreibweise notiert, sondern P(X&nbsp;≤&nbsp;k)&nbsp;=&nbsp;<span style="white-space:nowrap">F(n;&nbsp;p;&nbsp;k)</span>.</p>
     </section>
     <section class="panel" aria-label="Kenngrößen">
       <p class="eyebrow">Kenngrößen</p>
@@ -184,7 +190,92 @@ tr.on td{background:var(--hit-soft)}
       <div class="tbl"><table><thead><tr><th>k</th><th>P(X = k)</th><th>P(X ≤ k)</th></tr></thead><tbody id="tb"></tbody></table></div>
     </details>
   </section>
+
+  <section class="panel" aria-label="Inverse Fragestellungen">
+    <details id="invBox">
+      <summary>Inverse Fragestellungen: systematisches Probieren</summary>
+      <p class="invintro">Hier ist eine Wahrscheinlichkeit vorgegeben, gesucht ist k, n oder p. Man probiert mit dem WTR systematisch, bis die Bedingung gerade erfüllt ist. Die übrigen Werte kommen aus den Einstellungen oben.</p>
+      <div class="invrow">
+        <div class="field">
+          <label for="invType">Gesucht</label>
+          <select id="invType">
+            <option value="kmin">kleinstes k mit P(X ≤ k) ≥ q</option>
+            <option value="kmax">größtes k mit P(X ≤ k) ≤ q</option>
+            <option value="nmin">kleinstes n mit P(X ≥ 1) ≥ q</option>
+            <option value="pmin">kleinstes p (Hundertstel) mit P(X ≥ k) ≥ q</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="invQ"><span><span class="sym">q</span> vorgegebene Wahrscheinlichkeit</span></label>
+          <input type="number" id="invQ" min="0.01" max="0.99" step="0.01" value="0.9">
+        </div>
+      </div>
+      <div class="tbl"><table><thead><tr><th id="invHead">k</th><th>Wahrscheinlichkeit</th><th>Bedingung</th></tr></thead><tbody id="invTb"></tbody></table></div>
+      <p class="invres" id="invRes"></p>
+    </details>
+  </section>
 </div>
+
+<script>
+(function(){
+  const box=document.getElementById("invBox"),sel=document.getElementById("invType"),qIn=document.getElementById("invQ");
+  const tb=document.getElementById("invTb"),head=document.getElementById("invHead"),res=document.getElementById("invRes");
+  const nb=s=>'<span style="white-space:nowrap">'+s+'</span>';
+  const d4=x=>x.toFixed(4).replace(".",",");
+  const d2=x=>x.toFixed(2).replace(".",",");
+  const cumF=(n,p,k)=>{if(k<0)return 0;const a=pmf(n,p);let s=0;for(let i=0;i<=Math.min(k,n);i++)s+=a[i];return Math.min(1,s);};
+  function row(v,expr,val,ok,hit){
+    return '<tr'+(hit?' class="on"':'')+'><td>'+v+'</td><td>'+nb(expr)+' ≈ '+d4(val)+'</td><td>'+(ok?'erfüllt':'nicht erfüllt')+'</td></tr>';
+  }
+  function calc(){
+    if(!box.open)return;
+    let q=parseFloat(qIn.value);if(isNaN(q))return;q=Math.min(.99,Math.max(.01,q));
+    const n=S.n,p=S.p,k=S.k,t=sel.value,ps=d2(p),qs=d2(q);
+    let rows=[],txt="";
+    if(t==="kmin"||t==="kmax"){
+      head.textContent="k";
+      const F=[];for(let i=0;i<=n;i++)F[i]=cumF(n,p,i);
+      let r=-1;
+      if(t==="kmin"){for(let i=0;i<=n;i++)if(F[i]>=q-1e-12){r=i;break;}}
+      else{for(let i=n;i>=0;i--)if(F[i]<=q+1e-12){r=i;break;}}
+      if(r<0){txt="Kein k erfüllt die Bedingung.";}
+      else{
+        for(let i=Math.max(0,r-3);i<=Math.min(n,r+2);i++){
+          const ok=t==="kmin"?F[i]>=q-1e-12:F[i]<=q+1e-12;
+          rows.push(row(i,"F("+n+"; "+ps+"; "+i+")",F[i],ok,i===r));
+        }
+        txt=(t==="kmin"?"Kleinstes k: ":"Größtes k: ")+"<strong>k = "+r+"</strong>, denn "+nb("F("+n+"; "+ps+"; "+r+") ≈ "+d4(F[r]))+(t==="kmin"?" ≥ ":" ≤ ")+qs+".";
+      }
+    }else if(t==="nmin"){
+      head.textContent="n";
+      if(p<=0){txt="Für p = 0 gibt es keinen Treffer.";}
+      else{
+        const P=m=>1-Math.pow(1-p,m);
+        let r=1;while(P(r)<q-1e-12&&r<100000)r++;
+        for(let m=Math.max(1,r-3);m<=r+2;m++)rows.push(row(m,"1 − (1 − "+ps+")<sup>"+m+"</sup>",P(m),P(m)>=q-1e-12,m===r));
+        txt="Kleinstes n: <strong>n = "+r+"</strong>, denn "+nb("P(X ≥ 1) = 1 − (1 − "+ps+")<sup>"+r+"</sup> ≈ "+d4(P(r)))+" ≥ "+qs+".";
+      }
+    }else{
+      head.textContent="p";
+      const P=pp=>1-cumF(n,pp,k-1);
+      let r=-1;for(let j=1;j<=100;j++){if(P(j/100)>=q-1e-12){r=j;break;}}
+      if(k===0){txt="Für k = 0 ist P(X ≥ 0) = 1, wähle oben k ≥ 1.";}
+      else if(r<0){txt="Kein p erfüllt die Bedingung.";}
+      else{
+        for(let j=Math.max(1,r-3);j<=Math.min(100,r+2);j++){
+          const pp=j/100;rows.push(row(d2(pp),"1 − F("+n+"; "+d2(pp)+"; "+(k-1)+")",P(pp),P(pp)>=q-1e-12,j===r));
+        }
+        txt="Kleinstes p: <strong>p = "+d2(r/100)+"</strong>, denn "+nb("P(X ≥ "+k+") = 1 − F("+n+"; "+d2(r/100)+"; "+(k-1)+") ≈ "+d4(P(r/100)))+" ≥ "+qs+".";
+      }
+    }
+    tb.innerHTML=rows.join("");
+    res.innerHTML=txt+" So wird es auch in der Lösung notiert, nicht in Rechnerschreibweise.";
+  }
+  [sel,qIn].forEach(el=>el.addEventListener("input",calc));
+  box.addEventListener("toggle",calc);
+  ["nR","nN","pR","pN","kR","kN"].forEach(id=>{const el=document.getElementById(id);if(el){el.addEventListener("input",calc);el.addEventListener("change",calc);}});
+})();
+</script>
 
 <script>
 const $=id=>document.getElementById(id);

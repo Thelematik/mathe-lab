@@ -143,7 +143,7 @@ footer{border-top:1px solid var(--line);padding:16px 0 26px;font-size:.85rem;col
 <header>
   <div class="wrap">
     <div class="top">
-      <span class="eyebrow">E-Phase · Analysis · Ableitung</span>
+      <span class="eyebrow">E.2 Einführung des Ableitungsbegriffs · Analysis</span>
       <div class="tools" role="group" aria-label="Ansicht">
         <button type="button" class="btn" id="themeBtn" aria-pressed="false">Dunkler Modus</button>
         <button type="button" class="btn" id="fsm" title="Schrift kleiner" aria-label="Schrift kleiner">A−</button>
@@ -186,8 +186,8 @@ footer{border-top:1px solid var(--line);padding:16px 0 26px;font-size:.85rem;col
         <li class="key"><span class="year">um 1630</span><span>Pierre de Fermat entwickelt ein Verfahren für Extremwerte und Tangenten: Er verschiebt eine Stelle um eine kleine Größe E, vereinfacht und lässt E danach weg. Das ist im Kern die h-Methode.</span></li>
         <li><span class="year">1637</span><span>René Descartes stellt in „La Géométrie“ eine eigene Methode vor, bei der er Kreise an die Kurve legt.</span></li>
         <li class="key"><span class="year">1665</span><span class="tl-pic"><span>Isaac Newton entwickelt seine „Fluxionenrechnung“, mit der er Änderungsraten wie Geschwindigkeiten berechnet. Er veröffentlicht sie erst viel später.</span><figure><img src="bilder/newton-kneller-1689.jpg" loading="lazy" width="300" height="361" alt="Porträt von Isaac Newton mit langem grauem Haar und braunem Mantel"><figcaption>Isaac Newton, Gemälde von Godfrey Kneller (1689). Gemeinfrei, Wikimedia Commons.</figcaption></figure></span></li>
-        <li class="key"><span class="year">1684</span><span class="tl-pic"><span>Gottfried Wilhelm Leibniz veröffentlicht als Erster eine Differentialrechnung. Von ihm stammt die Schreibweise <span class="m">\frac{dy}{dx}</span>, die wir noch heute benutzen.</span><figure><img src="bilder/leibniz-francke-1695.jpg" loading="lazy" width="300" height="370" alt="Porträt von Gottfried Wilhelm Leibniz mit großer dunkler Lockenperücke und braunem Umhang"><figcaption>Gottfried Wilhelm Leibniz, Gemälde von Christoph Bernhard Francke (um 1695). Gemeinfrei, Wikimedia Commons.</figcaption></figure></span></li>
-        <li><span class="year">ab 1700</span><span>Zwischen Newton und Leibniz entbrennt ein heftiger Streit, wer die Differentialrechnung zuerst erfunden hat. Heute gilt: beide unabhängig voneinander.</span></li>
+        <li class="key"><span class="year">1684</span><span class="tl-pic"><span>Gottfried Wilhelm Leibniz veröffentlicht als Erster eine Differenzialrechnung. Von ihm stammt die Schreibweise <span class="m">\frac{dy}{dx}</span>, die wir noch heute benutzen.</span><figure><img src="bilder/leibniz-francke-1695.jpg" loading="lazy" width="300" height="370" alt="Porträt von Gottfried Wilhelm Leibniz mit großer dunkler Lockenperücke und braunem Umhang"><figcaption>Gottfried Wilhelm Leibniz, Gemälde von Christoph Bernhard Francke (um 1695). Gemeinfrei, Wikimedia Commons.</figcaption></figure></span></li>
+        <li><span class="year">ab 1700</span><span>Zwischen Newton und Leibniz entbrennt ein heftiger Streit, wer die Differenzialrechnung zuerst erfunden hat. Heute gilt: beide unabhängig voneinander.</span></li>
         <li><span class="year">1821</span><span>Augustin-Louis Cauchy fasst den Grenzwertbegriff genauer. Damit bekommt das „unendlich kleine“ E von Fermat und Leibniz ein sicheres Fundament.</span></li>
       </ol>
     </div>
@@ -347,10 +347,21 @@ footer{border-top:1px solid var(--line);padding:16px 0 26px;font-size:.85rem;col
     <div class="merk"><strong>Merke</strong>
       <ul style="margin:.4rem 0 0;padding-left:1.2rem">
         <li>Der <strong>Differenzenquotient</strong> ist die Steigung einer Sekante, also eine mittlere Änderungsrate.</li>
-        <li>Sein Grenzwert heißt <strong>Differentialquotient</strong> oder <strong>Ableitung</strong> <span class="m">f'(x_0)</span>. Er ist die Steigung der Tangente, also die lokale Änderungsrate.</li>
+        <li>Sein Grenzwert heißt <strong>Differenzialquotient</strong> oder <strong>Ableitung</strong> <span class="m">f'(x_0)</span>. Er ist die Steigung der Tangente, also die lokale Änderungsrate.</li>
         <li>Beide Methoden liefern dasselbe, denn mit <span class="m">x=x_0+h</span> geht die eine in die andere über.</li>
         <li>Wichtig: Man darf <span class="m">h=0</span> nicht einfach einsetzen, denn dann steht <span class="m">\frac{0}{0}</span> da. Erst kürzen, dann den Grenzwert bilden.</li>
       </ul>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="card">
+      <h3>Tangente und Normale</h3>
+      <p>Mit der Ableitung lässt sich die Gleichung der <strong>Tangente</strong> im Punkt <span class="m">P(x_0\,|\,f(x_0))</span> aufstellen. Die <strong>Normale</strong> steht im Punkt P senkrecht auf der Tangente. Ihre Steigung ist deshalb der negative Kehrwert der Tangentensteigung.</p>
+      <div class="formula" data-tex="t(x)=f'(x_0)\cdot(x-x_0)+f(x_0)"></div>
+      <div class="formula" data-tex="n(x)=-\frac{1}{f'(x_0)}\cdot(x-x_0)+f(x_0)\quad\text{für }f'(x_0)\neq 0"></div>
+      <p>Beispiel Stein: Für <span class="m">f(x)=5x^2</span> und <span class="m">x_0=1</span> gilt <span class="m">f(1)=5</span> und <span class="m">f'(1)=10</span>.</p>
+      <div class="formula" data-tex="\begin{gathered}t(x)=10\cdot(x-1)+5=10x-5\\ n(x)=-\tfrac{1}{10}\cdot(x-1)+5=-0{,}1x+5{,}1\end{gathered}"></div>
     </div>
   </div>
 
@@ -632,6 +643,7 @@ const QUIZ=[
   {q:"Was gibt der Differenzenquotient geometrisch an?",o:["Die Steigung der Sekante durch zwei Punkte des Graphen","Die Steigung der Tangente","Den Abstand der beiden Punkte"],r:0,fb:"Der Differenzenquotient ist Δy/Δx für zwei Punkte, also die Steigung der Sekante. Erst sein Grenzwert ist die Tangentensteigung."},
   {q:"Warum darf man in (f(x₀+h) − f(x₀))/h nicht einfach h = 0 einsetzen?",o:["Weil dann 0/0 entsteht, was nicht definiert ist","Weil h immer positiv sein muss","Weil f(x₀) dann nicht existiert"],r:0,fb:"Zähler und Nenner würden 0. Deshalb wird zuerst umgeformt und gekürzt, danach der Grenzwert gebildet."},
   {q:"Für f(x) = x² ergibt die h-Methode an der Stelle 3 den Term 6 + h. Was ist f′(3)?",o:["6","6 + h","9"],r:0,fb:"Für h gegen 0 strebt 6 + h gegen 6. Also hat die Tangente an der Stelle 3 die Steigung 6."},
+  {q:"Die Tangente an den Graphen von f hat im Punkt P die Steigung 4. Welche Steigung hat die Normale in P?",o:["−0,25","−4","0,25"],r:0,fb:"Die Normale steht senkrecht auf der Tangente, ihre Steigung ist der negative Kehrwert: −1/4 = −0,25."},
   {q:"Wie hängen x-Methode und h-Methode zusammen?",o:["Mit x = x₀ + h geht die eine in die andere über, beide liefern dasselbe","Die x-Methode liefert genauere Werte","Die h-Methode funktioniert nur für Parabeln"],r:0,fb:"Der Abstand x − x₀ ist genau h. Beide Schreibweisen beschreiben dieselbe Sekante und denselben Grenzwert."},
   {q:"Beim Stein mit s(t) = 5t² ist die Durchschnittsgeschwindigkeit zwischen 1 s und 1,01 s 10,05 m/s. Was ist die Momentangeschwindigkeit nach 1 s?",o:["10 m/s","10,05 m/s","5 m/s"],r:0,fb:"Die Durchschnittsgeschwindigkeiten nähern sich 10 m/s, das ist die Steigung der Tangente an der Stelle 1."}
 ];

@@ -11,6 +11,11 @@ Materialsammlung „Mathematik zum Ausprobieren“ von S. Thel (Hohe Landesschul
 - Hypothesentests: Nullhypothese, soweit fachlich richtig, mit Gleichheitszeichen (H₀: p = p₀). B(n; p) und F(n; p; k) nie über einen Zeilenumbruch trennen. Für die Prüfung auf Binomialverteilung genügen zwei Bedingungen (genau zwei Ausgänge, konstantes p).
 - Ableitung: x-Methode oder h-Methode wählbar, nicht beide gleichzeitig.
 
+## Bezug zum Kerncurriculum
+- Maßgeblich ist der KCGO Mathematik (Ausgabe 2024). Fachbegriffe und Schreibweisen wie dort, z. B. Trefferwahrscheinlichkeit, Zufallsgröße, Verwerfungsbereich, Differenzialquotient, eulersche Zahl.
+- Jedes Oberstufen-Tool zeigt in der Kopfzeile die Themenfeldnummer (z. B. „E.2 Einführung des Ableitungsbegriffs“, „Q3.2 Wahrscheinlichkeitsverteilungen“) und enthält einen Hinweis für Lehrkräfte mit KCGO-Bezug. Kacheln bleiben ohne Jahrgangsangabe.
+- Rechnerspezifische Schreibweisen (z. B. binomcdf) in Lösungen vermeiden, stattdessen mathematisch notieren, z. B. P(X ≤ k) = F(n; p; k).
+
 ## Ablauf
 - Neue Tools entstehen zuerst als Claude-Artefakt. Auf GitHub kommen sie erst, wenn Steffen es ausdrücklich sagt, dann immer mit Kachel auf der Startseite (`index.html`, Liste `INHALTE`).
 - Änderungen an einem Tool werden auf GitHub **und** im zugehörigen Claude-Artefakt gemacht, sofern es ein Artefakt gibt.

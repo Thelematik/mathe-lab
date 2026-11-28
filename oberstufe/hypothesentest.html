@@ -488,7 +488,7 @@ const CTX=[
 const TASKS=[
  {type:'R',p0:'0,70',text:'Ein Pharmaunternehmen behauptet, dass ein neues Medikament bei mehr als 70 % der Patienten die Symptome lindert. Bisher half das Standardmedikament genau 70 % der Betroffenen. Zur Überprüfung wird eine Stichprobe von 150 Patienten untersucht.',
   X:'Anzahl der Patienten in der Stichprobe, bei denen das neue Medikament die Symptome lindert.',pT:'Wahrscheinlichkeit dafür, dass das neue Medikament bei einem Patienten die Symptome lindert.',
-  bern:'Ja, da es für jeden Patienten zwei Ausgänge gibt (Linderung / keine Linderung), die Patienten unabhängig voneinander behandelt werden und die Erfolgswahrscheinlichkeit p als konstant angenommen werden kann.',
+  bern:'Ja, da es für jeden Patienten zwei Ausgänge gibt (Linderung / keine Linderung), die Patienten unabhängig voneinander behandelt werden und die Trefferwahrscheinlichkeit p als konstant angenommen werden kann.',
   why:'Das Unternehmen möchte nachweisen, dass das neue Medikament bei mehr als 70 % der Patienten hilft, also p > 0,70.'},
  {type:'L',p0:'0,15',text:'Ein Online-Händler hatte bisher eine Retourenquote von 15 %. Nach einer Umstellung des Verpackungsdesigns vermutet der Logistikleiter, dass die Retourenquote gesunken ist. Es werden 500 Bestellungen ausgewertet.',
   X:'Anzahl der retournierten Bestellungen in der Stichprobe.',pT:'Wahrscheinlichkeit dafür, dass eine Bestellung retourniert wird.',
@@ -528,7 +528,7 @@ const TASKS=[
   why:'Vermutet wird, dass die Buchungswahrscheinlichkeit gestiegen ist, also p > 0,75.'},
  {type:'L',p0:'0,20',text:'Ein Callcenter hat eine Erfolgsquote von 20 % bei Kaltakquise-Anrufen. Nach einer Änderung des Telefon-Leitfadens befürchten einige Mitarbeiter, dass die Erfolgsquote gesunken ist. Der Teamleiter lässt eine Stichprobe von 250 Anrufen auswerten.',
   X:'Anzahl der erfolgreichen Telefonate in der Stichprobe.',pT:'Wahrscheinlichkeit dafür, dass ein Kaltakquise-Anruf erfolgreich ist.',
-  bern:'Ja, da jeder Anruf entweder erfolgreich ist oder nicht, die Telefonate unabhängig voneinander geführt werden und die Erfolgswahrscheinlichkeit p konstant bleibt.',
+  bern:'Ja, da jeder Anruf entweder erfolgreich ist oder nicht, die Telefonate unabhängig voneinander geführt werden und die Trefferwahrscheinlichkeit p konstant bleibt.',
   why:'Die Mitarbeiter befürchten, dass die Erfolgsquote gesunken ist, also p < 0,20.'},
  {type:'Z',p0:'0,60',text:'Ein Energieversorger weiß aus den Vorjahren, dass genau 60 % der Kunden ihre Stromrechnung per Lastschrift bezahlen. Aufgrund von Änderungen im Online-Portal wird vermutet, dass sich dieser Anteil verändert hat. Es werden 400 Kundenkonten zufällig überprüft.',
   X:'Anzahl der Kunden in der Stichprobe, die per Lastschrift bezahlen.',pT:'Wahrscheinlichkeit dafür, dass ein Kunde per Lastschrift bezahlt.',

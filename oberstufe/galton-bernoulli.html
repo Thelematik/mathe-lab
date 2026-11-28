@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Galton-Brett und Bernoulli-Formel</title>
+<title>Galton-Brett und Formel von Bernoulli</title>
 <link rel="stylesheet" href="../assets/lib/katex/katex.min.css">
 <script defer src="../assets/lib/katex/katex.min.js"></script>
 <link rel="stylesheet" href="../assets/fonts/fonts.css">
@@ -45,6 +45,7 @@ code,kbd,samp,pre{font-family:"Source Code Pro", ui-monospace, monospace}
     display:grid; grid-template-rows:auto 1fr; height:100vh;
   }
   header{padding:12px 22px 6px}
+  header .kc{margin:0 0 2px;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
   header h1{margin:0;font-size:1.45rem;font-weight:650}
   header p{margin:2px 0 0;color:var(--muted);font-size:.95rem;text-wrap:pretty}
   header h1{text-wrap:balance}
@@ -113,6 +114,7 @@ code,kbd,samp,pre{font-family:"Source Code Pro", ui-monospace, monospace}
 </head>
 <body>
 <header>
+  <p class="kc">Q3.2 Wahrscheinlichkeitsverteilungen · Bernoulli-Ketten</p>
   <h1>Galton-Brett: Bernoulli-Kette und Binomialverteilung</h1>
   <p>An jedem Nagel wird die Kugel mit Wahrscheinlichkeit p nach rechts und mit 1&minus;p nach links abgelenkt. Sie landet in Fach k, wenn sie genau k-mal nach rechts fällt.</p>
   <p class="links"><button type="button" id="themeBtn" class="themebtn">Dunkel</button><a href="arbeitsblaetter/galton-bernoulli.pdf" target="_blank" rel="noopener">Arbeitsblatt „Vom Galton-Brett zur Formel von Bernoulli“ (PDF)</a><a href="galton-brett.html">Zurück zu Simulation 1: Binomialkoeffizient</a></p>
@@ -154,7 +156,7 @@ code,kbd,samp,pre{font-family:"Source Code Pro", ui-monospace, monospace}
     </div>
     <label class="check"><input type="checkbox" id="chkPascal"> Pascalsches Dreieck anzeigen</label>
 
-    <h2>Bernoulli-Formel</h2>
+    <h2>Formel von Bernoulli</h2>
     <label class="check" style="margin:0 0 8px"><input type="checkbox" id="chkFormula"> Formeln anzeigen</label>
     <div id="formulaHidden" class="hiddenNote">Die Formeln sind ausgeblendet. Leite die Formel zuerst selbst her und blende sie dann zur Kontrolle ein.</div>
     <div id="formulaBox" style="display:none">
