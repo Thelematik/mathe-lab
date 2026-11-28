@@ -78,6 +78,35 @@ h3{font-size:1rem;margin:.2rem 0 .5rem}
 .stepctl{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.9rem;padding-top:.8rem;border-top:1px solid var(--line)}
 .nw{white-space:nowrap}
 /* Laplace */
+.lp-step{display:grid;grid-template-columns:2.1rem minmax(0,1fr);gap:.8rem;padding:0 0 1rem;margin-bottom:1rem;border-bottom:1px solid var(--line)}
+.lp-step:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}
+.lp-num{width:2.1rem;height:2.1rem;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-family:"Source Code Pro",ui-monospace,monospace}
+.lp-step h2{margin:.25rem 0 .7rem}
+.lp-step .row:last-child{margin-bottom:0}
+.lp-sub{background:var(--panel2);border-radius:12px;padding:.6rem .75rem;margin:-.1rem 0 0}
+.lp-sub .row{margin-bottom:.4rem}
+.lp-own{margin-top:.2rem;font-size:.92rem}
+.lp-own summary{cursor:pointer;color:var(--accent);font-weight:600}
+.lp-own .row{margin:.5rem 0 0}
+.lp-hint{margin:.2rem 0 0}
+.lp-rows{display:flex;flex-direction:column;gap:.7rem}
+.lp-row{display:grid;grid-template-columns:9.2rem minmax(0,1fr);gap:.3rem 1rem;align-items:baseline;padding:.75rem .9rem;border:1px solid var(--line);border-radius:12px;font-size:1.08rem;line-height:1.6}
+.lp-row .lp-lab{font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;font-weight:700;color:var(--accent)}
+.lp-row.c .lp-lab{color:var(--comp)}
+.lp-row.p{background:var(--soft);border-color:var(--accent)}
+.lp-row.chk{border-color:color-mix(in srgb,var(--ok) 45%,var(--line))}
+.lp-row.chk .lp-lab{color:var(--ok)}
+.lp-row.bad{background:var(--warn-bg);border-color:var(--warn);color:var(--warn)}
+.lp-row.bad .lp-lab{color:var(--warn)}
+.lp-row.empty{color:var(--muted);border-style:dashed}
+.lp-row p{margin:0}
+.lp-row p+p{margin-top:.3rem}
+.lp-fx{display:flex;flex-wrap:wrap;align-items:center;gap:.25rem .4rem}
+.lp-fx>span{white-space:nowrap}
+.cnt{display:inline-grid;place-items:center;min-width:1.8rem;height:1.8rem;padding:0 .4rem;border-radius:8px;background:var(--panel2);border:2px solid var(--line);font-weight:700;font-family:"Source Code Pro",ui-monospace,monospace}
+.cnt.hl{background:var(--hl-soft);border-color:var(--hl)}
+.hlbg{background:var(--hl-soft);border-radius:5px;padding:0 .2em}
+@media(max-width:560px){.lp-row{grid-template-columns:1fr}.lp-step{grid-template-columns:1fr}.lp-num{display:none}#lp-vis .tiles{gap:.5rem}#lp-vis .tile{width:76px;height:76px}#lp-vis .tiles.muenze .tile{width:104px;height:104px}#lp-vis .tiles.urne .tile{width:64px;height:64px}#lp-vis .face{font-size:1.9rem;margin-top:.55rem}#lp-vis .fnum{font-size:.6rem}}
 .tiles{display:flex;flex-wrap:wrap;gap:.7rem;margin:.4rem 0 1rem}
 .tile{position:relative;width:86px;height:86px;border-radius:16px;border:3px solid var(--line);background:var(--panel2);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.2rem;padding:0;transition:transform .15s,border-color .15s,background .15s}
 .tile:hover{transform:translateY(-2px)}
@@ -172,12 +201,20 @@ h3{font-size:1rem;margin:.2rem 0 .5rem}
   </div>
   <div class="grid2">
     <div class="card">
-      <h2>Zufallsgerät und Ereignis</h2>
-      <div class="row" id="lp-devs"></div>
-      <div id="lp-extra"></div>
-      <div id="lp-vis"></div>
-      <div class="row" id="lp-pre"></div>
-      <p class="muted small" style="margin:0">Tippe auf einzelne Ergebnisse, um ein eigenes Ereignis E zusammenzustellen.</p>
+      <div class="lp-step"><div class="lp-num">1</div><div class="lp-body">
+        <h2>Zufallsgerät wählen</h2>
+        <div class="row" id="lp-devs"></div>
+        <div id="lp-extra"></div>
+      </div></div>
+      <div class="lp-step"><div class="lp-num">2</div><div class="lp-body">
+        <h2>Alle möglichen Ergebnisse</h2>
+        <div id="lp-vis"></div>
+      </div></div>
+      <div class="lp-step"><div class="lp-num">3</div><div class="lp-body">
+        <h2>Ereignis E festlegen</h2>
+        <div class="row" id="lp-pre"></div>
+        <p class="muted small lp-hint">Du kannst auch oben einzelne Ergebnisse antippen und so ein eigenes Ereignis zusammenstellen.</p>
+      </div></div>
     </div>
     <div class="card">
       <h2>Rechnung</h2>
@@ -449,13 +486,13 @@ function wheelSVG(o,{sel=new Set(),click=false,size=310}={}){
 function renderLaplace(){
   $('#lp-devs').innerHTML=DEVS.map(([k,n])=>`<button class="btn ${LP.dev===k?'on':''}" data-dev="${k}">${n}</button>`).join('');
   let ex='';
-  if(LP.dev==='rad')ex=`<div class="row"><span>Anzahl gleich großer Felder:</span><button class="btn sm" data-rad="-1">−</button><b>${LP.rad}</b><button class="btn sm" data-rad="1">+</button></div>`;
-  if(LP.dev==='urne')ex=`<div class="row">${counters('lp',KUG,LP.urn)}</div>`;
-  if(LP.dev==='sonder')ex=`<div class="row"><span>Beschriftung:</span>${FACE_PRESETS.map(p=>`<button class="btn sm ${LP.faces.join(' ')===p?'on':''}" data-faces="${p}">${p}</button>`).join('')}</div>
-    <div class="row"><input class="inp" id="lp-faces" value="${LP.faces.join(' ')}" size="16" aria-label="Eigene Beschriftung"><button class="btn sm" data-facesapply>übernehmen</button><span class="muted small" id="lp-faceerr">6 Zeichen, durch Leerzeichen getrennt</span></div>`;
+  if(LP.dev==='rad')ex=`<div class="lp-sub"><div class="row"><span>Anzahl gleich großer Felder:</span><button class="btn sm" data-rad="-1" aria-label="ein Feld weniger">−</button><b class="cnt">${LP.rad}</b><button class="btn sm" data-rad="1" aria-label="ein Feld mehr">+</button></div></div>`;
+  if(LP.dev==='urne')ex=`<div class="lp-sub"><div class="row">${counters('lp',KUG,LP.urn)}</div></div>`;
+  if(LP.dev==='sonder')ex=`<div class="lp-sub"><div class="row"><span>Beschriftung:</span>${FACE_PRESETS.map(p=>`<button class="btn sm ${LP.faces.join(' ')===p?'on':''}" data-faces="${p}">${p}</button>`).join('')}</div>
+    <details class="lp-own"><summary>Eigene Beschriftung eingeben</summary><div class="row"><input class="inp" id="lp-faces" value="${LP.faces.join(' ')}" size="14" aria-label="Eigene Beschriftung"><button class="btn sm" data-facesapply>übernehmen</button></div><div class="muted small" id="lp-faceerr" style="margin-top:.3rem">6 Zeichen, durch Leerzeichen getrennt</div></details></div>`;
   $('#lp-extra').innerHTML=ex;
   lpVisual();
-  $('#lp-pre').innerHTML=`<span class="muted">Ereignis E:</span>`+lpPresets().map(p=>`<button class="btn ${LP.ev===p.name?'on':''}" data-pre="${p.name}">${p.name}</button>`).join('')+`<button class="btn" data-pre="">leeren</button>`;
+  $('#lp-pre').innerHTML=lpPresets().map(p=>`<button class="btn ${LP.ev===p.name?'on':''}" data-pre="${p.name}">${p.name}</button>`).join('')+(LP.sel.size?`<button class="btn" data-pre="">Auswahl löschen</button>`:'');
   lpCalc();
 }
 function lpVisual(){
@@ -471,25 +508,34 @@ function lpCalc(){
   const o=lpOut(),E=o.filter(x=>LP.sel.has(x.id)),NE=o.filter(x=>!LP.sel.has(x.id)),W=sum(o.map(x=>x.w)),We=sum(E.map(x=>x.w));
   const set=a=>a.length?`{${a.map(x=>x.lab).join(', ')}}`:'{ }';
   const evn=LP.ev?` „${LP.ev}“`:'';
+  const row=(cls,lab,body)=>`<div class="lp-row ${cls}"><div class="lp-lab">${lab}</div><div>${body}</div></div>`;
   const L=[];
-  L.push(`<div class="line"><span class="tag">Ergebnisse</span> Ω = ${set(o)} <span class="muted">→ ${o.length} mögliche Ergebnisse</span></div>`);
-  L.push(`<div class="line"><span class="tag">Ereignis</span> E${evn} = ${set(E)} <span class="muted">→ ${E.length} günstige Ergebnisse</span></div>`);
-  let pE;
-  if(LP.dev==='radu'){
-    pE=new Fr(We,W).red();
-    L.push(`<div class="warn"><b>Achtung, kein Laplace-Experiment!</b> Die Felder sind unterschiedlich groß, die Ergebnisse sind also nicht gleich wahrscheinlich. Bloßes Abzählen ergäbe ${F(new Fr(E.length,o.length).red())}, das ist hier falsch.</div>`);
-    L.push(`<div class="line"><span class="tag">Richtig</span> Feld 1 ist ein halber Kreis, Feld 2 und Feld 3 sind je ein Viertelkreis. P(E) = ${E.length>1?E.map(x=>F(new Fr(x.w,W).red())).join(' + ')+' = ':''}<span class="result">${R(pE)}</span></div>`);
-  }else{
+  const lap=LP.dev!=='radu';
+  if(lap){
     const why={wuerfel:'Fairer Würfel: Jede Augenzahl ist gleich wahrscheinlich.',sonder:'Jede der 6 Seiten ist gleich wahrscheinlich. Gleiche Beschriftungen auf verschiedenen Seiten werden einzeln gezählt.',muenze:'Faire Münze: Kopf und Zahl sind gleich wahrscheinlich.',rad:'Alle Felder sind gleich groß, also gleich wahrscheinlich.',urne:'Jede einzelne Kugel wird mit gleicher Wahrscheinlichkeit gezogen. Deshalb werden die Kugeln nummeriert.'}[LP.dev];
-    L.push(`<div class="line"><span class="ok">✓ Laplace-Experiment.</span> ${why}</div>`);
+    L.push(row('chk','Prüfen',`<p><span class="ok">✓ Laplace-Experiment.</span> ${why}</p>`));
+  }else{
+    L.push(row('bad','Prüfen',`<p><b>Kein Laplace-Experiment!</b> Die Felder sind unterschiedlich groß, die Ergebnisse sind also nicht gleich wahrscheinlich. Hier darf man nicht einfach abzählen.</p>`));
+  }
+  L.push(row('','Mögliche Ergebnisse',`<p>Ω = ${set(o)}</p><p><span class="cnt">${o.length}</span> mögliche Ergebnisse</p>`));
+  if(!E.length&&!LP.ev){
+    L.push(row('empty','Ereignis',`<p>Lege links in Schritt 3 ein Ereignis E fest.</p>`));
+    $('#lp-calc').innerHTML=`<div class="lp-rows">${stepped('lp',L)}</div>`;return;
+  }
+  const note=!E.length?' <span class="muted">(unmögliches Ereignis)</span>':!NE.length?' <span class="muted">(sicheres Ereignis)</span>':'';
+  L.push(row('','Günstige Ergebnisse',`<p>E${evn} = <span class="hlbg">${set(E)}</span></p><p><span class="cnt hl">${E.length}</span> günstige Ergebnisse${note}</p>`));
+  let pE;
+  if(lap){
     pE=new Fr(E.length,o.length);
-    let note='';if(!E.length)note=`<span class="muted">(unmögliches Ereignis)</span>`;else if(!NE.length)note=`<span class="muted">(sicheres Ereignis)</span>`;
-    L.push(`<div class="line"><span class="tag">Laplace</span> P(E) = ${T('Anzahl der günstigen Ergebnisse','Anzahl aller möglichen Ergebnisse')} = <span class="result">${chain(pE)}</span> ${note}</div>`);
+    L.push(row('p','Wahrscheinlichkeit',`<div class="lp-fx"><span>P(E) = ${T('günstige Ergebnisse','mögliche Ergebnisse')}</span><span>= <span class="result">${chain(pE)}</span></span></div>`));
     pE=pE.red();
+  }else{
+    pE=new Fr(We,W).red();
+    L.push(row('p','Wahrscheinlichkeit',`<p>Feld 1 ist ein halber Kreis, Feld 2 und Feld 3 sind je ein Viertelkreis.</p><div class="lp-fx"><span>P(E) =</span>${E.length>1?`<span>${E.map(x=>F(new Fr(x.w,W).red())).join(' + ')}</span><span>=</span>`:''}<span class="result">${R(pE)}</span></div><p class="muted small">Bloßes Abzählen ergäbe ${F(new Fr(E.length,o.length).red())}, das ist hier falsch.</p>`));
   }
   const pc=new Fr(pE.d-pE.n,pE.d);
-  L.push(`<div class="line"><span class="tag tc">Gegenereignis</span> <span class="ov">E</span> = ${set(NE)} &nbsp; P(<span class="ov">E</span>) = 1 − P(E) = 1 − ${F(pE)} = <span class="result">${R(pc)}</span></div>`);
-  $('#lp-calc').innerHTML=stepped('lp',L);
+  L.push(row('c','Gegenereignis',`<p><span class="ov">E</span> = ${set(NE)}</p><div class="lp-fx"><span>P(<span class="ov">E</span>) = 1 − P(E)</span><span>= 1 − ${F(pE)}</span><span>= <span class="result">${R(pc)}</span></span></div>`));
+  $('#lp-calc').innerHTML=`<div class="lp-rows">${stepped('lp',L)}</div>`;
 }
 
 /* =========================================================
@@ -1024,7 +1070,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='lp-fa
   let t=null;try{t=localStorage.getItem('wa-theme')}catch(e){}
   if(!t)t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
   setTheme(t);
-  LP.sel=new Set(['f1','f2','f4']);LP.ev=null;
+  LP.sel=new Set(['f1','f2','f4']);LP.ev='Vokal';
   P4.ev='undKA';P4.sel=keysOf(p4Tree(),p4Events().find(x=>x.id==='undKA'));
   go(location.hash.slice(1));
 })();
