@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>W2: Dreieckskonstruktionen (Erklärvideo)</title>
+<link rel="stylesheet" href="../assets/fonts/fonts.css">
+<style id="typo-basis">
+/* Platz für die Scrollleiste immer freihalten, damit nichts springt, wenn die Seite länger wird */
+html{scrollbar-gutter:stable}
+/* Einheitliche Schriften: Text Source Sans 3, Überschriften Source Serif 4, Zahlen Source Code Pro */
+html{font-size:20px}
+body{font-family:"Source Sans 3", system-ui, sans-serif}
+h1,h2,h3{font-family:"Source Serif 4", Georgia, serif}
+button,input,select,textarea{font-family:inherit}
+code,kbd,samp,pre{font-family:"Source Code Pro", ui-monospace, monospace}
+</style>
+<style>
+  :root {
+    --ink: #1f3a5f;
+    --ink-soft: #4a6489;
+    --paper: #fbfaf6;
+    --grid: #e3e8ef;
+    --margin: #d9534f;
+    --card: #ffffff;
+    --line: #d6dde6;
+    --erklaerung: #2a6fb0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    background-color: var(--paper);
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 22px 22px;
+    line-height: 1.5;
+  }
+  header {
+    background: var(--paper);
+    border-bottom: 2px solid var(--margin);
+    padding: 2rem 1.25rem 1.4rem;
+  }
+  .wrap { max-width: 1000px; margin: 0 auto; }
+  h1 { font-size: clamp(1.5rem, 4vw, 2.2rem); margin: 0 0 .3rem; text-wrap: balance; }
+  .sub { margin: 0; color: var(--ink-soft); }
+  main { padding: 1.5rem 1.25rem 3rem; }
+  .player {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: .6rem;
+    box-shadow: 0 1px 3px rgba(31,58,95,.06);
+  }
+  video { display: block; width: 100%; height: auto; border-radius: 8px; background: #faf7f0; }
+  .info {
+    margin-top: 1.4rem;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+  }
+  .info h2 { font-size: 1.2rem; margin: 0 0 .5rem; }
+  .info ol { margin: 0; padding-left: 1.3rem; }
+  .info li { margin: .2rem 0; }
+  .hint { margin: .8rem 0 0; color: var(--ink-soft); font-size: .92rem; }
+  footer {
+    border-top: 1px solid var(--line);
+    background: var(--paper);
+    padding: 1.2rem 1.25rem;
+    font-size: .85rem;
+    color: var(--ink-soft);
+  }
+  footer a { color: var(--ink); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>W2: Dreiecke konstruieren mit Zirkel und Geodreieck</h1>
+    <p class="sub">Erklärvideo, etwa 11 Minuten, ohne Ton · mit Aufgaben W2 aus dem Mathematik-Wettbewerb Hessen</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="player">
+    <video controls preload="metadata" playsinline poster="videos/dreieckskonstruktionen.jpg">
+      <source src="videos/dreieckskonstruktionen.mp4" type="video/mp4">
+      Dein Browser kann dieses Video nicht abspielen.
+      <a href="videos/dreieckskonstruktionen.mp4">Video herunterladen</a>
+    </video>
+  </div>
+
+  <div class="info">
+    <h2>Das lernst du im Video</h2>
+    <ol>
+      <li>Vor dem Konstruieren: Angaben farbig markieren und eine Planfigur skizzieren</li>
+      <li>Die Kongruenzsätze SSS, SWS, WSW und SsW an Beispielen</li>
+      <li>Konstruktionen mit Höhen, Seitenhalbierenden und Winkelhalbierenden</li>
+      <li>Wettbewerbsaufgaben W2 aus den Jahren 2024/25 und 2025/26 Schritt für Schritt</li>
+    </ol>
+    <p class="hint">Tipp: Lege Zirkel, Geodreieck und einen spitzen Bleistift bereit. Halte das Video nach jedem Schritt an und konstruiere selbst mit.</p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    Verantwortlich: S. Thel ·
+    <a href="../impressum.html">Impressum</a> ·
+    <a href="mathewettbewerb-8.html">Zur Wettbewerbsvorbereitung</a> ·
+    <a href="../">Zur Übersicht</a> ·
+    Diese Seite verwendet keine Cookies und überträgt keine Daten an Dritte.
+  </div>
+</footer>
+
+<script src="../assets/zur-uebersicht.js" defer></script>
+</body>
+</html>
