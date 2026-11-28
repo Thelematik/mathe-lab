@@ -50,6 +50,7 @@ header p{margin:4px 0 0;color:var(--muted)}
 #invBox summary{cursor:pointer;font-weight:700}
 #invTb tr.on td{font-weight:700}
 .invres{margin:10px 0 0;line-height:1.5}
+@media (max-width:480px){#invBox table{font-size:.78rem}#invBox th,#invBox td{padding:4px 4px}}
 .main{display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start}
 @media (max-width:860px){.main{grid-template-columns:1fr}}
 .panel{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
@@ -57,9 +58,10 @@ header p{margin:4px 0 0;color:var(--muted)}
 .field label{display:flex;justify-content:space-between;align-items:baseline;font-weight:700}
 .field label .sym{font-family:var(--display);font-style:italic;font-size:1.2rem}
 .field .hint{font-weight:400;color:var(--muted);font-size:.85rem}
-.row{display:flex;gap:10px;align-items:center}
+.row{display:grid;grid-template-columns:minmax(0,1fr) 5.8em;gap:10px;align-items:center}
+.row input{min-width:0;width:100%}
 input[type=range]{flex:1;min-width:0;accent-color:var(--ink);height:28px}
-input[type=number],select{font:inherit;font-family:var(--mono);width:5.2em;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg)}
+input[type=number],select{box-sizing:border-box;max-width:100%;font:inherit;font-family:var(--mono);width:5.8em;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg)}
 select{width:100%;font-family:var(--body)}
 input:focus-visible,select:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .check{display:flex;gap:8px;align-items:center;font-size:.92rem;color:var(--muted)}
@@ -210,7 +212,7 @@ tr.on td{background:var(--hit-soft)}
           <input type="number" id="invQ" min="0.01" max="0.99" step="0.01" value="0.9">
         </div>
       </div>
-      <div class="tbl"><table><thead><tr><th id="invHead">k</th><th>Wahrscheinlichkeit</th><th>Bedingung</th></tr></thead><tbody id="invTb"></tbody></table></div>
+      <div class="tbl"><table><thead><tr><th id="invHead">k</th><th>Wahrscheinlichkeit</th><th>erfüllt?</th></tr></thead><tbody id="invTb"></tbody></table></div>
       <p class="invres" id="invRes"></p>
     </details>
   </section>
@@ -225,7 +227,7 @@ tr.on td{background:var(--hit-soft)}
   const d2=x=>x.toFixed(2).replace(".",",");
   const cumF=(n,p,k)=>{if(k<0)return 0;const a=pmf(n,p);let s=0;for(let i=0;i<=Math.min(k,n);i++)s+=a[i];return Math.min(1,s);};
   function row(v,expr,val,ok,hit){
-    return '<tr'+(hit?' class="on"':'')+'><td>'+v+'</td><td>'+nb(expr)+' ≈ '+d4(val)+'</td><td>'+(ok?'erfüllt':'nicht erfüllt')+'</td></tr>';
+    return '<tr'+(hit?' class="on"':'')+'><td>'+v+'</td><td>'+nb(expr)+' ≈ '+d4(val)+'</td><td>'+(ok?'ja':'nein')+'</td></tr>';
   }
   function calc(){
     if(!box.open)return;
